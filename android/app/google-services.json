@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "842697711096",
+    "firebase_url": "https://chatapp-4b3fa.firebaseio.com",
+    "project_id": "chatapp-4b3fa",
+    "storage_bucket": "chatapp-4b3fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842697711096:android:aac3b7f7b396f07c26ca0d",
+        "android_client_info": {
+          "package_name": "com.example.skype_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "842697711096-adc8ksbfvf7aiuugpk41i4rp6meev5g8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skype_clone",
+            "certificate_hash": "0eab1f52e92d7266afae4c81aeb02615213766f2"
+          }
+        },
+        {
+          "client_id": "842697711096-5j244kcnli47rrdea339vrqgsitor7mj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skype_clone",
+            "certificate_hash": "bf18d769075691bda7583a43e3e95f7918f0ea2c"
+          }
+        },
+        {
+          "client_id": "842697711096-qkdd7johhfa6b9aeh45gtm0mc75va7jk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCasYrtAQeQnFFZydRNzN9Zvau3UXdccxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "842697711096-qkdd7johhfa6b9aeh45gtm0mc75va7jk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
