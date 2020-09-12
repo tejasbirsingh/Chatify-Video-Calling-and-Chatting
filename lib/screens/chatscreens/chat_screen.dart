@@ -53,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // PDF related initializations 
 
-  bool _isEditing = false;
+
   bool uploading = false;
   String ocrText ="";
 
@@ -75,22 +75,23 @@ class _ChatScreenState extends State<ChatScreen> {
   }
   Future parseText() async {
       final picker = ImagePicker();
-      final imageFile = await picker.getImage(source: ImageSource.camera, maxHeight: 970, maxWidth: 670);
+      final imageFile = await picker.getImage(source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
       var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
       String img64 = base64Encode(bytes);
-      print(img64.toString());
+      // print(img64.toString());
       var url = 'https://api.ocr.space/parse/image';
       var payload = {"base64Image": "data:image/jpg;base64,${img64.toString()}"};
       var header = {"apikey": "d938f7220788957"};
       var post = await http.post(url, body: payload, headers: header);
       var result = jsonDecode(post.body);
-      print(result['ParsedResults'][0]['ParsedText']);
+     
+      // print(result['ParsedResults'][0]['ParsedText']);
       setState(() {
         uploading = false;
       ocrText = result['ParsedResults'][0]['ParsedText'];
       
       });
-      textFieldController.text = ocrText;  
+      textFieldController.text = textFieldController.text + "  "+  ocrText;  
 
 
  
@@ -212,22 +213,34 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(10);
 
-    return Container(
-      margin: EdgeInsets.only(top: 12),
-      constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
-      decoration: BoxDecoration(
-        color: UniversalVariables.senderColor,
-        borderRadius: BorderRadius.only(
-          topLeft: messageRadius,
-          topRight: messageRadius,
-          bottomLeft: messageRadius,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 10),
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.45),
+          decoration: BoxDecoration(
+            color: UniversalVariables.senderColor,
+            borderRadius: BorderRadius.only(
+              topLeft: messageRadius,
+              topRight: messageRadius,
+              bottomLeft: messageRadius,
+            ),
+          ),
+          child:
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: getMessage(message),
+              ),
+              
+           
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: getMessage(message),
-      ),
+        SizedBox(height: 2.0,),
+            
+           formatTime(message.timestamp.toDate()),
+          
+      ],
     );
   }
 
@@ -249,26 +262,44 @@ class _ChatScreenState extends State<ChatScreen> {
               )
             : Text("Url was null");
   }
+  formatTime(DateTime time){
+    String date =  time.day.toString() +"/" + time.month.toString() +"/" + time.year.toString() 
+    + "  " + (time.hour > 12 ? time.hour - 12 : time.hour).toString()+":" + 
+    ( time.minute.toString().length ==1 ? "0" + time.minute.toString() : time.minute.toString())
+    +" "+ (time.hour <  12 ?"am" :"pm").toString();
+    
+    return Text(date,
+    style: TextStyle(
+      fontSize: 10.0
+    ),);
 
+  }
   Widget receiverLayout(Message message) {
     Radius messageRadius = Radius.circular(10);
 
-    return Container(
-      margin: EdgeInsets.only(top: 12),
-      constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
-      decoration: BoxDecoration(
-        color: UniversalVariables.receiverColor,
-        borderRadius: BorderRadius.only(
-          bottomRight: messageRadius,
-          topRight: messageRadius,
-          bottomLeft: messageRadius,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 12),
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
+          decoration: BoxDecoration(
+            color: UniversalVariables.receiverColor,
+            borderRadius: BorderRadius.only(
+              bottomRight: messageRadius,
+              topRight: messageRadius,
+              bottomLeft: messageRadius,
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: getMessage(message),
+          ),
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: getMessage(message),
-      ),
+        SizedBox(height: 2.0,),
+        formatTime(message.timestamp.toDate())
+      ],
     );
   }
 
@@ -330,7 +361,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         title: "Text Extractor",
                         subtitle: "Extract the test from an image",
                         icon: Icons.scanner,
-                        onTap: ()=>parseText(),
+                        onTap: (){parseText();
+                        Navigator.pop(context);
+                        },
                       ),
                       ModalTile(
                         title: "Contact",
@@ -401,6 +434,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 TextField(
                   controller: textFieldController,
                   focusNode: textFieldFocus,
+                  maxLines: 4,
+                  minLines: 1,
+                  textInputAction: TextInputAction.newline,
+                  // scrollPadding: EdgeInsets.all(3),
                   onTap: () => hideEmojiContainer(),
                   style: TextStyle(
                     color: Colors.white,
@@ -411,6 +448,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         : setWritingTo(false);
                   },
                   decoration: InputDecoration(
+                    
                     hintText: "Type a message",
                     hintStyle: TextStyle(
                       color: UniversalVariables.greyColor,

@@ -21,14 +21,25 @@ class LastMessageContainer extends StatelessWidget {
             Message message = Message.fromMap(docList.last.data());
             return SizedBox(
               width: MediaQuery.of(context).size.width * 0.6,
-              child: Text(
-                message.message,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    message.message,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                  
+                  Text(DateTimeFormat(message.timestamp.toDate()),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),)
+                ],
               ),
             );
           }
@@ -49,5 +60,9 @@ class LastMessageContainer extends StatelessWidget {
         );
       },
     );
+  }
+
+  String DateTimeFormat(DateTime time){
+   return  time.day.toString() +"/" +time.month.toString() + "/" + time.year.toString();
   }
 }

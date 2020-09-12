@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/enum/user_state.dart';
@@ -112,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       scaffold: Scaffold(
         backgroundColor: UniversalVariables.blackColor,
         body: PageView(
+
           children: <Widget>[
             ChatListScreen(),
             LogScreen(),
@@ -123,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ],
           controller: pageController,
           onPageChanged: onPageChanged,
-          physics: NeverScrollableScrollPhysics(),
+          physics: PageScrollPhysics(),
         ),
         bottomNavigationBar: Container(
           child: Padding(
