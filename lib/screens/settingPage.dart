@@ -13,6 +13,7 @@ import 'package:skype_clone/Theme/theme_provider.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
+import 'package:skype_clone/resources/auth_methods.dart';
 
 import 'package:skype_clone/resources/update_methods.dart';
 import 'package:skype_clone/widgets/skype_appbar.dart';
@@ -29,8 +30,9 @@ class settingPage extends StatefulWidget {
 class _settingPageState extends State<settingPage> {
  var _darkTheme = true;
   File imageFile;
+  final picker =ImagePicker();
   final UpdateMethods _updateMethods = UpdateMethods();
- 
+ AuthMethods authUser = AuthMethods();
   @override
   void initState() {
 
@@ -106,20 +108,37 @@ final String noImageUrl = "https://www.google.com/search?q=no+image&rlz=1C1CHBF_
                         ),
                       ),
                     ),
+                    ListTile(
+                      
+                      title: Text("Name"),
+                      subtitle:    Text(userProvider.getUser.name),
+                      trailing: IconButton(icon: Icon(Icons.edit), onPressed: (){
+                             
+                      }),
+                    ),
+                     ListTile(
+                      
+                      title: Text("Email"),
+                      subtitle:    Text(userProvider.getUser.email),
+                      trailing: IconButton(icon: Icon(Icons.edit), onPressed: (){
+                              
+                      }),
+                    ),
+                    
                   ],
                 ),
       ),
     );
   }
   Future<File> _pickImage(String action) async {
-    File selectedImage;
+    PickedFile selectedImage;
 
     action == 'Gallery'
         ? selectedImage =
-            await ImagePicker.pickImage(source: ImageSource.gallery)
-        : await ImagePicker.pickImage(source: ImageSource.camera);
-
-    return selectedImage;
+            await picker.getImage(source: ImageSource.gallery)
+        : await picker.getImage(source: ImageSource.camera);
+    File file = File(selectedImage.path);
+    return file;
   }
 
   void onThemeChanged(bool value, ThemeNotifier themeNotifier) async {

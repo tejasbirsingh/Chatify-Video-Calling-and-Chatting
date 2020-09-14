@@ -10,6 +10,7 @@ import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
+import 'package:skype_clone/screens/pageviews/friends/contacts_page.dart';
 import 'package:skype_clone/screens/pageviews/logs/log_screen.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 
@@ -118,10 +119,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ChatListScreen(),
             LogScreen(),
             Center(
-                child: Text(
-              "Contact Screen",
-              style: TextStyle(color: Colors.white),
-            )),
+                child: contactsPage()),
           ],
           controller: pageController,
           onPageChanged: onPageChanged,

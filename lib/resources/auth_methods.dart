@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/enum/user_state.dart';
+import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +13,7 @@ class AuthMethods {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   GoogleSignIn _googleSignIn = GoogleSignIn();
+
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   static final CollectionReference _userCollection =
@@ -19,9 +21,8 @@ class AuthMethods {
 
   Future<User> getCurrentUser() async {
     User currentUser;
-    currentUser =  _auth.currentUser;
+    currentUser = _auth.currentUser;
     return currentUser;
-    
   }
 
   Future<UserData> getUserDetails() async {
@@ -34,8 +35,7 @@ class AuthMethods {
 
   Future<UserData> getUserDetailsById(id) async {
     try {
-      DocumentSnapshot documentSnapshot =
-          await _userCollection.doc(id).get();
+      DocumentSnapshot documentSnapshot = await _userCollection.doc(id).get();
       return UserData.fromMap(documentSnapshot.data());
     } catch (e) {
       print(e);
@@ -124,4 +124,58 @@ class AuthMethods {
 
   Stream<DocumentSnapshot> getUserStream({@required String uid}) =>
       _userCollection.doc(uid).snapshots();
+  Stream<QuerySnapshot> getFriends({String uid}) =>
+      _userCollection.doc(uid).collection("following").snapshots();
+
+  Future<void> addFriend(String currUserId, String followingUserId) async {
+    // var followingMap = Map<String, String>();
+    // followingMap['contact_id'] = followingUserId;
+    // followingMap['added_on'] = DateTime.now().toString();
+    Contact follower =Contact(uid:followingUserId,addedOn: Timestamp.now());
+    var senderMap =follower.toMap(follower);
+    await _userCollection
+        .doc(currUserId)
+        .collection('following')
+        .doc(followingUserId)
+        .set(senderMap);
+
+    // var followersMap = Map<String, String>();
+    
+    // followersMap['contact_id'] = currUserId;
+    // followingMap['added_on'] = DateTime.now().toString();
+    Contact following=Contact(uid:currUserId,addedOn: Timestamp.now());
+  var receiverMap = following.toMap(following);
+    return _userCollection
+        .doc(followingUserId)
+        .collection("followers")
+        .doc(currUserId)
+        .set(receiverMap);
+  }
+
+  Future<void> removeFriend(String currUserId, String followingUserId) async {
+    await _userCollection
+        .doc(currUserId)
+        .collection("following")
+        .doc(followingUserId)
+        .delete();
+
+    return _userCollection
+        .doc(followingUserId)
+        .collection("followers")
+        .doc(currUserId)
+        .delete();
+  }
+//   Future<List<UserData>> fetchContacts(UserData user) async{
+//     List<UserData> friends =List<UserData>();
+//     QuerySnapshot querySnapshot = await _userCollection
+//     .doc(user.uid)
+//     .collection("following")
+//     .get();
+
+//     for(var i=0;i<querySnapshot.docs.length;i++){
+//       UserData friend =await getUserDetailsById(querySnapshot.docs[i].data()["uid"]);
+//       friends.add(friend);
+//     }
+// return friends;
+//   }
 }

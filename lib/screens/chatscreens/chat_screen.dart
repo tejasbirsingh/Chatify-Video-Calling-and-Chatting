@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:photofilters/filters/filters.dart';
+import 'package:photofilters/filters/preset_filters.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/enum/view_state.dart';
@@ -36,6 +38,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  String fileName;
+  List<Filter> filters = presetFiltersList;
+  File imageFilterFile;
+ 
+
   ImageUploadProvider _imageUploadProvider;
 
   final StorageMethods _storageMethods = StorageMethods();
@@ -514,8 +521,11 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void pickImage({@required ImageSource source}) async {
-    File selectedImage = await Utils.pickImage(source: source);
+  Future pickImage({@required ImageSource source}) async {
+
+
+    File selectedImage = await Utils.pickImage(source: source);   
+    
     _storageMethods.uploadImage(
         image: selectedImage,
         receiverId: widget.receiver.uid,

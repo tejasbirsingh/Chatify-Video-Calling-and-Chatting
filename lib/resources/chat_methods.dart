@@ -31,10 +31,7 @@ class ChatMethods {
   }
 
   DocumentReference getContactsDocument({String of, String forContact}) =>
-      _userCollection
-          .doc(of)
-          .collection(CONTACTS_COLLECTION)
-          .doc(forContact);
+      _userCollection.doc(of).collection(CONTACTS_COLLECTION).doc(forContact);
 
   addToContacts({String senderId, String receiverId}) async {
     Timestamp currentTime = Timestamp.now();
@@ -113,10 +110,8 @@ class ChatMethods {
         .add(map);
   }
 
-  Stream<QuerySnapshot> fetchContacts({String userId}) => _userCollection
-      .doc(userId)
-      .collection(CONTACTS_COLLECTION)
-      .snapshots();
+  Stream<QuerySnapshot> fetchContacts({String userId}) =>
+      _userCollection.doc(userId).collection(CONTACTS_COLLECTION).snapshots();
 
   Stream<QuerySnapshot> fetchLastMessageBetween({
     @required String senderId,

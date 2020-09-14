@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 
-class CustomTile extends StatelessWidget {
+class friendCustomTile extends StatelessWidget {
   final Widget leading;
   final Widget title;
   final Widget icon;
-  final Widget subtitle;
+
   final Widget trailing;
   final EdgeInsets margin;
   final bool mini;
   final GestureTapCallback onTap;
   final GestureLongPressCallback onLongPress;
 
-  CustomTile({
+  friendCustomTile({
     @required this.leading,
     @required this.title,
     this.icon,
-     this.subtitle,
+    
     this.trailing,
     this.margin = const EdgeInsets.all(0),
     this.onTap,
@@ -55,11 +55,12 @@ class CustomTile extends StatelessWidget {
                         Row(
                           children: <Widget>[
                             icon ?? Container(),
-                           subtitle ?? Container()
+                         
                           ],
                         )
                       ],
                     ),
+                    
                     trailing ?? Container(),
                   ],
                 ),

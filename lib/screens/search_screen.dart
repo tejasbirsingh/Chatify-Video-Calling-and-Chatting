@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:skype_clone/models/userData.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/chat_screen.dart';
@@ -87,7 +89,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  buildSuggestions(String query) {
+  buildSuggestions(String query,UserData user) {
     final List<UserData> suggestionList = query.isEmpty
         ? []
         : userList != null
@@ -144,6 +146,10 @@ class _SearchScreenState extends State<SearchScreen> {
             searchedUser.name,
             style: TextStyle(color: UniversalVariables.greyColor),
           ),
+          trailing: IconButton(icon:Icon(Icons.person_add),
+          onPressed: (){
+                _authMethods.addFriend(user.uid, searchedUser.uid);
+          },),
         );
       }),
     );
@@ -151,13 +157,15 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final UserProvider userProvider = Provider.of<UserProvider>(context,listen: true);
+
     return PickupLayout(
       scaffold: Scaffold(
         backgroundColor: UniversalVariables.blackColor,
         appBar: searchAppBar(context),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: buildSuggestions(query),
+          child: buildSuggestions(query,userProvider.getUser),
         ),
       ),
     );

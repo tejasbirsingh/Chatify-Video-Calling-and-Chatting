@@ -450,6 +450,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.1"
+  photofilters:
+    dependency: "direct main"
+    description:
+      name: photofilters
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   platform:
     dependency: transitive
     description:

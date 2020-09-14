@@ -34,7 +34,7 @@ class LastMessageContainer extends StatelessWidget {
                     ),
                   ),
                   
-                  Text(DateTimeFormat(message.timestamp.toDate()),
+                  Text(dateTimeFormat(message.timestamp.toDate()),
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 14,
@@ -62,7 +62,7 @@ class LastMessageContainer extends StatelessWidget {
     );
   }
 
-  String DateTimeFormat(DateTime time){
+  String dateTimeFormat(DateTime time){
    return  time.day.toString() +"/" +time.month.toString() + "/" + time.year.toString();
   }
 }
