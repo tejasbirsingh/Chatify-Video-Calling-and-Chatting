@@ -12,6 +12,8 @@ class CachedImage extends StatelessWidget {
   final double radius;
   final double height;
   final double width;
+  final GestureTapCallback isTap ;
+
 
   final BoxFit fit;
 
@@ -25,6 +27,7 @@ class CachedImage extends StatelessWidget {
     this.radius = 0,
     this.height,
     this.width,
+    this.isTap,
     this.fit = BoxFit.cover,
   });
 
@@ -39,10 +42,7 @@ class CachedImage extends StatelessWidget {
         child: ClipRRect(
             borderRadius: BorderRadius.circular(isRound ? 50 : radius),
             child: GestureDetector(
-                  onTap: (){
-                   
-                    
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImagePage(imageUrl: imageUrl,)));},
+                  onTap: isTap,
                   child: Hero(
                     tag: imageUrl,
                                       child: CachedNetworkImage(

@@ -21,8 +21,10 @@ class ImagePage extends StatelessWidget {
         child: Hero(
           tag: imageUrl,
                   child: PhotoView(
+                    
             imageProvider: NetworkImage(
-            imageUrl
+            imageUrl,
+            
           ),
  
           //enableRotation: true,

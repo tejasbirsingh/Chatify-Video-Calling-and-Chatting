@@ -27,6 +27,7 @@ class UserCircle extends StatelessWidget {
         ),
         child: Stack(
           children: <Widget>[
+ 
             Align(
               alignment: Alignment.center,
               child: Text(

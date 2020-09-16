@@ -7,6 +7,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final List<Widget> actions;
   final Widget leading;
   final bool centerTitle;
+  final GestureTapCallback onTap;
+  
 
   const CustomAppBar({
     Key key,
@@ -14,6 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
     @required this.actions,
     @required this.leading, 
     @required this.centerTitle,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -36,7 +39,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
         leading: leading,
         actions: actions,
         centerTitle: centerTitle,
-        title: title,
+        title: GestureDetector(child: title,
+        onTap: onTap,),
       ),
     );
   }

@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:flutter/material.dart';
 
-
 import 'package:http/http.dart' as http;
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photofilters/filters/filters.dart';
 import 'package:photofilters/filters/preset_filters.dart';
@@ -20,6 +20,8 @@ import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
+import 'package:skype_clone/screens/profile.dart';
 import 'package:skype_clone/utils/call_utilities.dart';
 import 'package:skype_clone/utils/permissions.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
@@ -28,6 +30,7 @@ import 'package:skype_clone/widgets/appbar.dart';
 
 import 'package:skype_clone/widgets/custom_tile.dart';
 import 'dart:io' as Io;
+
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
 
@@ -41,7 +44,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String fileName;
   List<Filter> filters = presetFiltersList;
   File imageFilterFile;
- 
 
   ImageUploadProvider _imageUploadProvider;
 
@@ -52,18 +54,16 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController textFieldController = TextEditingController();
   FocusNode textFieldFocus = FocusNode();
   ScrollController _listScrollController = ScrollController();
-
+  bool _isEditing = false;
   UserData sender;
   String _currentUserId;
   bool isWriting = false;
   bool showEmojiPicker = false;
 
-  // PDF related initializations 
-
+  // PDF related initializations
 
   bool uploading = false;
-  String ocrText ="";
-
+  String ocrText = "";
 
   @override
   void initState() {
@@ -80,30 +80,27 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     });
   }
+
   Future parseText() async {
-      final picker = ImagePicker();
-      final imageFile = await picker.getImage(source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
-      var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
-      String img64 = base64Encode(bytes);
-      // print(img64.toString());
-      var url = 'https://api.ocr.space/parse/image';
-      var payload = {"base64Image": "data:image/jpg;base64,${img64.toString()}"};
-      var header = {"apikey": "d938f7220788957"};
-      var post = await http.post(url, body: payload, headers: header);
-      var result = jsonDecode(post.body);
-     
-      // print(result['ParsedResults'][0]['ParsedText']);
-      setState(() {
-        uploading = false;
+    final picker = ImagePicker();
+    final imageFile = await picker.getImage(
+        source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
+    var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
+    String img64 = base64Encode(bytes);
+    // print(img64.toString());
+    var url = 'https://api.ocr.space/parse/image';
+    var payload = {"base64Image": "data:image/jpg;base64,${img64.toString()}"};
+    var header = {"apikey": "d938f7220788957"};
+    var post = await http.post(url, body: payload, headers: header);
+    var result = jsonDecode(post.body);
+
+    // print(result['ParsedResults'][0]['ParsedText']);
+    setState(() {
+      uploading = false;
       ocrText = result['ParsedResults'][0]['ParsedText'];
-      
-      });
-      textFieldController.text = textFieldController.text + "  "+  ocrText;  
-
-
- 
+    });
+    textFieldController.text = textFieldController.text + "  " + ocrText;
   }
-
 
   showKeyboard() => textFieldFocus.requestFocus();
 
@@ -129,20 +126,35 @@ class _ChatScreenState extends State<ChatScreen> {
       scaffold: Scaffold(
         backgroundColor: UniversalVariables.blackColor,
         appBar: customAppBar(context),
-        body: Column(
-          children: <Widget>[
-            Flexible(
-              child: messageList(),
+        body: Stack(
+          children: [
+            Column(
+              children: <Widget>[
+                Flexible(
+                  child: messageList(),
+                ),
+                _imageUploadProvider.getViewState == ViewState.LOADING
+                    ? Container(
+                        alignment: Alignment.centerRight,
+                        margin: EdgeInsets.only(right: 15),
+                        child: CircularProgressIndicator(),
+                      )
+                    : Container(),
+                chatControls(),
+                showEmojiPicker
+                    ? Container(child: emojiContainer())
+                    : Container(),
+              ],
             ),
-            _imageUploadProvider.getViewState == ViewState.LOADING
+            (_isEditing)
                 ? Container(
-                    alignment: Alignment.centerRight,
-                    margin: EdgeInsets.only(right: 15),
-                    child: CircularProgressIndicator(),
+                    color: Colors.black,
+                    height: MediaQuery.of(context).size.height * 0.95,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   )
-                : Container(),
-            chatControls(),
-            showEmojiPicker ? Container(child: emojiContainer()) : Container(),
+                : Center()
           ],
         ),
       ),
@@ -225,8 +237,8 @@ class _ChatScreenState extends State<ChatScreen> {
       children: [
         Container(
           margin: EdgeInsets.only(top: 10),
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.45),
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.45),
           decoration: BoxDecoration(
             color: UniversalVariables.senderColor,
             borderRadius: BorderRadius.only(
@@ -235,18 +247,15 @@ class _ChatScreenState extends State<ChatScreen> {
               bottomLeft: messageRadius,
             ),
           ),
-          child:
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: getMessage(message),
-              ),
-              
-           
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: getMessage(message),
+          ),
         ),
-        SizedBox(height: 2.0,),
-            
-           formatTime(message.timestamp.toDate()),
-          
+        SizedBox(
+          height: 2.0,
+        ),
+        formatTime(message.timestamp.toDate()),
       ],
     );
   }
@@ -262,25 +271,36 @@ class _ChatScreenState extends State<ChatScreen> {
           )
         : message.photoUrl != null
             ? CachedImage(
-                message.photoUrl,
+                                message.photoUrl,
                 height: 250,
                 width: 250,
                 radius: 10,
+                isTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => ImagePage(imageUrl: message.photoUrl)))
               )
-            : Text("Url was null");
+            : Icon(Icons.sync_problem);
   }
-  formatTime(DateTime time){
-    String date =  time.day.toString() +"/" + time.month.toString() +"/" + time.year.toString() 
-    + "  " + (time.hour > 12 ? time.hour - 12 : time.hour).toString()+":" + 
-    ( time.minute.toString().length ==1 ? "0" + time.minute.toString() : time.minute.toString())
-    +" "+ (time.hour <  12 ?"am" :"pm").toString();
-    
-    return Text(date,
-    style: TextStyle(
-      fontSize: 10.0
-    ),);
 
+  formatTime(DateTime time) {
+    String date = time.day.toString() +
+        "/" +
+        time.month.toString() +
+        "/" +
+        time.year.toString() +
+        "  " +
+        (time.hour > 12 ? time.hour - 12 : time.hour).toString() +
+        ":" +
+        (time.minute.toString().length == 1
+            ? "0" + time.minute.toString()
+            : time.minute.toString()) +
+        " " +
+        (time.hour < 12 ? "am" : "pm").toString();
+
+    return Text(
+      date,
+      style: TextStyle(fontSize: 10.0),
+    );
   }
+
   Widget receiverLayout(Message message) {
     Radius messageRadius = Radius.circular(10);
 
@@ -289,8 +309,8 @@ class _ChatScreenState extends State<ChatScreen> {
       children: [
         Container(
           margin: EdgeInsets.only(top: 12),
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.65),
           decoration: BoxDecoration(
             color: UniversalVariables.receiverColor,
             borderRadius: BorderRadius.only(
@@ -304,7 +324,9 @@ class _ChatScreenState extends State<ChatScreen> {
             child: getMessage(message),
           ),
         ),
-        SizedBox(height: 2.0,),
+        SizedBox(
+          height: 2.0,
+        ),
         formatTime(message.timestamp.toDate())
       ],
     );
@@ -355,7 +377,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: <Widget>[
                       ModalTile(
                         title: "Media",
-                        subtitle: "Share Photos and Video",
+                        subtitle: "Share Photos",
                         icon: Icons.image,
                         onTap: () => pickImage(source: ImageSource.gallery),
                       ),
@@ -368,8 +390,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         title: "Text Extractor",
                         subtitle: "Extract the test from an image",
                         icon: Icons.scanner,
-                        onTap: (){parseText();
-                        Navigator.pop(context);
+                        onTap: () {
+                          parseText();
+                          Navigator.pop(context);
                         },
                       ),
                       ModalTile(
@@ -387,7 +410,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         subtitle: "Schedule a meeting in advance",
                         icon: Icons.schedule,
                       ),
-                     
                     ],
                   ),
                 ),
@@ -455,7 +477,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         : setWritingTo(false);
                   },
                   decoration: InputDecoration(
-                    
                     hintText: "Type a message",
                     hintStyle: TextStyle(
                       color: UniversalVariables.greyColor,
@@ -522,19 +543,49 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future pickImage({@required ImageSource source}) async {
-
-
-    File selectedImage = await Utils.pickImage(source: source);   
-    
-    _storageMethods.uploadImage(
-        image: selectedImage,
-        receiverId: widget.receiver.uid,
-        senderId: _currentUserId,
-        imageUploadProvider: _imageUploadProvider);
+    this.setState(() {
+      _isEditing = true;
+    });
+    File selectedImage = await Utils.pickImage(source: source);
+    if (selectedImage != null) {
+      File cropped = await ImageCropper.cropImage(
+          sourcePath: selectedImage.path,
+          aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+          compressFormat: ImageCompressFormat.jpg,
+          compressQuality: 80,
+          maxHeight: 700,
+          maxWidth: 700,
+          androidUiSettings: AndroidUiSettings(
+            toolbarColor: Colors.black54,
+            toolbarTitle: "Edit Image",
+            statusBarColor: Colors.black,
+            backgroundColor: Colors.black,
+            toolbarWidgetColor: Colors.white,
+          ));
+      _storageMethods.uploadImage(
+          image: cropped,
+          receiverId: widget.receiver.uid,
+          senderId: _currentUserId,
+          imageUploadProvider: _imageUploadProvider);
+      this.setState(() {
+        _isEditing = false;
+      });
+    } else {
+      this.setState(() {
+        _isEditing = false;
+      });
+    }
   }
 
   CustomAppBar customAppBar(context) {
     return CustomAppBar(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => profilePage(
+              user: widget.receiver,
+            ),
+          )),
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back,

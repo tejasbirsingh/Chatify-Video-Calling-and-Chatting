@@ -7,6 +7,7 @@ import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/screens/chatscreens/chat_screen.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+import 'package:skype_clone/screens/profile.dart';
 import 'package:skype_clone/widgets/custom_tile.dart';
 
 import 'last_message_container.dart';
@@ -71,23 +72,27 @@ class ViewLayout extends StatelessWidget {
         ),
       ),
       leading: Container(
-        constraints: BoxConstraints(maxHeight: 70, maxWidth: 70),
-        child: Stack(
-          children: <Widget>[
-           
-            OnlineDotIndicator(
-              uid: contact.uid,
-            ),
-             Center(
-               child: CachedImage(
-                contact.profilePhoto,
-                radius: 60,
-                isRound: true,
-            ),
-             ),
-          ],
+          constraints: BoxConstraints(maxHeight: 70, maxWidth: 70),
+          child: Stack(
+            children: <Widget>[
+             
+              OnlineDotIndicator(
+                uid: contact.uid,
+              ),
+               Center(
+                 child: CachedImage(
+                  
+                  contact.profilePhoto,
+                  radius: 60,
+                  isRound: true,
+                  isTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => profilePage(user: contact,),)),
+                  
+              ),
+               ),
+            ],
+          ),
         ),
-      ),
+      
     );
   }
 }
