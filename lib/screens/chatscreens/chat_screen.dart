@@ -15,12 +15,14 @@ import 'package:skype_clone/enum/view_state.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
+import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
 import 'package:skype_clone/screens/profile.dart';
 import 'package:skype_clone/utils/call_utilities.dart';
 import 'package:skype_clone/utils/permissions.dart';
@@ -30,6 +32,8 @@ import 'package:skype_clone/widgets/appbar.dart';
 
 import 'package:skype_clone/widgets/custom_tile.dart';
 import 'dart:io' as Io;
+
+import 'package:video_player/video_player.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
@@ -46,6 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
   File imageFilterFile;
 
   ImageUploadProvider _imageUploadProvider;
+  VideoUploadProvider _videoUploadProvider;
 
   final StorageMethods _storageMethods = StorageMethods();
   final ChatMethods _chatMethods = ChatMethods();
@@ -59,6 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String _currentUserId;
   bool isWriting = false;
   bool showEmojiPicker = false;
+  VideoPlayerController videoPlayerController;
 
   // PDF related initializations
 
@@ -121,6 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
+    _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
 
     return PickupLayout(
       scaffold: Scaffold(
@@ -137,6 +144,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? Container(
                         alignment: Alignment.centerRight,
                         margin: EdgeInsets.only(right: 15),
+                        child: CircularProgressIndicator(),
+                      )
+                    : Container(),
+                _videoUploadProvider.getViewState == ViewState.LOADING
+                    ? Container(
+                        alignment: Alignment.centerRight,
+                        margin: EdgeInsets.only(right: 15.0),
                         child: CircularProgressIndicator(),
                       )
                     : Container(),
@@ -261,23 +275,30 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   getMessage(Message message) {
-    return message.type != MESSAGE_TYPE_IMAGE
-        ? Text(
-            message.message,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.0,
-            ),
-          )
-        : message.photoUrl != null
-            ? CachedImage(
-                                message.photoUrl,
-                height: 250,
-                width: 250,
-                radius: 10,
-                isTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => ImagePage(imageUrl: message.photoUrl)))
-              )
-            : Icon(Icons.sync_problem);
+    if (message.type == MESSAGE_TYPE_IMAGE) {
+      return message.photoUrl != null
+          ? CachedImage(message.photoUrl,
+              height: 250,
+              width: 250,
+              radius: 10,
+              isTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ImagePage(
+                            imageUrl: message.photoUrl,
+                          ))))
+          : Icon(Icons.sync_problem);
+    }
+    else if(message.type == MESSAGE_TYPE_VIDEO){
+      return message.videoUrl!=null ? videoPlayer(
+        url: message.videoUrl,
+      ) : Icon(Icons.sync_problem);
+    }
+    else{
+      return Text(message.message,
+      style: TextStyle(color: Colors.white,
+      fontSize: 16.0),);
+    }
   }
 
   formatTime(DateTime time) {
@@ -361,7 +382,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Content and tools",
+                            "Send",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -380,6 +401,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         subtitle: "Share Photos",
                         icon: Icons.image,
                         onTap: () => pickImage(source: ImageSource.gallery),
+                      ),
+                      ModalTile(
+                        title: "Media",
+                        subtitle: "Share Video",
+                        icon: Icons.video_label,
+                        onTap: () => pickVideo(),
                       ),
                       ModalTile(
                         title: "File",
@@ -574,6 +601,25 @@ class _ChatScreenState extends State<ChatScreen> {
       this.setState(() {
         _isEditing = false;
       });
+    }
+  }
+
+  Future pickVideo() async {
+    PickedFile video = await ImagePicker().getVideo(
+        source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
+
+    if (video != null) {
+      videoPlayerController = VideoPlayerController.file(File(video.path))
+        ..initialize().then((_) {
+          setState(() {
+            videoPlayerController.play();
+          });
+        });
+      _storageMethods.uploadVideo(
+          video: File(video.path),
+          receiverId: widget.receiver.uid,
+          senderId: _currentUserId,
+          videoUploadProvider: _videoUploadProvider);
     }
   }
 

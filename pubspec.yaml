@@ -25,7 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   http:
   photofilters: ^2.0.1
-
+  local_auth: ^0.6.3+1
   shared_preferences: ^0.5.8
   firebase_core: ^0.5.0
   # For making request to firestore database
@@ -36,6 +36,7 @@ dependencies:
   firebase_analytics: ^5.0.2
   firebase_storage: ^4.0.0
   photo_view: ^0.10.1
+  video_player: ^0.10.12+2
 
   # For handling permissions
   # permission_handler: ^4.1.0

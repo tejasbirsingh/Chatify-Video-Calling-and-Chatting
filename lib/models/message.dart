@@ -7,6 +7,7 @@ class Message {
   String message;
   Timestamp timestamp;
   String photoUrl;
+  String videoUrl;
 
   Message({
     this.senderId,
@@ -25,6 +26,15 @@ class Message {
     this.type,
     this.timestamp,
     this.photoUrl,
+  });
+
+    Message.videoMessage({
+    this.senderId,
+    this.receiverId,
+    this.message,
+    this.type,
+    this.timestamp,
+    this.videoUrl,
   });
 
   Map toMap() {
@@ -47,6 +57,17 @@ class Message {
     map['photoUrl'] = this.photoUrl;
     return map;
   }
+  
+  Map toVideoMap() {
+    var map = Map<String, dynamic>();
+    map['message'] = this.message;
+    map['senderId'] = this.senderId;
+    map['receiverId'] = this.receiverId;
+    map['type'] = this.type;
+    map['timestamp'] = this.timestamp;
+    map['videoUrl'] = this.videoUrl;
+    return map;
+  }
 
   // named constructor
   Message.fromMap(Map<String, dynamic> map) {
@@ -56,5 +77,6 @@ class Message {
     this.message = map['message'];
     this.timestamp = map['timestamp'];
     this.photoUrl = map['photoUrl'];
+    this.videoUrl=map['videoUrl'];
   }
 }

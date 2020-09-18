@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
 
 class StorageMethods {
@@ -16,8 +17,6 @@ class StorageMethods {
   UserData user = UserData();
 
   Future<String> uploadImageToStorage(File imageFile) async {
-    // mention try catch later on
-
     try {
       _storageReference = FirebaseStorage.instance
           .ref()
@@ -25,8 +24,24 @@ class StorageMethods {
       StorageUploadTask storageUploadTask =
           _storageReference.putFile(imageFile);
       var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
-    
+
       // print(url);
+      return url;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String> uploadVideoToStorage(File videoFile) async {
+    try {
+      _storageReference = FirebaseStorage.instance
+          .ref()
+          .child('${DateTime.now().millisecondsSinceEpoch}');
+      StorageUploadTask storageUploadTask =
+          _storageReference.putFile(videoFile,StorageMetadata(contentType: 'video/mp4'));
+      var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
+
+      print('This is video url = {$url}');
       return url;
     } catch (e) {
       return null;
@@ -52,5 +67,17 @@ class StorageMethods {
 
     chatMethods.setImageMsg(url, receiverId, senderId);
   }
-  
+
+  void uploadVideo({
+    @required File video,
+    @required String receiverId,
+    @required String senderId,
+    @required VideoUploadProvider videoUploadProvider,
+  }) async {
+    final ChatMethods chatMethods = ChatMethods();
+    videoUploadProvider.setToLoading();
+    String url = await uploadVideoToStorage(video);
+    videoUploadProvider.setToIdle();
+    chatMethods.setVideoMsg(url, receiverId, senderId);
+  }
 }

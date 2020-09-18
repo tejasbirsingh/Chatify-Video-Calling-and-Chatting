@@ -110,6 +110,32 @@ class ChatMethods {
         .add(map);
   }
 
+  void setVideoMsg(String url, String receiverId, String senderId) async {
+    Message message;
+
+    message = Message.videoMessage(
+        message: "VIDEO",
+        receiverId: receiverId,
+        senderId: senderId,
+        videoUrl: url,
+        timestamp: Timestamp.now(),
+        type: 'video');
+
+    // create imagemap
+    var map = message.toVideoMap();
+
+    // var map = Map<String, dynamic>();
+    await _messageCollection
+        .doc(message.senderId)
+        .collection(message.receiverId)
+        .add(map);
+
+    _messageCollection
+        .doc(message.receiverId)
+        .collection(message.senderId)
+        .add(map);
+  }
+
   Stream<QuerySnapshot> fetchContacts({String userId}) =>
       _userCollection.doc(userId).collection(CONTACTS_COLLECTION).snapshots();
 
