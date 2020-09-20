@@ -28,15 +28,25 @@ class settingPage extends StatefulWidget {
 
 // ignore: camel_case_types
 class _settingPageState extends State<settingPage> {
-  var _darkTheme = true;
+  bool _darkTheme = true;
+bool _appLocked =false;
   File imageFile;
   bool _isEditing= false;
   final picker = ImagePicker();
   final UpdateMethods _updateMethods = UpdateMethods();
   AuthMethods authUser = AuthMethods();
+
   @override
   void initState() {
     super.initState();
+    getSwitchValues();
+
+  }
+  getSwitchValues() async{
+    _appLocked = await getAppLocker();
+    setState(() {
+      
+    });
   }
 
   @override
@@ -125,12 +135,44 @@ class _settingPageState extends State<settingPage> {
               subtitle: Text(userProvider.getUser.email),
               trailing: IconButton(icon: Icon(Icons.edit), onPressed: () {}),
             ),
+            ListTile(
+              title: Text('App Locker'),
+              contentPadding: const EdgeInsets.only(left: 16.0),
+              trailing: Transform.scale(
+                scale: 0.8,
+                child: Switch(
+                  value: _appLocked,
+                  onChanged: (bool val) {
+                    setState(() {
+                      _appLocked = val;
+                       setAppLocker(val);
+                    });
+                   
+                 
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+  Future<bool> getAppLocker() async{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+     setState(() {
+               _appLocked = prefs.getBool('isLocked')!= null ? prefs.getBool('isLocked') : false ;
+     });
+     return _appLocked;
+     }
 
+  Future<bool> setAppLocker(bool val) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLocked', val);
+         return val;
+  }
+
+  
   Future<File> _pickImage(String action) async {
     File selectedImage;
     this.setState(() {

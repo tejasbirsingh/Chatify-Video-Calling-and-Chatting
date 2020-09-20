@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:skype_clone/encryption/encryptText.dart';
 
 class Message {
   String senderId;
@@ -17,8 +18,6 @@ class Message {
     this.timestamp,
   });
 
-  //Will be only called when you wish to send an image
-  // named constructor
   Message.imageMessage({
     this.senderId,
     this.receiverId,
@@ -28,7 +27,7 @@ class Message {
     this.photoUrl,
   });
 
-    Message.videoMessage({
+  Message.videoMessage({
     this.senderId,
     this.receiverId,
     this.message,
@@ -38,11 +37,15 @@ class Message {
   });
 
   Map toMap() {
+    var encryptedText = encryptAESCryptoJS(this.message, "password");
+    // print(encryptedText);
+    // var decrypted = decryptAESCryptoJS("U2FsdGVkX18kywp91Ikacgub10Cw94ZytfYUrsevhYQ=","password");
+    // print(decrypted);
     var map = Map<String, dynamic>();
     map['senderId'] = this.senderId;
     map['receiverId'] = this.receiverId;
     map['type'] = this.type;
-    map['message'] = this.message;
+    map['message'] = encryptedText;
     map['timestamp'] = this.timestamp;
     return map;
   }
@@ -57,7 +60,7 @@ class Message {
     map['photoUrl'] = this.photoUrl;
     return map;
   }
-  
+
   Map toVideoMap() {
     var map = Map<String, dynamic>();
     map['message'] = this.message;
@@ -71,12 +74,18 @@ class Message {
 
   // named constructor
   Message.fromMap(Map<String, dynamic> map) {
+    var decryptedMessage;
+    // if message is of type text then only we need to enrpyt it other wise we can simply assign it to message 
+    if (map['message'] != 'IMAGE' && map['message'] != 'VIDEO')
+      decryptedMessage = decryptAESCryptoJS(map['message'], "password");
+    else
+      decryptedMessage = map['message'];
     this.senderId = map['senderId'];
     this.receiverId = map['receiverId'];
     this.type = map['type'];
-    this.message = map['message'];
+    this.message = decryptedMessage;
     this.timestamp = map['timestamp'];
     this.photoUrl = map['photoUrl'];
-    this.videoUrl=map['videoUrl'];
+    this.videoUrl = map['videoUrl'];
   }
 }

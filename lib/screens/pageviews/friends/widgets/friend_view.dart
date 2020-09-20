@@ -6,7 +6,7 @@ import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 
 import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/resources/chat_methods.dart';
+
 import 'package:skype_clone/screens/chatscreens/chat_screen.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 
@@ -41,7 +41,7 @@ class friendView extends StatelessWidget {
 
 class ViewLayout extends StatelessWidget {
   final UserData friendViewLayout;
-  final ChatMethods _chatMethods = ChatMethods();
+
   final AuthMethods _authMethods = AuthMethods();
 
   ViewLayout({
