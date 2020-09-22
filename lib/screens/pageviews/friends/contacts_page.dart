@@ -21,11 +21,7 @@ class _contactsPageState extends State<contactsPage> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final AuthMethods _auth = AuthMethods();
 
-  @override
-  void initState() {
 
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

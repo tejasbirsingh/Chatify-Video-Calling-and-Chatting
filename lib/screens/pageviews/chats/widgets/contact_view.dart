@@ -32,7 +32,7 @@ class ContactView extends StatelessWidget {
           );
         }
         return Center(
-          child: CircularProgressIndicator(),
+          child: Container(),
         );
       },
     );

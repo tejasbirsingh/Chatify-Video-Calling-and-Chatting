@@ -22,15 +22,15 @@ class ChatListScreen extends StatelessWidget {
         appBar: SkypeAppBar(
           title: UserCircle(),
           actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, "/search_screen");
-              },
-            ),
+            // IconButton(
+            //   icon: Icon(
+            //     Icons.search,
+            //     color: Colors.white,
+            //   ),
+            //   onPressed: () {
+            //     Navigator.pushNamed(context, "/search_screen");
+            //   },
+            // ),
             IconButton(
               icon: Icon(
                 Icons.more_vert,
@@ -77,13 +77,12 @@ class ChatListContainer extends StatelessWidget {
                 itemCount: docList.length,
                 itemBuilder: (context, index) {
                   Contact contact = Contact.fromMap(docList[index].data());
-
                   return ContactView(contact);
                 },
               );
             }
 
-            return Center(child: CircularProgressIndicator());
+            return Center(child: Container(),);
           }),
     );
   }

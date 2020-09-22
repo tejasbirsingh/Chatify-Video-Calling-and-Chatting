@@ -30,6 +30,10 @@ class CustomTile extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+          
+          ),
         padding: EdgeInsets.symmetric(horizontal: mini ? 10 : 0),
         margin: margin,
         child: Row(

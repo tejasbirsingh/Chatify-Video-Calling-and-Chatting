@@ -103,6 +103,18 @@ class AuthMethods {
     return userList;
   }
 
+  Future<List<String>> fetchAllFriends(User curruser) async{
+   
+    List<String> userList = List<String>();
+    QuerySnapshot querySnapshot = await  _userCollection.doc(curruser.uid).collection("following").get();
+
+    for(var i=0;i<querySnapshot.docs.length;i++){     
+        userList.add(querySnapshot.docs[i].data()['contact_id']);      
+    }
+    
+    return userList;
+  }
+
   Future<bool> signOut() async {
     try {
       await _googleSignIn.signOut();
@@ -124,6 +136,8 @@ class AuthMethods {
 
   Stream<DocumentSnapshot> getUserStream({@required String uid}) =>
       _userCollection.doc(uid).snapshots();
+
+
   Stream<QuerySnapshot> getFriends({String uid}) =>
       _userCollection.doc(uid).collection("following").snapshots();
 

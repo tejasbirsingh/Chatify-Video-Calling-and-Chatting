@@ -20,4 +20,5 @@ class UniversalVariables {
       colors: [gradientColorStart, gradientColorEnd],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight);
+      
 }

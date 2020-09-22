@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
@@ -20,6 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final AuthMethods _authMethods = AuthMethods();
 
   List<UserData> userList;
+  List<String> friendsList;
   String query = "";
   TextEditingController searchController = TextEditingController();
 
@@ -34,6 +36,17 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       });
     });
+  fetchFriends();
+   
+  }
+  fetchFriends(){
+     _authMethods.getCurrentUser().then((User user) {
+      _authMethods.fetchAllFriends(user).then((List<String> list) {
+        setState(() {
+          friendsList = list;
+        });
+      });
+    });
   }
 
   searchAppBar(BuildContext context) {
@@ -43,10 +56,6 @@ class _SearchScreenState extends State<SearchScreen> {
           UniversalVariables.gradientColorStart,
           UniversalVariables.gradientColorEnd,
         ],
-      ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => Navigator.pop(context),
       ),
       elevation: 0,
       bottom: PreferredSize(
@@ -89,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  buildSuggestions(String query,UserData user) {
+  buildSuggestions(String query, UserData user) {
     final List<UserData> suggestionList = query.isEmpty
         ? []
         : userList != null
@@ -116,6 +125,12 @@ class _SearchScreenState extends State<SearchScreen> {
             name: suggestionList[index].name,
             username: suggestionList[index].email);
 
+        bool isFriend;
+        if (friendsList.contains(searchedUser.uid.toString())) {
+          isFriend = true;
+        } else {
+          isFriend = false;
+        }
         return CustomTile(
           mini: false,
           onTap: () {
@@ -146,10 +161,13 @@ class _SearchScreenState extends State<SearchScreen> {
             searchedUser.name,
             style: TextStyle(color: UniversalVariables.greyColor),
           ),
-          trailing: IconButton(icon:Icon(Icons.person_add),
-          onPressed: (){
-                _authMethods.addFriend(user.uid, searchedUser.uid);
-          },),
+          trailing: IconButton(
+            icon: isFriend ? Icon(Icons.check) : Icon(Icons.person_add),
+            color: isFriend ? Colors.green : Colors.white,
+            onPressed: () {
+              _authMethods.addFriend(user.uid, searchedUser.uid);
+                        },
+          ),
         );
       }),
     );
@@ -157,7 +175,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final UserProvider userProvider = Provider.of<UserProvider>(context,listen: true);
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: true);
 
     return PickupLayout(
       scaffold: Scaffold(
@@ -165,7 +184,7 @@ class _SearchScreenState extends State<SearchScreen> {
         appBar: searchAppBar(context),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: buildSuggestions(query,userProvider.getUser),
+          child: buildSuggestions(query, userProvider.getUser),
         ),
       ),
     );
