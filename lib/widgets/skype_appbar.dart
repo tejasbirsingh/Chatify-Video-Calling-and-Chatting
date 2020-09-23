@@ -14,25 +14,31 @@ class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomAppBar(
-      leading: IconButton(
-        icon: Icon(
-          Icons.notifications,
-          color: Colors.white,
+    return Container(
+      color: Theme.of(context).backgroundColor,
+      child: CustomAppBar(
+        
+        leading: IconButton(
+          icon: Icon(
+            Icons.notifications,
+          color: Theme.of(context).iconTheme.color,
+            // color: Colors.white,
+          ),
+          onPressed: () {},
         ),
-        onPressed: () {},
+        title: (title is String)
+            ? Text(
+                title,
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.headline1.color,
+                  // color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : title,
+        centerTitle: true,
+        actions: actions,
       ),
-      title: (title is String)
-          ? Text(
-              title,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          : title,
-      centerTitle: true,
-      actions: actions,
     );
   }
 

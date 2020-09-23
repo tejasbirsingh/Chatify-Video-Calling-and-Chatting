@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
@@ -7,20 +6,21 @@ import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:video_trimmer/trim_editor.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 import 'package:video_trimmer/video_viewer.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class TrimmerView extends StatefulWidget {
   final Trimmer trimmerFile;
   final String receiver;
   final String sender;
-  TrimmerView({this.trimmerFile,this.receiver,this.sender});
+  TrimmerView({this.trimmerFile, this.receiver, this.sender});
   @override
   _TrimmerViewState createState() => _TrimmerViewState();
 }
 
 class _TrimmerViewState extends State<TrimmerView> {
+  StorageMethods _storageMethods = StorageMethods();
   double _startValue = 0.0;
   double _endValue = 0.0;
-  StorageMethods _storageMethods = StorageMethods();
 
   bool _isPlaying = false;
   bool _progressVisibility = false;
@@ -46,11 +46,12 @@ class _TrimmerViewState extends State<TrimmerView> {
 
   @override
   Widget build(BuildContext context) {
-    VideoUploadProvider _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
+    VideoUploadProvider _videoUploadProvider =
+        Provider.of<VideoUploadProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Video Trimmer"),
+        title:"Video Trimmer".text.white.bold.make(),
       ),
       body: Builder(
         builder: (context) => Center(
@@ -67,28 +68,41 @@ class _TrimmerViewState extends State<TrimmerView> {
                     backgroundColor: Colors.red,
                   ),
                 ),
-                RaisedButton(
-                  onPressed: _progressVisibility
-                      ? null
-                      : () async {
-                          _saveVideo().then((outputPath) {
-                            print('OUTPUT PATH: $outputPath');
-                            final snackBar = SnackBar(
-                                content: Text('Video Saved successfully'));
-                            Scaffold.of(context).showSnackBar(snackBar);
-                          });
-                        },
-                  child: Text("SAVE"),
-                ),
-                RaisedButton(
-                  child: Text('Send'),
-                  onPressed: () {
-                    _storageMethods.uploadVideo(
-                        video: File(widget.trimmerFile.getVideoFile().readAsStringSync()),
-                        receiverId: widget.receiver,
-                        senderId: widget.sender,
-                        videoUploadProvider: _videoUploadProvider);
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RaisedButton(
+                      onPressed: _progressVisibility
+                          ? null
+                          : () async {
+                              _saveVideo().then((outputPath) {
+                                print('OUTPUT PATH: $outputPath');
+                                final snackBar = SnackBar(
+                                    content: Text('Video Saved successfully'));
+                                Scaffold.of(context).showSnackBar(snackBar);
+
+                                   _storageMethods.uploadVideo(
+                              video: File(outputPath),
+                              receiverId: widget.receiver,
+                              senderId: widget.sender,
+                              videoUploadProvider: _videoUploadProvider);
+                               Navigator.pop(context);
+                              });
+                            },
+                      child: Text("SAVE"),
+                    ),
+                    // IconButton(
+                    //   icon: Icon(Icons.send),
+                    //   onPressed: () {
+                    //     _storageMethods.uploadVideo(
+                    //         video: File(widget.trimmerFile.toString()),
+                    //         receiverId: widget.receiver,
+                    //         senderId: widget.sender,
+                    //         videoUploadProvider: _videoUploadProvider);
+                    //     Navigator.pop(context);
+                    //   },
+                    // )
+                  ],
                 ),
                 Expanded(
                   child: VideoViewer(),

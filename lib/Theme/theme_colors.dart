@@ -1,23 +1,51 @@
 import 'package:flutter/material.dart';
 
 final darkTheme = ThemeData(
-  primarySwatch: Colors.grey,
-  primaryColor: Colors.black,
-  brightness: Brightness.dark,
-  // backgroundColor: const Color(0xFF212121),
-   backgroundColor: Colors.black,
-  accentColor: Colors.white,
-  accentIconTheme: IconThemeData(color: Colors.black),
-  dividerColor: Colors.black12,
-);
+    backgroundColor: Colors.black87,
+    dialogBackgroundColor: Colors.grey,
+      cardColor: Colors.black54,
+    dividerColor: Colors.grey,
+    iconTheme: IconThemeData(
+      color: Colors.white,
+    ),
+    textTheme: TextTheme(
+      headline1: TextStyle(
+          color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),
+      bodyText1: TextStyle(color: Colors.white, fontSize: 18.0),
+      bodyText2: TextStyle(color: Colors.white, fontSize: 14.0),
+    ),
+    appBarTheme: AppBarTheme(
+        centerTitle: true,
+        color: Colors.black87,
+        elevation: 10.0,
+        iconTheme: IconThemeData(color: Colors.white),
+        textTheme: TextTheme(
+          headline1: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),
+        )));
+
+
 
 final lightTheme = ThemeData(
-  primarySwatch: Colors.grey,
-  primaryColor: Colors.white,
-  brightness: Brightness.light,
-  // backgroundColor: const Color(0xFFE5E5E5),
-  accentColor: Colors.black,
-    backgroundColor:Colors.white,
-  accentIconTheme: IconThemeData(color: Colors.white),
-  dividerColor: Colors.white54,
-);
+    backgroundColor: Colors.white,
+    dialogBackgroundColor: Colors.grey.shade800,
+    cardColor: Colors.grey.shade200,
+    dividerColor: Colors.grey,
+    iconTheme: IconThemeData(
+      color: Colors.black,
+    ),
+    textTheme: TextTheme(
+      headline1: TextStyle(
+          color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20.0),
+      bodyText1: TextStyle(color: Colors.black, fontSize: 18.0),
+      bodyText2: TextStyle(color: Colors.white, fontSize: 14.0),
+    ),
+    appBarTheme: AppBarTheme(
+        iconTheme: IconThemeData(color: Colors.white),
+        centerTitle: true,
+        color: Colors.white,
+        elevation: 10.0,
+        textTheme: TextTheme(
+          headline1: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20.0),
+        )));

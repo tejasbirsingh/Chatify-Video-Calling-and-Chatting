@@ -68,8 +68,9 @@ class ViewLayout extends StatelessWidget {
         (friendViewLayout != null ? friendViewLayout.name : null) != null
             ? friendViewLayout.name
             : "..",
-        style:
-            TextStyle(color: Colors.white, fontFamily: "Arial", fontSize: 19),
+            style:Theme.of(context).textTheme.bodyText1
+        // style:
+            // TextStyle(color: Colors.white, fontFamily: "Arial", fontSize: 19),
       ),
       trailing: IconButton(icon: Icon(Icons.info,color: Colors.green,),
       onPressed: (){},),

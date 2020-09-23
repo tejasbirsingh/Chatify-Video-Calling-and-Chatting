@@ -18,7 +18,8 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: UniversalVariables.blackColor,
+      // backgroundColor: UniversalVariables.blackColor,
+      backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: [
           Center(
@@ -43,6 +44,7 @@ class LoginScreenState extends State<LoginScreen> {
         child: Text(
           "LOGIN",
           style: TextStyle(
+            color: Theme.of(context).textTheme.bodyText1.color,
               fontSize: 35, fontWeight: FontWeight.w900, letterSpacing: 1.2),
         ),
         onPressed: () => performLogin(),

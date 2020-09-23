@@ -28,6 +28,7 @@ class LastMessageContainer extends StatelessWidget {
                     message.message,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+       
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 14,

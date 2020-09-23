@@ -18,7 +18,8 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
-        backgroundColor: UniversalVariables.blackColor,
+        // backgroundColor: UniversalVariables.blackColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
           title: UserCircle(),
           actions: <Widget>[
@@ -34,7 +35,8 @@ class ChatListScreen extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.more_vert,
-                color: Colors.white,
+                  color: Theme.of(context).iconTheme.color,
+                // color: Colors.white,
               ),
               onPressed: () {
                 Navigator.pushNamed(context, "/setting_page");

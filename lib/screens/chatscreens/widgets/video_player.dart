@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:skype_clone/screens/chatscreens/video_viewer.dart';
+
 import 'package:video_player/video_player.dart';
 
 class videoPlayer extends StatefulWidget {
@@ -20,7 +22,8 @@ class _videoPlayerState extends State<videoPlayer> {
     _videoPlayerController
       ..initialize().then((_) {
         _videoPlayerController.setLooping(false);
-        _videoPlayerController.seekTo(Duration(seconds: 0));
+        
+        // _videoPlayerController.seekTo(Duration(seconds: 0));
         setState(() {});
         _videoPlayerController..addListener(() {});
       });
@@ -38,10 +41,15 @@ class _videoPlayerState extends State<videoPlayer> {
     return Column(
       children: [
         _videoPlayerController.value.initialized
-            ? AspectRatio(
-                aspectRatio: _videoPlayerController.value.aspectRatio,
-                child: VideoPlayer(_videoPlayerController),
-              )
+            ? GestureDetector(
+              onTap: (){
+                 Navigator.push(context,MaterialPageRoute(builder: (context)=> videoPage(url: widget.url,)));   },
+                child: AspectRatio(
+                  aspectRatio: _videoPlayerController.value.aspectRatio,
+                  // aspectRatio: 2/1,
+                  child: VideoPlayer(_videoPlayerController),
+                ),
+            )
             : Container(),
         
        

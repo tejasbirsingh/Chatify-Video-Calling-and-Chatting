@@ -11,7 +11,8 @@ class LogScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
-        backgroundColor: UniversalVariables.blackColor,
+        // backgroundColor: UniversalVariables.blackColor,
+            backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
           title: "Calls",
           actions: <Widget>[

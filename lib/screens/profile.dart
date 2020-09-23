@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skype_clone/models/userData.dart';
+import 'package:skype_clone/widgets/appbar.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 
 class profilePage extends StatefulWidget {
@@ -14,9 +16,14 @@ class _profilePageState extends State<profilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.user.name),
+      backgroundColor: Theme.of(context).backgroundColor,
+      appBar:AppBar(
+        title: Text(widget.user.name,style: Theme.of(context).textTheme.headline1,),
+        leading: IconButton(icon: Icon(Icons.arrow_back),
+        color: Theme.of(context).iconTheme.color,
+        onPressed: ()=>Navigator.pop(context),),
       ),
+
       body: Column(
         
         children: [
@@ -31,9 +38,8 @@ class _profilePageState extends State<profilePage> {
           ),
           SizedBox(height: 20.0,),
           Text('Email :    ' + widget.user.email,
-          style: TextStyle(
-            fontSize: 20.0
-          ),)
+          style: Theme.of(context).textTheme.headline1
+          )
       
 
       ],),

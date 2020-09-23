@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
-import 'package:skype_clone/Theme/theme_provider.dart';
+import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
@@ -29,9 +29,9 @@ class settingPage extends StatefulWidget {
 // ignore: camel_case_types
 class _settingPageState extends State<settingPage> {
   bool _darkTheme = true;
-bool _appLocked =false;
+  bool _appLocked = false;
   File imageFile;
-  bool _isEditing= false;
+  bool _isEditing = false;
   final picker = ImagePicker();
   final UpdateMethods _updateMethods = UpdateMethods();
   AuthMethods authUser = AuthMethods();
@@ -40,13 +40,11 @@ bool _appLocked =false;
   void initState() {
     super.initState();
     getSwitchValues();
-
   }
-  getSwitchValues() async{
+
+  getSwitchValues() async {
     _appLocked = await getAppLocker();
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   @override
@@ -59,8 +57,10 @@ bool _appLocked =false;
     _darkTheme = (themeNotifier.getTheme() == darkTheme);
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(title: Text('Settings'), actions: [
           IconButton(
+            color: Theme.of(context).iconTheme.color,
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.of(context).pop(),
           )
@@ -77,8 +77,8 @@ bool _appLocked =false;
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    print(
-                        'this the url ${snapshot.data.data()["profile_photo"]}');
+                    // print(
+                    //     'this the url ${snapshot.data.data()["profile_photo"]}');
                     String url = snapshot.data.data()['profile_photo'];
 
                     return ListTile(
@@ -110,11 +110,16 @@ bool _appLocked =false;
                   }
                 }),
             ListTile(
-              title: Text('Dark Mode'),
+              title: Text(
+                'Dark Mode',
+                style: Theme.of(context).textTheme.headline1,
+              ),
               contentPadding: const EdgeInsets.only(left: 16.0),
               trailing: Transform.scale(
                 scale: 0.8,
                 child: Switch(
+                  inactiveTrackColor: Theme.of(context).dividerColor,
+                  activeColor: Colors.green,
                   value: _darkTheme,
                   onChanged: (val) {
                     setState(() {
@@ -126,29 +131,40 @@ bool _appLocked =false;
               ),
             ),
             ListTile(
-              title: Text("Name"),
-              subtitle: Text(userProvider.getUser.name),
+              title: Text(
+                "Name",
+                style: Theme.of(context).textTheme.headline1,
+              ),
+              subtitle: Text(userProvider.getUser.name,
+                  style: Theme.of(context).textTheme.bodyText1),
               trailing: IconButton(icon: Icon(Icons.edit), onPressed: () {}),
             ),
             ListTile(
-              title: Text("Email"),
-              subtitle: Text(userProvider.getUser.email),
+              title: Text(
+                "Email",
+                style: Theme.of(context).textTheme.headline1,
+              ),
+              subtitle: Text(userProvider.getUser.email,
+                  style: Theme.of(context).textTheme.bodyText1),
               trailing: IconButton(icon: Icon(Icons.edit), onPressed: () {}),
             ),
             ListTile(
-              title: Text('App Locker'),
+              title: Text(
+                'App Locker',
+                style: Theme.of(context).textTheme.headline1,
+              ),
               contentPadding: const EdgeInsets.only(left: 16.0),
               trailing: Transform.scale(
                 scale: 0.8,
                 child: Switch(
+                      inactiveTrackColor: Theme.of(context).dividerColor,
+                  activeColor: Colors.green,
                   value: _appLocked,
                   onChanged: (bool val) {
                     setState(() {
                       _appLocked = val;
-                       setAppLocker(val);
+                      setAppLocker(val);
                     });
-                   
-                 
                   },
                 ),
               ),
@@ -158,21 +174,22 @@ bool _appLocked =false;
       ),
     );
   }
-  Future<bool> getAppLocker() async{
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-     setState(() {
-               _appLocked = prefs.getBool('isLocked')!= null ? prefs.getBool('isLocked') : false ;
-     });
-     return _appLocked;
-     }
 
-  Future<bool> setAppLocker(bool val) async{
+  Future<bool> getAppLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLocked', val);
-         return val;
+    setState(() {
+      _appLocked =
+          prefs.getBool('isLocked') != null ? prefs.getBool('isLocked') : false;
+    });
+    return _appLocked;
   }
 
-  
+  Future<bool> setAppLocker(bool val) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLocked', val);
+    return val;
+  }
+
   Future<File> _pickImage(String action) async {
     File selectedImage;
     this.setState(() {
@@ -197,25 +214,24 @@ bool _appLocked =false;
             backgroundColor: Colors.black,
             toolbarWidgetColor: Colors.white,
           ));
-          this.setState(() {
-            _isEditing=false;
-          });
-    return cropped;
-    }
-    else{
-       this.setState(() {
-            _isEditing=false;
-          });
+      this.setState(() {
+        _isEditing = false;
+      });
+      return cropped;
+    } else {
+      this.setState(() {
+        _isEditing = false;
+      });
     }
     return selectedImage;
   }
 
   void onThemeChanged(bool value, ThemeNotifier themeNotifier) async {
-    (value)
+    (value) == true
         ? themeNotifier.setTheme(darkTheme)
         : themeNotifier.setTheme(lightTheme);
     var prefs = await SharedPreferences.getInstance();
-    prefs.setBool('darkMode', value);
+    prefs.setBool('darkTheme', value);
   }
 
   Future<AlertDialog> _showImageDialog(BuildContext context, UserData user) {

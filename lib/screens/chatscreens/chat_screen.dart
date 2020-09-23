@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +22,10 @@ import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
 import 'package:skype_clone/screens/profile.dart';
 import 'package:skype_clone/utils/call_utilities.dart';
 import 'package:skype_clone/utils/permissions.dart';
@@ -34,6 +37,7 @@ import 'package:skype_clone/widgets/custom_tile.dart';
 import 'dart:io' as Io;
 
 import 'package:video_player/video_player.dart';
+import 'package:video_trimmer/video_trimmer.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
@@ -131,8 +135,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return PickupLayout(
       scaffold: Scaffold(
-        backgroundColor: UniversalVariables.blackColor,
+        // backgroundColor: UniversalVariables.blackColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         appBar: customAppBar(context),
+  
         body: Stack(
           children: [
             Column(
@@ -244,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget senderLayout(Message message) {
-    Radius messageRadius = Radius.circular(10);
+    Radius messageRadius = Radius.circular(35.0);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -252,9 +258,10 @@ class _ChatScreenState extends State<ChatScreen> {
         Container(
           margin: EdgeInsets.only(top: 10),
           constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.45),
+              maxWidth: MediaQuery.of(context).size.width * 0.50),
           decoration: BoxDecoration(
-            color: UniversalVariables.senderColor,
+            // color: UniversalVariables.senderColor,
+            gradient: LinearGradient(colors: [Colors.green.shade400,Colors.teal.shade600]),
             borderRadius: BorderRadius.only(
               topLeft: messageRadius,
               topRight: messageRadius,
@@ -288,16 +295,17 @@ class _ChatScreenState extends State<ChatScreen> {
                             imageUrl: message.photoUrl,
                           ))))
           : Icon(Icons.sync_problem);
-    }
-    else if(message.type == MESSAGE_TYPE_VIDEO){
-      return message.videoUrl!=null ? videoPlayer(
-        url: message.videoUrl,
-      ) : Icon(Icons.sync_problem);
-    }
-    else{
-      return Text(message.message,
-      style: TextStyle(color: Colors.white,
-      fontSize: 16.0),);
+    } else if (message.type == MESSAGE_TYPE_VIDEO) {
+      return message.videoUrl != null
+          ? videoPlayer(
+              url: message.videoUrl,
+            )
+          : Icon(Icons.sync_problem);
+    } else {
+      return Text(
+        message.message,
+        style: TextStyle(color: Colors.white, fontSize: 16.0),
+      );
     }
   }
 
@@ -323,7 +331,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget receiverLayout(Message message) {
-    Radius messageRadius = Radius.circular(10);
+    Radius messageRadius = Radius.circular(35);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -331,9 +339,10 @@ class _ChatScreenState extends State<ChatScreen> {
         Container(
           margin: EdgeInsets.only(top: 12),
           constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.65),
+              maxWidth: MediaQuery.of(context).size.width * 0.50),
           decoration: BoxDecoration(
-            color: UniversalVariables.receiverColor,
+            // color: UniversalVariables.receiverColor,
+            gradient: LinearGradient(colors: [Colors.blue.shade700,Colors.blue.shade900]),
             borderRadius: BorderRadius.only(
               bottomRight: messageRadius,
               topRight: messageRadius,
@@ -485,6 +494,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Expanded(
             child: Stack(
+              
               alignment: Alignment.centerRight,
               children: [
                 TextField(
@@ -505,9 +515,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                   decoration: InputDecoration(
                     hintText: "Type a message",
-                    hintStyle: TextStyle(
-                      color: UniversalVariables.greyColor,
-                    ),
+                    hintStyle: Theme.of(context).textTheme.bodyText2,
+                    //TextStyle(
+                      // color: UniversalVariables.greyColor,                    
+                    // ),
                     border: OutlineInputBorder(
                         borderRadius: const BorderRadius.all(
                           const Radius.circular(50.0),
@@ -516,7 +527,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     filled: true,
-                    fillColor: UniversalVariables.separatorColor,
+                    // fillColor: UniversalVariables.separatorColor,
+                    fillColor: Theme.of(context).dividerColor
                   ),
                 ),
                 IconButton(
@@ -604,10 +616,37 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // Future pickVideo() async {
+  //   PickedFile video = await ImagePicker().getVideo(
+  //       source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
+
+  //   if (video != null) {
+  //     videoPlayerController = VideoPlayerController.file(File(video.path))
+  //       ..initialize().then((_) {
+  //         setState(() {
+  //           videoPlayerController.play();
+  //         });
+  //       });
+  //     _storageMethods.uploadVideo(
+  //         video: File(video.path),
+  //         receiverId: widget.receiver.uid,
+  //         senderId: _currentUserId,
+  //         videoUploadProvider: _videoUploadProvider);
+  //   }
+  // }
+
   Future pickVideo() async {
+    final Trimmer _trimmer = Trimmer();
     PickedFile video = await ImagePicker().getVideo(
         source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
-
+    await _trimmer.loadVideo(videoFile: File(video.path));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return TrimmerView(
+        trimmerFile: _trimmer,
+        receiver: widget.receiver.uid,
+        sender: _currentUserId,
+      );
+    }));
     if (video != null) {
       videoPlayerController = VideoPlayerController.file(File(video.path))
         ..initialize().then((_) {
@@ -615,11 +654,6 @@ class _ChatScreenState extends State<ChatScreen> {
             videoPlayerController.play();
           });
         });
-      _storageMethods.uploadVideo(
-          video: File(video.path),
-          receiverId: widget.receiver.uid,
-          senderId: _currentUserId,
-          videoUploadProvider: _videoUploadProvider);
     }
   }
 
@@ -635,6 +669,7 @@ class _ChatScreenState extends State<ChatScreen> {
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back,
+            color: Theme.of(context).iconTheme.color,
         ),
         onPressed: () {
           Navigator.pop(context);
@@ -643,10 +678,13 @@ class _ChatScreenState extends State<ChatScreen> {
       centerTitle: false,
       title: Text(
         widget.receiver.name,
+        style: Theme.of(context).textTheme.headline1,
       ),
       actions: <Widget>[
         IconButton(
+            color: Theme.of(context).iconTheme.color,
           icon: Icon(
+            
             Icons.video_call,
           ),
           onPressed: () async =>
@@ -659,6 +697,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   : {},
         ),
         IconButton(
+            color: Theme.of(context).iconTheme.color,
           icon: Icon(
             Icons.phone,
           ),

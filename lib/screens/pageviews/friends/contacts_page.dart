@@ -29,9 +29,11 @@ class _contactsPageState extends State<contactsPage> {
         Provider.of<UserProvider>(context, listen: true);
 
     return Scaffold(
-      backgroundColor: UniversalVariables.blackColor,
+      // backgroundColor: UniversalVariables.blackColor,
+          backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
-          title: Text('Contacts Page'),
+          title: Text('Contacts Page',
+          style: Theme.of(context).textTheme.headline1,),
           actions: [IconButton(icon: Icon(Icons.list), onPressed: () {})],
         ),
         body: StreamBuilder<QuerySnapshot>(
@@ -47,9 +49,7 @@ class _contactsPageState extends State<contactsPage> {
                 itemBuilder: (context, i) {
                   Contact user = Contact.fromMap(docList[i].data());
                   return friendView(user);
-                  // return CustomTile( title: Text(docList[i].data()["uid"]),
-                  // subtitle: Text('Hello'),
-                  // leading: Icon(Icons.access_alarm),) ;
+                 
                 },
               );
             }

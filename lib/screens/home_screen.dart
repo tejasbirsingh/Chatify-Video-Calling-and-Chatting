@@ -132,7 +132,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return PickupLayout(
       scaffold: Scaffold(
-        backgroundColor: UniversalVariables.blackColor,
+        // backgroundColor: UniversalVariables.blackColor,
+        backgroundColor:Theme.of(context).backgroundColor,
         body: PageView(
           children: <Widget>[
             

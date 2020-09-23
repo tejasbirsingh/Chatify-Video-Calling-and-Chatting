@@ -23,9 +23,10 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.only(topLeft:Radius.circular(30.0),topRight: Radius.circular(30.0)),
-      color: Colors.white70,
-      elevation: 10.0,
+      borderRadius: BorderRadius.only(topLeft:Radius.circular(40.0),topRight: Radius.circular(40.0)),
+      color:Theme.of(context).cardColor,
+      
+ 
       child: Padding(
         padding: const EdgeInsets.only(
           bottom: 10.0,
@@ -67,7 +68,7 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
             children: <Widget>[
               Icon(
                 item.iconData,
-                color: isSelected ? item.color : Colors.black,
+                color: isSelected ? item.color :Theme.of(context).iconTheme.color,
                 size: widget.barStyle.iconSize,
               ),
               SizedBox(

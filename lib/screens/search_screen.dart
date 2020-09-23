@@ -152,18 +152,15 @@ class _SearchScreenState extends State<SearchScreen> {
           // ),
           title: Text(
             searchedUser.username,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.bodyText1
           ),
           subtitle: Text(
             searchedUser.name,
-            style: TextStyle(color: UniversalVariables.greyColor),
+            style: Theme.of(context).textTheme.bodyText1,
           ),
           trailing: IconButton(
-            icon: isFriend ? Icon(Icons.check) : Icon(Icons.person_add),
-            color: isFriend ? Colors.green : Colors.white,
+            icon: isFriend ? Icon(Icons.check,size: 40.0,) : Icon(Icons.person_add,size:40.0),
+            color: isFriend ? Colors.green :Theme.of(context).iconTheme.color,
             onPressed: () {
               _authMethods.addFriend(user.uid, searchedUser.uid);
                         },
@@ -180,7 +177,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return PickupLayout(
       scaffold: Scaffold(
-        backgroundColor: UniversalVariables.blackColor,
+        // backgroundColor: UniversalVariables.blackColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         appBar: searchAppBar(context),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
