@@ -687,14 +687,16 @@ class _ChatScreenState extends State<ChatScreen> {
             
             Icons.video_call,
           ),
-          onPressed: () async =>
+          onPressed: () async {
               await Permissions.cameraAndMicrophonePermissionsGranted()
                   ? CallUtils.dial(
                       from: sender,
                       to: widget.receiver,
                       context: context,
                     )
-                  : {},
+                  : {};
+                 
+                  }
         ),
         IconButton(
             color: Theme.of(context).iconTheme.color,

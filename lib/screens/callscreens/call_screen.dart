@@ -66,11 +66,11 @@ class _CallScreenState extends State<CallScreen> {
           .callStream(uid: userProvider.getUser.uid)
           .listen((DocumentSnapshot ds) {
         // defining the logic
-        switch (ds.data) {
+        switch (ds.data()) {
           case null:
             // snapshot is null which means that call is hanged and documents are deleted
             Navigator.pop(context);
-            break;
+            break; 
 
           default:
             break;
@@ -143,6 +143,7 @@ class _CallScreenState extends State<CallScreen> {
     };
 
     AgoraRtcEngine.onLeaveChannel = () {
+   
       setState(() {
         _infoStrings.add('onLeaveChannel');
         _users.clear();
@@ -323,9 +324,12 @@ class _CallScreenState extends State<CallScreen> {
             padding: const EdgeInsets.all(12.0),
           ),
           RawMaterialButton(
-            onPressed: () => callMethods.endCall(
+            onPressed: () {
+              callMethods.endCall(
               call: widget.call,
-            ),
+            );
+            Navigator.pop(context);
+            },
             child: Icon(
               Icons.call_end,
               color: Colors.white,
@@ -366,7 +370,7 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return    Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Stack(
