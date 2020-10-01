@@ -123,7 +123,9 @@ class _SearchScreenState extends State<SearchScreen> {
             uid: suggestionList[index].uid,
             profilePhoto: suggestionList[index].profilePhoto,
             name: suggestionList[index].name,
-            username: suggestionList[index].email);
+            username: suggestionList[index].email,
+            firebaseToken: suggestionList[index].firebaseToken
+            );
 
         bool isFriend;
         if (friendsList.contains(searchedUser.uid.toString())) {
@@ -143,7 +145,7 @@ class _SearchScreenState extends State<SearchScreen> {
           },
           leading: CachedImage(
             searchedUser.profilePhoto,
-            radius: 25,
+            radius:60.0 ,
             isRound: true,
           ),
           // leading: CircleAvatar(

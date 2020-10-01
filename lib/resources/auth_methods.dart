@@ -74,7 +74,7 @@ class AuthMethods {
     return docs.length == 0 ? true : false;
   }
 
-  Future<void> addDataToDb(User currentUser) async {
+  Future<void> addDataToDb(User currentUser,String token) async {
     String username = Utils.getUsername(currentUser.email);
 
     UserData user = UserData(
@@ -82,6 +82,7 @@ class AuthMethods {
         email: currentUser.email,
         name: currentUser.displayName,
         profilePhoto: currentUser.photoURL,
+        firebaseToken:token,
         username: username);
 
     firestore

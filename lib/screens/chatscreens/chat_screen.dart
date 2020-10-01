@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:photofilters/filters/filters.dart';
 import 'package:photofilters/filters/preset_filters.dart';
 import 'package:provider/provider.dart';
+import 'package:skype_clone/configs/firebase_config.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/enum/view_state.dart';
 import 'package:skype_clone/models/message.dart';
@@ -138,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen> {
         // backgroundColor: UniversalVariables.blackColor,
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: customAppBar(context),
-  
+
         body: Stack(
           children: [
             Column(
@@ -261,7 +263,8 @@ class _ChatScreenState extends State<ChatScreen> {
               maxWidth: MediaQuery.of(context).size.width * 0.50),
           decoration: BoxDecoration(
             // color: UniversalVariables.senderColor,
-            gradient: LinearGradient(colors: [Colors.green.shade400,Colors.teal.shade600]),
+            gradient: LinearGradient(
+                colors: [Colors.green.shade400, Colors.teal.shade600]),
             borderRadius: BorderRadius.only(
               topLeft: messageRadius,
               topRight: messageRadius,
@@ -309,6 +312,40 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<http.Response> sendNotification(
+      String message, String sender, String receiver) async{
+  //        await firebaseMessaging.requestNotificationPermissions(
+  //   const IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false),
+  // );
+    // print("Firebase Token: " + receiver);
+    return await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Authorization': 'key=$SERVER_KEY',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        // "message": {
+        "to": "$receiver",
+        "collapse_key": "type_a",
+        "priority": "high",
+        "alert":"true",
+        "id":'1',
+        "notification": {
+          "title": "$sender",
+          "body": "$message",
+        },
+        "data": {
+          "title": "$sender",
+          "body": "$message",
+          "sound": "default",
+          "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        }
+        // }
+      }),
+    );
+  }
+
   formatTime(DateTime time) {
     String date = time.day.toString() +
         "/" +
@@ -342,7 +379,8 @@ class _ChatScreenState extends State<ChatScreen> {
               maxWidth: MediaQuery.of(context).size.width * 0.50),
           decoration: BoxDecoration(
             // color: UniversalVariables.receiverColor,
-            gradient: LinearGradient(colors: [Colors.blue.shade700,Colors.blue.shade900]),
+            gradient: LinearGradient(
+                colors: [Colors.blue.shade700, Colors.blue.shade900]),
             borderRadius: BorderRadius.only(
               bottomRight: messageRadius,
               topRight: messageRadius,
@@ -472,6 +510,8 @@ class _ChatScreenState extends State<ChatScreen> {
       textFieldController.text = "";
 
       _chatMethods.addMessageToDb(_message);
+      sendNotification(_message.message.toString(), sender.name.toString(),
+          widget.receiver.firebaseToken.toString());
     }
 
     return Container(
@@ -494,7 +534,6 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Expanded(
             child: Stack(
-              
               alignment: Alignment.centerRight,
               children: [
                 TextField(
@@ -514,22 +553,21 @@ class _ChatScreenState extends State<ChatScreen> {
                         : setWritingTo(false);
                   },
                   decoration: InputDecoration(
-                    hintText: "Type a message",
-                    hintStyle: Theme.of(context).textTheme.bodyText2,
-                    //TextStyle(
-                      // color: UniversalVariables.greyColor,                    
-                    // ),
-                    border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          const Radius.circular(50.0),
-                        ),
-                        borderSide: BorderSide.none),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    filled: true,
-                    // fillColor: UniversalVariables.separatorColor,
-                    fillColor: Theme.of(context).dividerColor
-                  ),
+                      hintText: "Type a message",
+                      hintStyle: Theme.of(context).textTheme.bodyText2,
+                      //TextStyle(
+                      // color: UniversalVariables.greyColor,
+                      // ),
+                      border: OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(50.0),
+                          ),
+                          borderSide: BorderSide.none),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      filled: true,
+                      // fillColor: UniversalVariables.separatorColor,
+                      fillColor: Theme.of(context).dividerColor),
                 ),
                 IconButton(
                   splashColor: Colors.transparent,
@@ -669,7 +707,7 @@ class _ChatScreenState extends State<ChatScreen> {
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back,
-            color: Theme.of(context).iconTheme.color,
+          color: Theme.of(context).iconTheme.color,
         ),
         onPressed: () {
           Navigator.pop(context);
@@ -683,11 +721,10 @@ class _ChatScreenState extends State<ChatScreen> {
       actions: <Widget>[
         IconButton(
             color: Theme.of(context).iconTheme.color,
-          icon: Icon(
-            
-            Icons.video_call,
-          ),
-          onPressed: () async {
+            icon: Icon(
+              Icons.video_call,
+            ),
+            onPressed: () async {
               await Permissions.cameraAndMicrophonePermissionsGranted()
                   ? CallUtils.dial(
                       from: sender,
@@ -695,11 +732,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       context: context,
                     )
                   : {};
-                 
-                  }
-        ),
+            }),
         IconButton(
-            color: Theme.of(context).iconTheme.color,
+          color: Theme.of(context).iconTheme.color,
           icon: Icon(
             Icons.phone,
           ),

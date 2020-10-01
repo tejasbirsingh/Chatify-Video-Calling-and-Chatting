@@ -6,6 +6,7 @@ class UserData {
   String status;
   int state;
   String profilePhoto;
+  String firebaseToken;
 
   UserData({
     this.uid,
@@ -15,6 +16,7 @@ class UserData {
     this.status,
     this.state,
     this.profilePhoto,
+    this.firebaseToken,
   });
 
   Map toMap(UserData user) {
@@ -26,6 +28,7 @@ class UserData {
     data["status"] = user.status;
     data["state"] = user.state;
     data["profile_photo"] = user.profilePhoto;
+    data["firebase_token"] =user.firebaseToken;
     return data;
   }
 
@@ -38,5 +41,6 @@ class UserData {
     this.status = mapData['status'];
     this.state = mapData['state'];
     this.profilePhoto = mapData['profile_photo'];
+    this.firebaseToken=mapData['firebase_token'];
   }
 }
