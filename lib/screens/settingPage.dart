@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
@@ -157,6 +158,7 @@ class _settingPageState extends State<settingPage> {
               trailing: Transform.scale(
                 scale: 0.8,
                 child: Switch(
+               
                       inactiveTrackColor: Theme.of(context).dividerColor,
                   activeColor: Colors.green,
                   value: _appLocked,

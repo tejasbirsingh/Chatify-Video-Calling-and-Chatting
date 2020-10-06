@@ -35,7 +35,7 @@ class ChatListScreen extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.more_vert,
-                  color: Theme.of(context).iconTheme.color,
+                color: Theme.of(context).iconTheme.color,
                 // color: Colors.white,
               ),
               onPressed: () {
@@ -44,7 +44,7 @@ class ChatListScreen extends StatelessWidget {
             ),
           ],
         ),
-        floatingActionButton: NewChatButton(),
+        // floatingActionButton: NewChatButton(),
         body: ChatListContainer(),
       ),
     );
@@ -84,7 +84,9 @@ class ChatListContainer extends StatelessWidget {
               );
             }
 
-            return Center(child: Container(),);
+            return Center(
+              child: Container(),
+            );
           }),
     );
   }

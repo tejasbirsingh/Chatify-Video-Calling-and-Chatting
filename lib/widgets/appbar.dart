@@ -14,7 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
     Key key,
     @required this.title,
     @required this.actions,
-    @required this.leading, 
+     this.leading, 
     @required this.centerTitle,
     this.onTap,
   }) : super(key: key);

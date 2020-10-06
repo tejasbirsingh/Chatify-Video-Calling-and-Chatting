@@ -25,7 +25,7 @@ class LogScreen extends StatelessWidget {
             // ),
           ],
         ),
-        floatingActionButton: FloatingColumn(),
+        // floatingActionButton: FloatingColumn(),
         body: Padding(
           padding: EdgeInsets.only(left: 15),
           child: LogListContainer(),
