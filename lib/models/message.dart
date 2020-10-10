@@ -6,6 +6,7 @@ class Message {
   String receiverId;
   String type;
   String message;
+  
   Timestamp timestamp;
   String photoUrl;
   String videoUrl;

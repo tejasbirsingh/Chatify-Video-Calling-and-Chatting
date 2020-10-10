@@ -16,8 +16,8 @@ class Utils {
   static String getInitials(String name) {
     List<String> nameSplit = name.split(" ");
     String firstNameInitial = nameSplit[0][0];
-    String lastNameInitial = nameSplit[1][0];
-    return firstNameInitial + lastNameInitial;
+    String lastNameInitial = nameSplit.length > 1  ? nameSplit[1][0]  : "";
+    return lastNameInitial!="" ? firstNameInitial + lastNameInitial : firstNameInitial;
   }
 
   // this is new

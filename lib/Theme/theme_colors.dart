@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 final darkTheme = ThemeData(
     backgroundColor: Colors.black87,
     dialogBackgroundColor: Colors.grey,
-      cardColor: Colors.black54,
+    cardColor: Colors.grey.withOpacity(0.8),
+    splashColor: Colors.white,
     dividerColor: Colors.grey,
     iconTheme: IconThemeData(
       color: Colors.white,
@@ -24,9 +25,8 @@ final darkTheme = ThemeData(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),
         )));
 
-
-
 final lightTheme = ThemeData(
+    splashColor: Colors.black,
     backgroundColor: Colors.white,
     dialogBackgroundColor: Colors.grey.shade800,
     cardColor: Colors.grey.shade200,

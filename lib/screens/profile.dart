@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/widgets/appbar.dart';
+
 import 'package:velocity_x/velocity_x.dart';
 
 
@@ -24,25 +24,30 @@ class _profilePageState extends State<profilePage> {
         onPressed: ()=>Navigator.pop(context),),
       ),
 
-      body: Column(
-        
-        children: [
-          SizedBox(height: 10.0,),
-          Align(
-            alignment: Alignment.center,
-                      child: CircleAvatar(
-              radius: 120.0,
-              backgroundImage: NetworkImage(widget.user.profilePhoto
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal:18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 10.0,),
+            Align(
+              alignment: Alignment.center,
+                        child: CircleAvatar(
+                radius: 120.0,
+                backgroundImage: NetworkImage(widget.user.profilePhoto
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 20.0,),
-          Text('Email :    ' + widget.user.email,
-          style: Theme.of(context).textTheme.headline1
-          )
-      
-
-      ],),
+            SizedBox(height: 20.0,),
+            Text('Email :    ' + widget.user.email,
+            style: Theme.of(context).textTheme.headline1
+            ),
+             SizedBox(height: 20.0,),
+           Text('Status :    ${widget.user.status ?? 'No status'}' ,
+            style: Theme.of(context).textTheme.headline1
+            ),
+        ],),
+      ),
       
     );
   }

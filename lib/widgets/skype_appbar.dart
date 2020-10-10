@@ -5,11 +5,13 @@ import 'package:skype_clone/widgets/appbar.dart';
 class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final title;
   final List<Widget> actions;
+  final Widget leading;
 
   const SkypeAppBar({
     Key key,
     @required this.title,
     @required this.actions,
+    this.leading
   }) : super(key: key);
 
   @override
@@ -17,7 +19,7 @@ class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       color: Theme.of(context).backgroundColor,
       child: CustomAppBar(
-        
+        leading : leading,
         // leading: IconButton(
         //   icon: Icon(
         //     Icons.notifications,

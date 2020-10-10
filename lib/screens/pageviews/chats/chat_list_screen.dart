@@ -11,8 +11,6 @@ import 'package:skype_clone/screens/pageviews/chats/widgets/user_circle.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/widgets/skype_appbar.dart';
 
-import 'widgets/new_chat_button.dart';
-
 class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -23,15 +21,6 @@ class ChatListScreen extends StatelessWidget {
         appBar: SkypeAppBar(
           title: UserCircle(),
           actions: <Widget>[
-            // IconButton(
-            //   icon: Icon(
-            //     Icons.search,
-            //     color: Colors.white,
-            //   ),
-            //   onPressed: () {
-            //     Navigator.pushNamed(context, "/search_screen");
-            //   },
-            // ),
             IconButton(
               icon: Icon(
                 Icons.more_vert,
@@ -44,7 +33,6 @@ class ChatListScreen extends StatelessWidget {
             ),
           ],
         ),
-        // floatingActionButton: NewChatButton(),
         body: ChatListContainer(),
       ),
     );
@@ -69,9 +57,9 @@ class ChatListContainer extends StatelessWidget {
 
               if (docList.isEmpty) {
                 return QuietBox(
-                  heading: "This is where all the contacts are listed",
+                  heading: "All recent chats with friends will be shown here",
                   subtitle:
-                      "Search for your friends and family to start calling or chatting with them",
+                      "Search your friends, add them and start chatting !",
                 );
               }
               return ListView.builder(

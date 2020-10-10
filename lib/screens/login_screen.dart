@@ -73,7 +73,7 @@ class LoginScreenState extends State<LoginScreen> {
       isLoginPressed = false;
     });
   }
- Future<bool> setAppLocker() async {
+  setAppLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLocked', false);
     
@@ -94,6 +94,7 @@ class LoginScreenState extends State<LoginScreen> {
           }));
         });
       } else {
+          setAppLocker();
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
           return HomeScreen();

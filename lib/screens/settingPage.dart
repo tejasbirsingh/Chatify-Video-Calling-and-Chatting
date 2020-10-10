@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:toggle_switch/toggle_switch.dart';
+
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
@@ -33,10 +33,17 @@ class _settingPageState extends State<settingPage> {
   bool _appLocked = false;
   File imageFile;
   bool _isEditing = false;
+  String newName = "";
+  String newStatus = "";
+  final _statusKey = GlobalKey<FormState>();
+  final _nameKey = GlobalKey<FormState>();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _statusController = TextEditingController();
   final picker = ImagePicker();
   final UpdateMethods _updateMethods = UpdateMethods();
   AuthMethods authUser = AuthMethods();
-
+  bool isNameEdit = false;
+  bool isStatusEdit = false;
   @override
   void initState() {
     super.initState();
@@ -59,30 +66,29 @@ class _settingPageState extends State<settingPage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        appBar: SkypeAppBar(title: Text('Settings'), actions: [
-          IconButton(
-            color: Theme.of(context).iconTheme.color,
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.of(context).pop(),
-          )
-        ]),
-        body: ListView(
-          children: [
-            SizedBox(
-              height: 20.0,
-            ),
-            StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection(USERS_COLLECTION)
-                    .doc(userProvider.getUser.uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    // print(
-                    //     'this the url ${snapshot.data.data()["profile_photo"]}');
-                    String url = snapshot.data.data()['profile_photo'];
-
-                    return ListTile(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Settings', style: Theme.of(context).textTheme.headline1),
+          iconTheme:Theme.of(context).iconTheme
+         
+        ),
+        body: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection(USERS_COLLECTION)
+                .doc(userProvider.getUser.uid)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                String url = snapshot.data.data()['profile_photo'];
+                String name = snapshot.data.data()['name'];
+                String email = snapshot.data.data()['email'];
+                String status = snapshot.data.data()['status'];
+                return ListView(
+                  children: [
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    ListTile(
                       contentPadding: EdgeInsets.symmetric(
                           horizontal:
                               MediaQuery.of(context).size.width / 2 - 100.0),
@@ -103,76 +109,223 @@ class _settingPageState extends State<settingPage> {
                           ),
                         ),
                       ),
-                    );
-                  } else {
-                    return ListTile(
-                      leading: CircularProgressIndicator(),
-                    );
-                  }
-                }),
-            ListTile(
-              title: Text(
-                'Dark Mode',
-                style: Theme.of(context).textTheme.headline1,
-              ),
-              contentPadding: const EdgeInsets.only(left: 16.0),
-              trailing: Transform.scale(
-                scale: 0.8,
-                child: Switch(
-                  inactiveTrackColor: Theme.of(context).dividerColor,
-                  activeColor: Colors.green,
-                  value: _darkTheme,
-                  onChanged: (val) {
-                    setState(() {
-                      _darkTheme = val;
-                    });
-                    onThemeChanged(val, themeNotifier);
-                  },
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                "Name",
-                style: Theme.of(context).textTheme.headline1,
-              ),
-              subtitle: Text(userProvider.getUser.name,
-                  style: Theme.of(context).textTheme.bodyText1),
-              trailing: IconButton(icon: Icon(Icons.edit), onPressed: () {}),
-            ),
-            ListTile(
-              title: Text(
-                "Email",
-                style: Theme.of(context).textTheme.headline1,
-              ),
-              subtitle: Text(userProvider.getUser.email,
-                  style: Theme.of(context).textTheme.bodyText1),
-              trailing: IconButton(icon: Icon(Icons.edit), onPressed: () {}),
-            ),
-            ListTile(
-              title: Text(
-                'App Locker',
-                style: Theme.of(context).textTheme.headline1,
-              ),
-              contentPadding: const EdgeInsets.only(left: 16.0),
-              trailing: Transform.scale(
-                scale: 0.8,
-                child: Switch(
-               
-                      inactiveTrackColor: Theme.of(context).dividerColor,
-                  activeColor: Colors.green,
-                  value: _appLocked,
-                  onChanged: (bool val) {
-                    setState(() {
-                      _appLocked = val;
-                      setAppLocker(val);
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Dark Mode',
+                        style: Theme.of(context).textTheme.headline1,
+                      ),
+                      contentPadding: const EdgeInsets.only(left: 16.0),
+                      trailing: Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          inactiveTrackColor: Theme.of(context).dividerColor,
+                          activeColor: Colors.green,
+                          value: _darkTheme,
+                          onChanged: (val) {
+                            setState(() {
+                              _darkTheme = val;
+                            });
+                            onThemeChanged(val, themeNotifier);
+                          },
+                        ),
+                      ),
+                    ),
+                    isNameEdit == false
+                        ? ListTile(
+                            title: Text(
+                              "Name",
+                              style: Theme.of(context).textTheme.headline1,
+                            ),
+                            subtitle: Text(name,
+                                style: Theme.of(context).textTheme.bodyText1),
+                            trailing: IconButton(
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isNameEdit = true;
+                                  });
+                                }),
+                          )
+                        : Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Form(
+                              key: _nameKey,
+                              child: TextFormField(
+                                controller: _nameController,
+                                cursorColor: Theme.of(context).iconTheme.color,
+                                style: Theme.of(context).textTheme.bodyText1,
+                                validator: (val) {
+                                  if (val.length < 2)
+                                    return "Name should be atleast of length 2 !";
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).splashColor,
+                                          width: 2.0),
+                                    ),
+                                     focusedBorder:OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).splashColor,
+                                          width: 2.0),
+                                    ),
+                                    hintText: "Edit Name",
+                                    labelText: "Name",
+                                    hintStyle:
+                                        Theme.of(context).textTheme.bodyText1,
+                                    labelStyle:
+                                        Theme.of(context).textTheme.bodyText1,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        Icons.check,
+                                        size: 30.0,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                      onPressed: () {
+                                        if (_nameKey.currentState.validate()) {
+                                          FirebaseFirestore.instance
+                                              .collection(USERS_COLLECTION)
+                                              .doc(userProvider.getUser.uid)
+                                              .update({
+                                            "name": _nameController.text
+                                          });
+                                          _nameController.clear();
+                                          setState(() {
+                                            isNameEdit = false;
+                                          });
+                                        }
+                                        setState(() {
+                                          isNameEdit = false;
+                                        });
+                                      },
+                                    )),
+                              ),
+                            ),
+                          ),
+                    isStatusEdit == false
+                        ? ListTile(
+                            title: Text(
+                              "Status",
+                              style: Theme.of(context).textTheme.headline1,
+                            ),
+                            subtitle: Text(status ?? "No Status",
+                                style: Theme.of(context).textTheme.bodyText1),
+                            trailing: IconButton(
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isStatusEdit = true;
+                                  });
+                                }),
+                          )
+                        : Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Form(
+                              key: _statusKey,
+                              child: TextFormField(
+                                controller: _statusController,
+                                cursorColor: Theme.of(context).iconTheme.color,
+                                style: Theme.of(context).textTheme.bodyText1,
+                                validator: (val) {
+                                  if (val.isEmpty) return "Enter the Status";
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).splashColor,
+                                          width: 2.0),
+                                    ),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).splashColor,
+                                          width: 2.0),
+                                    ),
+                                    hintText: "Edit Status",
+                                    labelText: "Status",
+                                    hintStyle:
+                                        Theme.of(context).textTheme.bodyText1,
+                                    labelStyle:
+                                        Theme.of(context).textTheme.bodyText1,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        Icons.check,
+                                        size: 30.0,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                      onPressed: () {
+                                        if (_statusKey.currentState
+                                            .validate()) {
+                                          FirebaseFirestore.instance
+                                              .collection(USERS_COLLECTION)
+                                              .doc(userProvider.getUser.uid)
+                                              .update({
+                                            "status": _statusController.text
+                                          });
+                                          _statusController.clear();
+                                          setState(() {
+                                            isStatusEdit = false;
+                                          });
+                                        }
+                                        setState(() {
+                                          isStatusEdit = false;
+                                        });
+                                      },
+                                    )),
+                              ),
+                            ),
+                          ),
+                    ListTile(
+                      title: Text(
+                        "Email",
+                        style: Theme.of(context).textTheme.headline1,
+                      ),
+                      subtitle: Text(email,
+                          style: Theme.of(context).textTheme.bodyText1),
+                      trailing:
+                          IconButton(icon: Icon(Icons.edit), onPressed: () {}),
+                    ),
+                    ListTile(
+                      title: Text(
+                        'App Locker',
+                        style: Theme.of(context).textTheme.headline1,
+                      ),
+                      contentPadding: const EdgeInsets.only(left: 16.0),
+                      trailing: Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          inactiveTrackColor: Theme.of(context).dividerColor,
+                          activeColor: Colors.green,
+                          value: _appLocked,
+                          onChanged: (bool val) {
+                            setState(() {
+                              _appLocked = val;
+                              setAppLocker(val);
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            }),
       ),
     );
   }
@@ -242,9 +395,15 @@ class _settingPageState extends State<settingPage> {
         barrierDismissible: false,
         builder: ((context) {
           return SimpleDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
+            backgroundColor: Colors.grey,
             children: <Widget>[
               SimpleDialogOption(
-                child: Text('Choose from Gallery'),
+                child: Text(
+                  'Choose from Gallery',
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
                 onPressed: () {
                   _pickImage('Gallery').then((selectedImage) {
                     setState(() {
@@ -253,14 +412,17 @@ class _settingPageState extends State<settingPage> {
                     compressImage();
                     _updateMethods.uploadImageToStorage(imageFile).then((url) {
                       _updateMethods.updatePhoto(url, user.uid).then((v) {
-                        //  Navigator.pop(context);
+                        Navigator.pop(context);
                       });
                     });
                   });
                 },
               ),
               SimpleDialogOption(
-                child: Text('Take Photo'),
+                child: Text(
+                  'Take Photo',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 onPressed: () {
                   _pickImage('Camera').then((selectedImage) {
                     setState(() {
@@ -276,7 +438,10 @@ class _settingPageState extends State<settingPage> {
                 },
               ),
               SimpleDialogOption(
-                child: Text('Cancel'),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },

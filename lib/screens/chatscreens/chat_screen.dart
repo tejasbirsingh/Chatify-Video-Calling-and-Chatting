@@ -1,14 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:photofilters/filters/filters.dart';
 import 'package:photofilters/filters/preset_filters.dart';
 import 'package:provider/provider.dart';
@@ -20,11 +20,11 @@ import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
+import 'package:skype_clone/resources/call_methods.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
@@ -34,10 +34,8 @@ import 'package:skype_clone/utils/permissions.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import 'package:skype_clone/widgets/appbar.dart';
-
 import 'package:skype_clone/widgets/custom_tile.dart';
 import 'dart:io' as Io;
-
 import 'package:video_player/video_player.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
@@ -91,6 +89,11 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future parseText() async {
@@ -261,10 +264,20 @@ class _ChatScreenState extends State<ChatScreen> {
           margin: EdgeInsets.only(top: 10),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.50),
-          decoration: BoxDecoration(
-            // color: UniversalVariables.senderColor,
+          decoration: message.type!="Call" ?
+          BoxDecoration(
+          
             gradient: LinearGradient(
                 colors: [Colors.green.shade400, Colors.teal.shade600]),
+            borderRadius: BorderRadius.only(
+              topLeft: messageRadius,
+              topRight: messageRadius,
+              bottomLeft: messageRadius,
+            ),
+          ) :
+          BoxDecoration(
+          
+           color: Colors.grey.withOpacity(0.7),
             borderRadius: BorderRadius.only(
               topLeft: messageRadius,
               topRight: messageRadius,
@@ -304,7 +317,23 @@ class _ChatScreenState extends State<ChatScreen> {
               url: message.videoUrl,
             )
           : Icon(Icons.sync_problem);
-    } else {
+    }
+    else if(message.type=="Call"){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.call),
+          SizedBox(width:10.0),
+          Text("Call",
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+      
+          ),),
+        ],
+      );
+    } 
+    else {
       return Text(
         message.message,
         style: TextStyle(color: Colors.white, fontSize: 16.0),
@@ -313,10 +342,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<http.Response> sendNotification(
-      String message, String sender, String receiver) async{
-  //        await firebaseMessaging.requestNotificationPermissions(
-  //   const IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false),
-  // );
+      String message, String sender, String receiver) async {
+      //      await firebaseMessaging.requestNotificationPermissions(
+      // const IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false),
+    // );
     // print("Firebase Token: " + receiver);
     return await http.post(
       'https://fcm.googleapis.com/fcm/send',
@@ -329,8 +358,8 @@ class _ChatScreenState extends State<ChatScreen> {
         "to": "$receiver",
         "collapse_key": "type_a",
         "priority": "high",
-        "alert":"true",
-        "id":'1',
+        "alert": "true",
+        "id": '1',
         "notification": {
           "title": "$sender",
           "body": "$message",
@@ -377,10 +406,19 @@ class _ChatScreenState extends State<ChatScreen> {
           margin: EdgeInsets.only(top: 12),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.50),
-          decoration: BoxDecoration(
+           decoration: message.type !="Call" ? 
+           BoxDecoration(
             // color: UniversalVariables.receiverColor,
-            gradient: LinearGradient(
+          gradient: LinearGradient(
                 colors: [Colors.blue.shade700, Colors.blue.shade900]),
+            borderRadius: BorderRadius.only(
+              bottomRight: messageRadius,
+              topRight: messageRadius,
+              bottomLeft: messageRadius,
+            ),
+          ) : BoxDecoration(
+            // color: UniversalVariables.receiverColor,
+        color: Colors.grey.withOpacity(0.7),
             borderRadius: BorderRadius.only(
               bottomRight: messageRadius,
               topRight: messageRadius,
@@ -523,10 +561,10 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Container(
               padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
-                gradient: UniversalVariables.fabGradient,
+                gradient: LinearGradient(colors: [Colors.green, Colors.teal]),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.add),
+              child: Icon(Icons.add, color: Colors.white),
             ),
           ),
           SizedBox(
@@ -583,7 +621,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       hideEmojiContainer();
                     }
                   },
-                  icon: Icon(Icons.face),
+                  icon: Icon(
+                    Icons.emoji_emotions_sharp,
+                    size: 30.0,
+                    color: Colors.yellow,
+                  ),
                 ),
               ],
             ),
@@ -592,7 +634,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ? Container()
               : Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Icon(Icons.record_voice_over),
+                  child: Icon(Icons.mic_none_outlined),
                 ),
           isWriting
               ? Container()
@@ -654,25 +696,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // Future pickVideo() async {
-  //   PickedFile video = await ImagePicker().getVideo(
-  //       source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
-
-  //   if (video != null) {
-  //     videoPlayerController = VideoPlayerController.file(File(video.path))
-  //       ..initialize().then((_) {
-  //         setState(() {
-  //           videoPlayerController.play();
-  //         });
-  //       });
-  //     _storageMethods.uploadVideo(
-  //         video: File(video.path),
-  //         receiverId: widget.receiver.uid,
-  //         senderId: _currentUserId,
-  //         videoUploadProvider: _videoUploadProvider);
-  //   }
-  // }
-
   Future pickVideo() async {
     final Trimmer _trimmer = Trimmer();
     PickedFile video = await ImagePicker().getVideo(
@@ -722,24 +745,36 @@ class _ChatScreenState extends State<ChatScreen> {
         IconButton(
             color: Theme.of(context).iconTheme.color,
             icon: Icon(
-              Icons.video_call,
+              Icons.video_call_outlined,
+              size: 30.0,
             ),
             onPressed: () async {
+              Message _message = Message(
+                receiverId: widget.receiver.uid,
+                senderId: sender.uid,
+                message: "Call",
+                timestamp: Timestamp.now(),
+                type: 'Call',
+              );
               await Permissions.cameraAndMicrophonePermissionsGranted()
-                  ? CallUtils.dial(
-                      from: sender,
-                      to: widget.receiver,
-                      context: context,
-                    )
+                  ? {   
+                    
+                      CallUtils.dial(
+                        from: sender,
+                        to: widget.receiver,
+                        context: context,
+                      ),
+                      _chatMethods.addMessageToDb(_message)
+                    }
                   : {};
             }),
-        IconButton(
-          color: Theme.of(context).iconTheme.color,
-          icon: Icon(
-            Icons.phone,
-          ),
-          onPressed: () {},
-        )
+        // IconButton(
+        //   color: Theme.of(context).iconTheme.color,
+        //   icon: Icon(
+        //     Icons.phone,
+        //   ),
+        //   onPressed: () {},
+        // )
       ],
     );
   }

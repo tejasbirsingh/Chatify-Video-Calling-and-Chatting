@@ -13,9 +13,9 @@ class LogListContainer extends StatefulWidget {
 }
 
 class _LogListContainerState extends State<LogListContainer> {
-  getIcon(String callStatus) {
+  getIcon(String callStatus, double _iconSize) {
     Icon _icon;
-    double _iconSize = 15;
+    
 
     switch (callStatus) {
       case CALL_STATUS_DIALLED:
@@ -78,12 +78,22 @@ class _LogListContainerState extends State<LogListContainer> {
                   onLongPress: () => showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text("Delete this Log?"),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0)),
+                      title: Text("Delete this Log?",
+                      style:TextStyle(color: Colors.black,
+                      fontSize: 20.0),),
                       content:
-                          Text("Are you sure you wish to delete this log?"),
+                          Text("Are you sure you wish to delete this log?",
+                           style: Theme.of(context).textTheme.bodyText1,
+                          ),
                       actions: [
                         FlatButton(
-                          child: Text("YES"),
+                          child: Text("YES",style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold
+                          ),),
                           onPressed: () async {
                             Navigator.maybePop(context);
                             await LogRepository.deleteLogs(i);
@@ -93,7 +103,12 @@ class _LogListContainerState extends State<LogListContainer> {
                           },
                         ),
                         FlatButton(
-                          child: Text("NO"),
+                          child: Text("NO",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
+                            color: Colors.black
+                          ),),
                           onPressed: () => Navigator.maybePop(context),
                         ),
                       ],
@@ -106,13 +121,14 @@ class _LogListContainerState extends State<LogListContainer> {
                       fontSize: 17,
                     ),
                   ),
-                  icon: getIcon(_log.callStatus),
+                  icon: getIcon(_log.callStatus,15.0),
                   subtitle: Text(
                     Utils.formatDateString(_log.timestamp),
                     style: TextStyle(
                       fontSize: 13,
                     ),
                   ),
+                  trailing: getIcon(_log.callStatus,30.0),
                 );
               },
             );

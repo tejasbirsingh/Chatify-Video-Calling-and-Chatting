@@ -20,7 +20,7 @@ class UserDetailsContainer extends StatelessWidget {
     signOut() async {
       final bool isLoggedOut = await AuthMethods().signOut();
       if (isLoggedOut) {
-        // set userState to offline as the user logs out'
+      
         authMethods.setUserState(
           userId: userProvider.getUser.uid,
           userState: UserState.Offline,
