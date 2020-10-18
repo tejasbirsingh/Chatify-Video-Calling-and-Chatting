@@ -14,7 +14,7 @@ import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
 import 'package:skype_clone/screens/pageviews/friends/contacts_page.dart';
 import 'package:skype_clone/screens/pageviews/logs/log_screen.dart';
 import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final List<BarItem> barItems = [
@@ -128,88 +128,90 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    double _labelFontSize = 10;
+    // double _labelFontSize = 10;
 
     return PickupLayout(
-      scaffold: Scaffold(
-        // backgroundColor: UniversalVariables.blackColor,
-        backgroundColor:Theme.of(context).backgroundColor,
-        body: PageView(
-          children: <Widget>[
-            
-            ChatListScreen(),
-            SearchScreen(),
-            Center(child: contactsPage()),
-            LogScreen(),
-          ],
-          controller: pageController,
-          onPageChanged: onPageChanged,
-          physics: NeverScrollableScrollPhysics(),
+      scaffold: SafeArea(
+              child: Scaffold(
+          // backgroundColor: UniversalVariables.blackColor,
+          backgroundColor:Theme.of(context).backgroundColor,
+          body: PageView(
+            children: <Widget>[
+              
+              ChatListScreen(),
+              SearchScreen(),
+              Center(child: contactsPage()),
+              LogScreen(),
+            ],
+            controller: pageController,
+            onPageChanged: onPageChanged,
+            physics: NeverScrollableScrollPhysics(),
+          ),
+          bottomNavigationBar: AnimatedBottomBar(
+              barItems: widget.barItems,
+              animationDuration: const Duration(milliseconds: 150),
+              barStyle: BarStyle(fontSize: 20.0, iconSize: 30.0),
+              onBarTap: (index) {
+                setState(() {
+                  _page = index;
+                });
+                navigationTapped(_page);
+              }),
+          // bottomNavigationBar: Container(
+          //   child: Padding(
+          //     padding: EdgeInsets.symmetric(vertical: 10),
+          //     child: CupertinoTabBar(
+          //       backgroundColor: UniversalVariables.blackColor,
+          //       items: <BottomNavigationBarItem>[
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.chat,
+          //               color: (_page == 0)
+          //                   ? UniversalVariables.lightBlueColor
+          //                   : UniversalVariables.greyColor),
+          //           title: Text(
+          //             "Chats",
+          //             style: TextStyle(
+          //                 fontSize: _labelFontSize,
+          //                 color: (_page == 0)
+          //                     ? UniversalVariables.lightBlueColor
+          //                     : Colors.grey),
+          //           ),
+          //         ),
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.call,
+          //               color: (_page == 1)
+          //                   ? UniversalVariables.lightBlueColor
+          //                   : UniversalVariables.greyColor),
+          //           title: Text(
+          //             "Calls",
+          //             style: TextStyle(
+          //                 fontSize: _labelFontSize,
+          //                 color: (_page == 1)
+          //                     ? UniversalVariables.lightBlueColor
+          //                     : Colors.grey),
+          //           ),
+          //         ),
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.contact_phone,
+          //               color: (_page == 2)
+          //                   ? UniversalVariables.lightBlueColor
+          //                   : UniversalVariables.greyColor),
+          //           title: Text(
+          //             "Contacts",
+          //             style: TextStyle(
+          //                 fontSize: _labelFontSize,
+          //                 color: (_page == 2)
+          //                     ? UniversalVariables.lightBlueColor
+          //                     : Colors.grey),
+          //           ),
+          //         ),
+          //       ],
+          //       onTap: navigationTapped,
+          //       currentIndex: _page,
+          //     ),
+          //   ),
+          // ),
         ),
-        bottomNavigationBar: AnimatedBottomBar(
-            barItems: widget.barItems,
-            animationDuration: const Duration(milliseconds: 150),
-            barStyle: BarStyle(fontSize: 20.0, iconSize: 30.0),
-            onBarTap: (index) {
-              setState(() {
-                _page = index;
-              });
-              navigationTapped(_page);
-            }),
-        // bottomNavigationBar: Container(
-        //   child: Padding(
-        //     padding: EdgeInsets.symmetric(vertical: 10),
-        //     child: CupertinoTabBar(
-        //       backgroundColor: UniversalVariables.blackColor,
-        //       items: <BottomNavigationBarItem>[
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.chat,
-        //               color: (_page == 0)
-        //                   ? UniversalVariables.lightBlueColor
-        //                   : UniversalVariables.greyColor),
-        //           title: Text(
-        //             "Chats",
-        //             style: TextStyle(
-        //                 fontSize: _labelFontSize,
-        //                 color: (_page == 0)
-        //                     ? UniversalVariables.lightBlueColor
-        //                     : Colors.grey),
-        //           ),
-        //         ),
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.call,
-        //               color: (_page == 1)
-        //                   ? UniversalVariables.lightBlueColor
-        //                   : UniversalVariables.greyColor),
-        //           title: Text(
-        //             "Calls",
-        //             style: TextStyle(
-        //                 fontSize: _labelFontSize,
-        //                 color: (_page == 1)
-        //                     ? UniversalVariables.lightBlueColor
-        //                     : Colors.grey),
-        //           ),
-        //         ),
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.contact_phone,
-        //               color: (_page == 2)
-        //                   ? UniversalVariables.lightBlueColor
-        //                   : UniversalVariables.greyColor),
-        //           title: Text(
-        //             "Contacts",
-        //             style: TextStyle(
-        //                 fontSize: _labelFontSize,
-        //                 color: (_page == 2)
-        //                     ? UniversalVariables.lightBlueColor
-        //                     : Colors.grey),
-        //           ),
-        //         ),
-        //       ],
-        //       onTap: navigationTapped,
-        //       currentIndex: _page,
-        //     ),
-        //   ),
-        // ),
       ),
     );
   }

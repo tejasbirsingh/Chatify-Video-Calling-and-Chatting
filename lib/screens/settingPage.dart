@@ -1,27 +1,25 @@
-import 'dart:async';
+
+// ignore: camel_case_types
 import 'dart:io';
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image/image.dart' as Im;
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
-import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/userData.dart';
+import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
-
 import 'package:skype_clone/resources/update_methods.dart';
 import 'package:skype_clone/utils/utilities.dart';
-import 'package:skype_clone/widgets/skype_appbar.dart';
 
-// ignore: camel_case_types
 class settingPage extends StatefulWidget {
   @override
   _settingPageState createState() => _settingPageState();
@@ -324,8 +322,11 @@ class _settingPageState extends State<settingPage> {
                     ),
                   ],
                 );
-              }
-            }),
+              
+            }
+            return Center(child: CircularProgressIndicator(),);
+           }
+            ),
       ),
     );
   }
@@ -373,6 +374,7 @@ class _settingPageState extends State<settingPage> {
         _isEditing = false;
       });
       return cropped;
+      // return selectedImage;
     } else {
       this.setState(() {
         _isEditing = false;
@@ -421,7 +423,7 @@ class _settingPageState extends State<settingPage> {
               SimpleDialogOption(
                 child: Text(
                   'Take Photo',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyText1,
                 ),
                 onPressed: () {
                   _pickImage('Camera').then((selectedImage) {
@@ -440,7 +442,7 @@ class _settingPageState extends State<settingPage> {
               SimpleDialogOption(
                 child: Text(
                   'Cancel',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                   style: Theme.of(context).textTheme.bodyText1,
                 ),
                 onPressed: () {
                   Navigator.pop(context);

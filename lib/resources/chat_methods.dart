@@ -135,6 +135,30 @@ class ChatMethods {
         .collection(message.senderId)
         .add(map);
   }
+  void setAudioMsg(String url, String receiverId, String senderId) async {
+    Message message;
+
+    message = Message.audioMessage(
+        message: "AUDIO",
+        receiverId: receiverId,
+        senderId: senderId,
+        audioUrl: url,
+        timestamp: Timestamp.now(),
+        type: 'audio');
+
+ 
+    var map = message.toAudioMap();
+
+    await _messageCollection
+        .doc(message.senderId)
+        .collection(message.receiverId)
+        .add(map);
+
+    _messageCollection
+        .doc(message.receiverId)
+        .collection(message.senderId)
+        .add(map);
+  }
 
   Stream<QuerySnapshot> fetchContacts({String userId}) =>
       _userCollection.doc(userId).collection(CONTACTS_COLLECTION).snapshots();

@@ -23,7 +23,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-
+  rive: ^0.6.2
+  flare_flutter: ^2.0.6
   flutter_local_notifications: ^1.4.4+4
   video_trimmer: ^0.2.7
   toggle_switch: ^0.1.8
@@ -32,9 +33,11 @@ dependencies:
   http:
   photofilters: ^2.0.1
   local_auth: ^0.6.3+1
+  audioplayers: ^0.16.1
   shared_preferences: ^0.5.10
   firebase_core: ^0.5.0
   tuple: ^1.0.3
+  audio_recorder: ^1.0.2
   # For making request to firestore database
   cloud_firestore: ^0.14.0+2
   encrypt: ^4.0.3
@@ -44,22 +47,14 @@ dependencies:
   firebase_analytics: ^5.0.2
   firebase_storage: ^4.0.0
   photo_view: ^0.10.1
-  video_player: ^0.10.12+2
+  video_player: ^0.10.12+5
   sounds: ^0.9.3
+  
   cached_video_player: ^1.0.3
   chewie: ^0.9.10
   flutter_ringtone_player: ^2.0.0
   agora_rtc_engine: ^3.1.2
-  
-
-  # For handling permissions`
-  # permission_handler: ^4.1.0
-
-  # For handling authentication via firebase
-  
-  
-
-  # For handling google sign in
+ # For handling google sign in
   google_sign_in: ^4.5.3
 
   # Shimmer effect library
@@ -67,57 +62,51 @@ dependencies:
 
   # Gradient app bar
   gradient_app_bar: ^0.1.3
-  
 
   # Emojies
   emoji_picker: ^0.1.0
 
   # image_picker
-  image_picker: ^0.6.7+7
+  image_picker: ^0.6.7+11
 
   # path provider
   path_provider: ^1.6.0
 
   # firebase storage
 
-
   # provider
   provider: ^4.0.3
 
   # cached network image
   cached_network_image: ^2.0.0
-
+  dio: ^3.0.10
   # agora rtc engine
 
-
   # permission handler
-  permission_handler: 3.0.0
+  permission_handler: ^3.0.0
 
   # local storage
   hive: ^1.4.1+1
   sqflite: ^1.3.0
   image: ^2.1.14
-  flutter_mobile_vision: ^0.1.3 
-  
+  flutter_mobile_vision: ^0.1.3
+
   pdf: ^1.10.0
   google_fonts: ^1.1.0
-  
   flutter_full_pdf_viewer: ^1.0.6
   # intl
+ 
   intl: ^0.16.1
-
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -126,6 +115,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - logo.png
+    - assets/call_pick.flr
+    - assets/call_end.flr
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

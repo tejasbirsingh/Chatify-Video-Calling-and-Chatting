@@ -8,7 +8,6 @@ import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 
 import 'package:skype_clone/screens/pageviews/friends/widgets/friend_view.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
 
 import 'package:skype_clone/widgets/skype_appbar.dart';
 
@@ -21,20 +20,24 @@ class _contactsPageState extends State<contactsPage> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final AuthMethods _auth = AuthMethods();
 
-
-
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: true);
 
     return Scaffold(
-      // backgroundColor: UniversalVariables.blackColor,
-          backgroundColor: Theme.of(context).backgroundColor,
+        // backgroundColor: UniversalVariables.blackColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
-          title: Text('Contacts Page',
-          style: Theme.of(context).textTheme.headline1,),
-          actions: [IconButton(icon: Icon(Icons.list), onPressed: () {})],
+          
+          title: Text(
+            'Contacts',
+            style: Theme.of(context).textTheme.headline1,
+          ),
+          actions: [
+            IconButton(icon: Icon(Icons.list,
+            color: Theme.of(context).iconTheme.color,), 
+            onPressed: () {})],
         ),
         body: StreamBuilder<QuerySnapshot>(
           stream: _auth.getFriends(uid: userProvider.getUser.uid),
@@ -49,7 +52,6 @@ class _contactsPageState extends State<contactsPage> {
                 itemBuilder: (context, i) {
                   Contact user = Contact.fromMap(docList[i].data());
                   return friendView(user);
-                 
                 },
               );
             }

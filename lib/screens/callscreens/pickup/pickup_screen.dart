@@ -1,13 +1,19 @@
+import 'package:flare_flutter/flare_cache_builder.dart';
 import 'package:flutter/material.dart';
+
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/call.dart';
 import 'package:skype_clone/models/log.dart';
 import 'package:skype_clone/resources/call_methods.dart';
 import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
 import 'package:skype_clone/screens/callscreens/call_screen.dart';
+
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-import 'package:skype_clone/utils/permissions.dart';
+
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:flare_flutter/flare_actor.dart';
+import 'package:skype_clone/utils/permissions.dart';
+
 class PickupScreen extends StatefulWidget {
   final Call call;
 
@@ -41,10 +47,8 @@ class _PickupScreenState extends State<PickupScreen> {
 
   @override
   void initState() {
-
     super.initState();
     FlutterRingtonePlayer.playRingtone();
-
   }
 
   @override
@@ -67,56 +71,107 @@ class _PickupScreenState extends State<PickupScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "Incoming...",
+              "Incoming Call",
               style: TextStyle(
-                fontSize: 30,
-                color: Theme.of(context).textTheme.headline1.color
-              ),
+                  fontSize: 30,
+                  color: Theme.of(context).textTheme.headline1.color),
             ),
             SizedBox(height: 50),
             CachedImage(
               widget.call.callerPic,
               isRound: true,
-              radius: 180,
+              radius: 200,
             ),
             SizedBox(height: 15),
-            Text(
-              widget.call.callerName,
-              style: Theme.of(context).textTheme.headline1
-            ),
+            Text(widget.call.callerName,
+                style: Theme.of(context).textTheme.headline1),
             SizedBox(height: 75),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.call_end),
-                  color: Colors.redAccent,
-                  onPressed: () async {
-                    FlutterRingtonePlayer.stop();
-                    isCallMissed = false;
-                    addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                    await callMethods.endCall(call: widget.call);
-                  },
-                ),
-                SizedBox(width: 25),
-                IconButton(
-                    icon: Icon(Icons.call),
+                Container(
+                  decoration: BoxDecoration(
                     color: Colors.green,
-                    onPressed: () async {
+                    borderRadius: BorderRadius.circular(60.0),
+                  ),
+                  // child: IconButton(
+                  //     icon: Icon(Icons.call),
+                  //     color: Colors.white,
+                  //     onPressed: () async {
+                  //       FlutterRingtonePlayer.stop();
+                  //       isCallMissed = false;
+                  //       addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                  //       await Permissions.cameraAndMicrophonePermissionsGranted()
+                  //           ? Navigator.push(
+                  //               context,
+                  //               MaterialPageRoute(
+                  //                 builder: (context) =>
+                  //                     CallScreen(call: widget.call),
+                  //               ),
+                  //             )
+                  //           // ignore: unnecessary_statements
+                  //           : {};
+                  //     }),
+                  child: GestureDetector(
+                      onTap: () async {
+                        FlutterRingtonePlayer.stop();
+                        isCallMissed = false;
+                        addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                        await Permissions.cameraAndMicrophonePermissionsGranted()
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CallScreen(call: widget.call),
+                                ),
+                              )
+                            // ignore: unnecessary_statements
+                            : {};
+                      },
+                    child: Container(
+                      width: 70.0,
+                      height: 70.0,
+                      child: FlareActor(
+                        "assets/call_pick.flr",
+                        animation: 'Record2',
+  
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 35),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(60.0),
+                  ),
+                  // child: IconButton(
+                  //   icon: Icon(Icons.call_end),
+                  //   color: Colors.white,
+                  //   onPressed: () async {
+                  //     FlutterRingtonePlayer.stop();
+                  //     isCallMissed = false;
+                  //     addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                  //     await callMethods.endCall(call: widget.call);
+                  //   },
+                  // ),
+                  child:GestureDetector(
+                    onTap: ()async {
                       FlutterRingtonePlayer.stop();
                       isCallMissed = false;
                       addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                      await Permissions.cameraAndMicrophonePermissionsGranted()
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    CallScreen(call: widget.call),
-                              ),
-                            )
-                          // ignore: unnecessary_statements
-                          : {};
-                    }),
+                      await callMethods.endCall(call: widget.call);
+                    },
+                    child: Container(
+                      width: 70.0,
+                    height: 70.0,
+                    child: FlareActor(
+                      "assets/call_end.flr",
+                      animation: 'Record2',
+                    ),
+                    ),
+                  )
+                ),
               ],
             ),
           ],

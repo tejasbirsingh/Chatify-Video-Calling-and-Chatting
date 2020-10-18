@@ -22,7 +22,7 @@ class _videoPlayerState extends State<videoPlayer> {
     _videoPlayerController
       ..initialize().then((_) {
         _videoPlayerController.setLooping(false);
-        
+
         // _videoPlayerController.seekTo(Duration(seconds: 0));
         setState(() {});
         _videoPlayerController..addListener(() {});
@@ -42,17 +42,21 @@ class _videoPlayerState extends State<videoPlayer> {
       children: [
         _videoPlayerController.value.initialized
             ? GestureDetector(
-              onTap: (){
-                 Navigator.push(context,MaterialPageRoute(builder: (context)=> videoPage(url: widget.url,)));   },
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => videoPage(
+                                url: widget.url,
+                              )));
+                },
                 child: AspectRatio(
-                  aspectRatio: _videoPlayerController.value.aspectRatio,
-                  // aspectRatio: 2/1,
+                  // aspectRatio: _videoPlayerController.value.aspectRatio,
+                  aspectRatio: 1/1,
                   child: VideoPlayer(_videoPlayerController),
                 ),
-            )
+              )
             : Container(),
-        
-       
         Center(
             child: _isplaying == true
                 ? IconButton(
@@ -62,18 +66,19 @@ class _videoPlayerState extends State<videoPlayer> {
                     onPressed: () {
                       _videoPlayerController.pause();
                       setState(() {
-                        _isplaying= false;
+                        _isplaying = false;
                       });
                     })
                 : IconButton(
                     icon: Icon(
                       Icons.play_arrow,
                     ),
-                    onPressed: () { _videoPlayerController.play();
-                    setState(() {
-                      _isplaying=true;
-                    });}
-                  )),
+                    onPressed: () {
+                      _videoPlayerController.play();
+                      setState(() {
+                        _isplaying = true;
+                      });
+                    })),
       ],
     );
   }

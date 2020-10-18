@@ -8,7 +8,7 @@ import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/pageviews/chats/widgets/contact_view.dart';
 import 'package:skype_clone/screens/pageviews/chats/widgets/quiet_box.dart';
 import 'package:skype_clone/screens/pageviews/chats/widgets/user_circle.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+
 import 'package:skype_clone/widgets/skype_appbar.dart';
 
 class ChatListScreen extends StatelessWidget {
@@ -16,10 +16,11 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
-        // backgroundColor: UniversalVariables.blackColor,
+        
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
-          title: UserCircle(),
+          title: 'Chats',
+          leading: UserCircle(),
           actions: <Widget>[
             IconButton(
               icon: Icon(

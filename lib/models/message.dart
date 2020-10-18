@@ -10,6 +10,7 @@ class Message {
   Timestamp timestamp;
   String photoUrl;
   String videoUrl;
+  String audioUrl;
 
   Message({
     this.senderId,
@@ -36,6 +37,15 @@ class Message {
     this.timestamp,
     this.videoUrl,
   });
+    Message.audioMessage({
+    this.senderId,
+    this.receiverId,
+    this.message,
+    this.type,
+    this.timestamp,
+    this.audioUrl,
+  });
+
 
   Map toMap() {
     var encryptedText = encryptAESCryptoJS(this.message, "password");
@@ -72,12 +82,22 @@ class Message {
     map['videoUrl'] = this.videoUrl;
     return map;
   }
+   Map toAudioMap() {
+    var map = Map<String, dynamic>();
+    map['message'] = this.message;
+    map['senderId'] = this.senderId;
+    map['receiverId'] = this.receiverId;
+    map['type'] = this.type;
+    map['timestamp'] = this.timestamp;
+    map['audioUrl'] = this.audioUrl;
+    return map;
+  }
 
   // named constructor
   Message.fromMap(Map<String, dynamic> map) {
     var decryptedMessage;
     // if message is of type text then only we need to enrpyt it other wise we can simply assign it to message 
-    if (map['message'] != 'IMAGE' && map['message'] != 'VIDEO')
+    if (map['message'] != 'IMAGE' && map['message'] != 'VIDEO' && map["message"]!='AUDIO')
       decryptedMessage = decryptAESCryptoJS(map['message'], "password");
     else
       decryptedMessage = map['message'];
@@ -88,5 +108,6 @@ class Message {
     this.timestamp = map['timestamp'];
     this.photoUrl = map['photoUrl'];
     this.videoUrl = map['videoUrl'];
+    this.audioUrl = map['audioUrl'];
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
@@ -36,11 +35,11 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       });
     });
-  fetchFriends();
-   
+    fetchFriends();
   }
-  fetchFriends(){
-     _authMethods.getCurrentUser().then((User user) {
+
+  fetchFriends() {
+    _authMethods.getCurrentUser().then((User user) {
       _authMethods.fetchAllFriends(user).then((List<String> list) {
         setState(() {
           friendsList = list;
@@ -51,10 +50,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
   searchAppBar(BuildContext context) {
     return GradientAppBar(
+   
       gradient: LinearGradient(
         colors: [
-          UniversalVariables.gradientColorStart,
-          UniversalVariables.gradientColorEnd,
+ 
+          Colors.green,
+          Colors.teal
         ],
       ),
       elevation: 0,
@@ -77,6 +78,7 @@ class _SearchScreenState extends State<SearchScreen> {
               fontSize: 35,
             ),
             decoration: InputDecoration(
+              prefixIcon: Icon(Icons.search,color: Colors.white,),
               suffixIcon: IconButton(
                 icon: Icon(Icons.close, color: Colors.white),
                 onPressed: () {
@@ -88,7 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
               hintText: "Search",
               hintStyle: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 35,
+                fontSize: 30,
                 color: Color(0x88ffffff),
               ),
             ),
@@ -110,9 +112,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 bool matchesName = _getName.contains(_query);
 
                 return (matchesUsername || matchesName);
-
-                // (User user) => (user.username.toLowerCase().contains(query.toLowerCase()) ||
-                //     (user.name.toLowerCase().contains(query.toLowerCase()))),
               }).toList()
             : [];
 
@@ -124,8 +123,7 @@ class _SearchScreenState extends State<SearchScreen> {
             profilePhoto: suggestionList[index].profilePhoto,
             name: suggestionList[index].name,
             username: suggestionList[index].email,
-            firebaseToken: suggestionList[index].firebaseToken
-            );
+            firebaseToken: suggestionList[index].firebaseToken);
 
         bool isFriend;
         if (friendsList.contains(searchedUser.uid.toString())) {
@@ -145,27 +143,32 @@ class _SearchScreenState extends State<SearchScreen> {
           },
           leading: CachedImage(
             searchedUser.profilePhoto,
-            radius:60.0 ,
+            radius: 60.0,
             isRound: true,
           ),
-          // leading: CircleAvatar(
-          //   backgroundImage: NetworkImage(searchedUser.profilePhoto),
-          //   backgroundColor: Colors.grey,
-          // ),
-          title: Text(
-            searchedUser.username,
-            style: Theme.of(context).textTheme.bodyText1
-          ),
+          title: Text(searchedUser.username,
+              style: Theme.of(context).textTheme.bodyText1),
           subtitle: Text(
             searchedUser.name,
             style: Theme.of(context).textTheme.bodyText1,
           ),
           trailing: IconButton(
-            icon: isFriend ? Icon(Icons.check,size: 40.0,) : Icon(Icons.person_add,size:40.0),
-            color: isFriend ? Colors.green :Theme.of(context).iconTheme.color,
+            icon: isFriend
+                ? Icon(
+                    Icons.check,
+                    size: 40.0,
+                  )
+                : Icon(Icons.person_add, size: 40.0),
+            color: isFriend ? Colors.green : Theme.of(context).iconTheme.color,
             onPressed: () {
+
               _authMethods.addFriend(user.uid, searchedUser.uid);
-                        },
+
+              final snackbar = SnackBar(content: Text("Friend added!"),);
+                final snackbarFriend = SnackBar(content: Text("Already a friend!"),);
+              isFriend ? Scaffold.of(context).showSnackBar(snackbarFriend) : Scaffold.of(context).showSnackBar(snackbar);
+              
+            },
           ),
         );
       }),

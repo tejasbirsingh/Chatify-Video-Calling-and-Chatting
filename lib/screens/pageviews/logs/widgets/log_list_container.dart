@@ -78,6 +78,7 @@ class _LogListContainerState extends State<LogListContainer> {
                   onLongPress: () => showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
+                      backgroundColor: Theme.of(context).cardColor,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0)),
                       title: Text("Delete this Log?",
@@ -116,15 +117,13 @@ class _LogListContainerState extends State<LogListContainer> {
                   ),
                   title: Text(
                     hasDialled ? _log.receiverName : _log.callerName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17,
-                    ),
+                    style: Theme.of(context).textTheme.bodyText1
                   ),
                   icon: getIcon(_log.callStatus,15.0),
                   subtitle: Text(
                     Utils.formatDateString(_log.timestamp),
                     style: TextStyle(
+                      color:Theme.of(context).textTheme.bodyText1.color ,
                       fontSize: 13,
                     ),
                   ),

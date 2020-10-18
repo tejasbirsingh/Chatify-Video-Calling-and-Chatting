@@ -43,7 +43,7 @@ class UserDetailsContainer extends StatelessWidget {
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
-                color: Colors.white,
+                color: Theme.of(context).iconTheme.color
               ),
               onPressed: () => Navigator.maybePop(context),
             ),
@@ -54,7 +54,7 @@ class UserDetailsContainer extends StatelessWidget {
                 onPressed: () => signOut(),
                 child: Text(
                   "Sign Out",
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                  style: Theme.of(context).textTheme.bodyText1
                 ),
               )
             ],
@@ -87,16 +87,12 @@ class UserDetailsBody extends StatelessWidget {
             children: <Widget>[
               Text(
                 user.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
+                style:Theme.of(context).textTheme.bodyText1
               ),
               SizedBox(height: 10),
               Text(
                 user.email,
-                style: TextStyle(fontSize: 14, color: Colors.white),
+                style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1.color),
               ),
             ],
           ),

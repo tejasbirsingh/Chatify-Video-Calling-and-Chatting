@@ -18,6 +18,18 @@ class Permissions {
     }
   }
 
+  static Future<bool> recordingPermission() async {
+    PermissionStatus microphonePermissionStatus =
+        await _getMicrophonePermission();
+
+    if (microphonePermissionStatus == PermissionStatus.granted) {
+      return true;
+    } else {
+      _handleRecordInvalidPermission(microphonePermissionStatus);
+      return false;
+    }
+  }
+
   static Future<PermissionStatus> _getCameraPermission() async {
     PermissionStatus permission =
         await PermissionHandler().checkPermissionStatus(PermissionGroup.camera);
@@ -45,6 +57,22 @@ class Permissions {
           PermissionStatus.unknown;
     } else {
       return permission;
+    }
+  }
+
+  static void _handleRecordInvalidPermission(
+    PermissionStatus microphonePermissionStatus,
+  ) {
+    if (microphonePermissionStatus == PermissionStatus.denied) {
+      throw new PlatformException(
+          code: "PERMISSION_DENIED",
+          message: "Access to camera and microphone denied",
+          details: null);
+    } else if (microphonePermissionStatus == PermissionStatus.disabled) {
+      throw new PlatformException(
+          code: "PERMISSION_DISABLED",
+          message: "Location data is not available on device",
+          details: null);
     }
   }
 

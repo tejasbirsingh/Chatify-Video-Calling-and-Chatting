@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
 import 'package:skype_clone/models/userData.dart';
+import 'package:skype_clone/provider/audio_upload_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
@@ -37,11 +38,27 @@ class StorageMethods {
       _storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      StorageUploadTask storageUploadTask =
-          _storageReference.putFile(videoFile,StorageMetadata(contentType: 'video/mp4'));
+      StorageUploadTask storageUploadTask = _storageReference.putFile(
+          videoFile, StorageMetadata(contentType: 'video/mp4'));
       var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
 
       print('This is video url = {$url}');
+      return url;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String> uploadAudioMessage(File audioFile) async {
+    try {
+      _storageReference = FirebaseStorage.instance
+          .ref()
+          .child('${DateTime.now().millisecondsSinceEpoch}');
+      StorageUploadTask storageUploadTask = _storageReference.putFile(
+          audioFile, StorageMetadata(contentType: 'audio/mp3'));
+      var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
+
+      // print('This is audio message url = {$url}');
       return url;
     } catch (e) {
       return null;
@@ -56,16 +73,27 @@ class StorageMethods {
   }) async {
     final ChatMethods chatMethods = ChatMethods();
 
-    // Set some loading value to db and show it to user
     imageUploadProvider.setToLoading();
 
-    // Get url from the image bucket
     String url = await uploadImageToStorage(image);
 
-    // Hide loading
     imageUploadProvider.setToIdle();
 
     chatMethods.setImageMsg(url, receiverId, senderId);
+  }
+
+  void uploadAudio({
+    @required File audio,
+    @required String receiverId,
+    @required String senderId,
+    @required AudioUploadProvider audioUploadProvider,
+  }) async {
+    final ChatMethods chatMethods = ChatMethods();
+
+    audioUploadProvider.setToLoading();
+    String url = await uploadAudioMessage(audio);
+    audioUploadProvider.setToIdle();
+    chatMethods.setAudioMsg(url, receiverId, senderId);
   }
 
   void uploadVideo({
