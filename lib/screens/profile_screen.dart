@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skype_clone/models/userData.dart';
 
-import 'package:velocity_x/velocity_x.dart';
 
 class profilePage extends StatefulWidget {
   final UserData user;
@@ -15,6 +14,7 @@ class _profilePageState extends State<profilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+    
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
         title: Text(

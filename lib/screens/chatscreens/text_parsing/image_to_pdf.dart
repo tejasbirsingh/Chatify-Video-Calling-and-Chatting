@@ -8,7 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io' as Io;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:skype_clone/screens/chatscreens/pdf_view_screen.dart';
+import 'package:skype_clone/screens/chatscreens/text_parsing/pdf_view_screen.dart';
+
 
 class imageToPdf extends StatefulWidget {
   @override
@@ -36,8 +37,7 @@ class _imageToPdfState extends State<imageToPdf> {
   }
 
   writePdf() async {
-// final Uint8List fontData = Io.File('open-sans.ttf').readAsBytesSync();
-// final ttf = pw.Font.ttf(fontData.buffer.asByteData());
+
     final font = await rootBundle.load("fonts/OpenSans-Light.ttf");
     final ttf = pw.Font.ttf(font);
     pdf.addPage(pw.MultiPage(
@@ -47,10 +47,11 @@ class _imageToPdfState extends State<imageToPdf> {
           return <pw.Widget>[
             pw.Header(
                 child: pw.Text('Document', style: pw.TextStyle(font: ttf))),
-            pw.Paragraph(text: ocrText, style: pw.TextStyle(font: ttf,
-            fontSize: 20.0)),
+            pw.Paragraph(
+                text: ocrText, style: pw.TextStyle(font: ttf, fontSize: 20.0)),
           ];
-        }));
+        }),
+              );
   }
 
   Future savePdf() async {
@@ -75,13 +76,13 @@ class _imageToPdfState extends State<imageToPdf> {
         .getImage(source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
     var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
     String img64 = base64Encode(bytes);
-    // print(img64.toString());
+
     var url = 'https://api.ocr.space/parse/image';
     var payload = {"base64Image": "data:image/jpg;base64,${img64.toString()}"};
     var header = {"apikey": "d938f7220788957"};
     var post = await http.post(url, body: payload, headers: header);
     var result = jsonDecode(post.body);
-    // print(result['ParsedResults'][0]['ParsedText']);
+
     setState(() {
       uploading = false;
       ocrText = result['ParsedResults'][0]['ParsedText'];
@@ -95,12 +96,16 @@ class _imageToPdfState extends State<imageToPdf> {
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
+        
+     
           backgroundColor: Theme.of(context).backgroundColor,
           iconTheme: Theme.of(context).iconTheme,
           title: Text(
             "Image to Pdf",
             style: Theme.of(context).textTheme.headline1,
           ),
+          
+        
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -108,7 +113,10 @@ class _imageToPdfState extends State<imageToPdf> {
               Padding(
                 padding: const EdgeInsets.only(top: 50.0),
                 child: GestureDetector(
-                  onTap: () => parseText(),
+                  onTap: () {
+                    parseText();
+                 
+                  },
                   child: Padding(
                     padding: EdgeInsets.only(left: 40.0, right: 40.0),
                     child: Container(
@@ -154,10 +162,26 @@ class _imageToPdfState extends State<imageToPdf> {
                       borderRadius: BorderRadius.circular(40.0)),
                   color: Colors.grey,
                   child: Text(
-                    'Save and View Pdf of the text',
+                    'Add Page to Pdf',
+                    style: Theme.of(context).textTheme.bodyText1,
                   ),
                   onPressed: () async {
-                    await writePdf();
+                  await writePdf();
+                  _editingController.clear();
+                  },
+                ),
+              ),
+              Container(
+                child: RaisedButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40.0)),
+                  color: Colors.grey,
+                  child: Text(
+                    'Save and View Pdf of the text',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  onPressed: () async {
+                    
                     await savePdf();
                     Io.Directory documentDirectory =
                         await getApplicationDocumentsDirectory();
@@ -181,11 +205,15 @@ class _imageToPdfState extends State<imageToPdf> {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 40.0),
         child: TextField(
-          
           cursorColor: Colors.grey,
           style: Theme.of(context).textTheme.bodyText1,
-          // maxLines: 100,
           decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.0),
+                borderSide: BorderSide(color: Colors.green)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.0),
+                borderSide: BorderSide(color: Colors.green)),
             hintText: "Text will be shown here",
             hintStyle: Theme.of(context).textTheme.bodyText1,
             suffixIcon: IconButton(

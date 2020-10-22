@@ -1,15 +1,13 @@
-import 'dart:io';
-import 'dart:math';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-
+import 'package:skype_clone/utils/utilities.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 
 class ImagePage extends StatefulWidget {
   final String imageUrl;
-  ImagePage({@required this.imageUrl});
+  final List<String> imageUrlList ;
+  ImagePage({@required this.imageUrl,this.imageUrlList});
   @override
   _ImagePageState createState() => _ImagePageState();
 }
@@ -17,89 +15,60 @@ class ImagePage extends StatefulWidget {
 class _ImagePageState extends State<ImagePage> {
   final String noImageAvailable =
       "https://www.esm.rochester.edu/uploads/NoPhotoAvailable.jpg";
-  bool downloading = false;
-
-  String progress = '0';
-
-  bool isDownloaded = false;
-
+  String downloadedMessage = 'Initializing...';
+  bool _isDownloading = false;
+  double _percentage = 0;
   String fileName;
   @override
   initState() {
     super.initState();
-    fileName = generateRandomString(15);
-  }
-
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
+    fileName = Utils.generateRandomString(15);
   }
 
   Future<void> downloadFile() async {
-    setState(() {
-      downloading = true;
-    });
-    String savePath = await getFilePath(fileName);
+    var dir = await getExternalStorageDirectory();
     Dio dio = Dio();
+
     dio.download(
-      widget.imageUrl,
-      savePath,
-      onReceiveProgress: (rcv, total) {
-        // print('received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
-
+        widget.imageUrl ?? noImageAvailable, '${dir.path}/${fileName}.jpg',
+        onReceiveProgress: (actualBytes, totalBytes) {
+      var percentage = actualBytes / totalBytes * 100;
+      _percentage = percentage / 100;
+      if (percentage == 100) {
         setState(() {
-          progress = ((rcv / total) * 100).toStringAsFixed(0);
+          _isDownloading = false;
         });
-
-        if (progress == '100') {
-          setState(() {
-            isDownloaded = true;
-          });
-        } else if (double.parse(progress) < 100) {}
-      },
-      deleteOnError: true,
-    ).then((_) {
+      }
       setState(() {
-        if (progress == '100') {
-          isDownloaded = true;
-        }
-
-        downloading = false;
+        downloadedMessage = 'Downloading...${percentage.floor()} % ';
       });
     });
   }
 
-  Future<String> getFilePath(uniqueFileName) async {
-    String path = '';
-    Directory dir = await getApplicationDocumentsDirectory();
-    path = '${dir.path}/$uniqueFileName.png';
-    return path;
-  }
-
   @override
   Widget build(BuildContext context) {
+    print(widget.imageUrlList);
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
             icon: Icon(Icons.download_rounded),
             onPressed: () async {
-               downloadFile();
+              downloadFile();
+
+              setState(() {
+                _isDownloading = true;
+              });
             },
           )
         ],
-        leading: IconButton(   
+        leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Stack(
         children: [
-          downloading ? CircularProgressIndicator() : SizedBox(),
-          SizedBox(height: 10),
-          downloading ? Text(progress) : SizedBox(),
           Container(
               child: Hero(
             tag: widget.imageUrl,
@@ -111,6 +80,28 @@ class _ImagePageState extends State<ImagePage> {
               //enableRotation: true,
             ),
           )),
+          _isDownloading
+              ? Center(
+                  child: Column(
+                  children: [
+                    Text(
+                      downloadedMessage ?? '',
+                      style: TextStyle(color: Colors.white, fontSize: 20.0),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.2),
+                      child: LinearProgressIndicator(
+                        value: _percentage,
+                        backgroundColor: Colors.green,
+                      ),
+                    ),
+                  ],
+                ))
+              : Text(""),
         ],
       ),
     );

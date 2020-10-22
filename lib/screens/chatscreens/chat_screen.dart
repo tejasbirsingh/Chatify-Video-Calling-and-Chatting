@@ -3,40 +3,38 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:file/local.dart';
 import 'package:audio_recorder/audio_recorder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
-
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:provider/provider.dart';
-
-import 'package:skype_clone/configs/firebase_config.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/enum/view_state.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/userData.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:skype_clone/provider/audio_upload_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'dart:io' as Io;
-
 import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
-import 'package:skype_clone/screens/chatscreens/image_to_pdf.dart';
+import 'package:skype_clone/screens/chatscreens/messageForwarding/forward_list.dart';
+import 'package:skype_clone/screens/chatscreens/text_parsing/image_to_pdf.dart';
+import 'package:skype_clone/screens/chatscreens/push_notification.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/audioPlayer.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
+import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
 import 'package:skype_clone/screens/profile_screen.dart';
 import 'package:skype_clone/utils/call_utilities.dart';
 import 'package:skype_clone/utils/permissions.dart';
@@ -58,13 +56,10 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   String fileName;
-
-  File imageFilterFile;
-
   ImageUploadProvider _imageUploadProvider;
   VideoUploadProvider _videoUploadProvider;
   AudioUploadProvider _audioUploadProvider;
-
+  List<String> imageUrlList;
   final StorageMethods _storageMethods = StorageMethods();
   final ChatMethods _chatMethods = ChatMethods();
   final AuthMethods _authMethods = AuthMethods();
@@ -84,8 +79,10 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isWriting = false;
   bool showEmojiPicker = false;
   VideoPlayerController videoPlayerController;
-
-  // PDF related initializations
+  bool _isAppBarOptions = false;
+  String messageId = "";
+  String forwardMessageText = "";
+  String forwardedImage = "";
 
   bool uploading = false;
   String ocrText = "";
@@ -118,14 +115,11 @@ class _ChatScreenState extends State<ChatScreen> {
         source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
     var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
     String img64 = base64Encode(bytes);
-    // print(img64.toString());
     var url = 'https://api.ocr.space/parse/image';
     var payload = {"base64Image": "data:image/jpg;base64,${img64.toString()}"};
     var header = {"apikey": "d938f7220788957"};
     var post = await http.post(url, body: payload, headers: header);
     var result = jsonDecode(post.body);
-
-    // print(result['ParsedResults'][0]['ParsedText']);
     setState(() {
       uploading = false;
       ocrText = result['ParsedResults'][0]['ParsedText'];
@@ -158,7 +152,8 @@ class _ChatScreenState extends State<ChatScreen> {
       scaffold: SafeArea(
         child: Scaffold(
           backgroundColor: Theme.of(context).backgroundColor,
-          appBar: customAppBar(context),
+          appBar:
+              _isAppBarOptions ? optionsAppBar(context) : customAppBar(context),
           body: Stack(
             children: [
               Column(
@@ -219,7 +214,6 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           isWriting = true;
         });
-
         textFieldController.text = textFieldController.text + emoji.emoji;
       },
       recommendKeywords: ["face", "happy", "party", "sad"],
@@ -254,6 +248,7 @@ class _ChatScreenState extends State<ChatScreen> {
           reverse: true,
           itemCount: snapshot.data.docs.length,
           itemBuilder: (context, index) {
+            
             return chatMessageItem(snapshot.data.docs[index]);
           },
         );
@@ -261,22 +256,13 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
-  }
-
   _start() async {
     try {
       if (await Permissions.recordingPermission()) {
         var ran = Random().nextInt(50);
-        String path = generateRandomString(ran);
+        String path = Utils.generateRandomString(ran);
         Io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
         path = appDocDirectory.path + '/' + path;
-
         await AudioRecorder.start(
             path: path, audioOutputFormat: AudioOutputFormat.WAV);
 
@@ -297,20 +283,17 @@ class _ChatScreenState extends State<ChatScreen> {
     var recording = await AudioRecorder.stop();
 
     bool isRecording = await AudioRecorder.isRecording;
-
     if (recording.path != null) {
       File file = File(recording.path);
-
       if (file.path != null) {
         _storageMethods.uploadAudio(
             audio: file,
             receiverId: widget.receiver.uid,
             senderId: _currentUserId,
             audioUploadProvider: _audioUploadProvider);
-               sendNotification("Audio", sender.name.toString(),
-          widget.receiver.firebaseToken.toString());
+        sendNotification("Audio", sender.name.toString(),
+            widget.receiver.firebaseToken.toString());
       }
-      print(file.path);
 
       setState(() {
         _recording = recording;
@@ -321,30 +304,74 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget chatMessageItem(DocumentSnapshot snapshot) {
     Message _message = Message.fromMap(snapshot.data());
+    if(_message.type==MESSAGE_TYPE_IMAGE) {
+      imageUrlList.add(_message.photoUrl);
+    }
+    return _message.type != "Call"
+        ? GestureDetector(
+            onLongPress: () {
+              setState(() {
+                _message.type == MESSAGE_TYPE_IMAGE
+                    ? {forwardedImage = _message.photoUrl}
+                    : [];
+                messageId = snapshot.id;
+                _isAppBarOptions = true;
+                forwardMessageText = _message.message;
+              });
+              // deleteDialog(context, snapshot.id);
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 15),
+              child: Container(
+                alignment: _message.senderId == _currentUserId
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: _message.senderId == _currentUserId
+                    ? senderLayout(_message)
+                    : receiverLayout(_message),
+              ),
+            ),
+          )
+        : GestureDetector(
+            child: callLayout(_message),
+            onLongPress: () {
+              deleteDialog(context, snapshot.id);
+            },
+          );
+  }
 
-    return GestureDetector(
-      onLongPress: () {
-        deleteDialog(context, snapshot.id);
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 15),
-        child: Container(
-          alignment: _message.senderId == _currentUserId
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
-          child: _message.senderId == _currentUserId
-              ? senderLayout(_message)
-              : receiverLayout(_message),
-        ),
+  Widget callLayout(Message _message) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.3, vertical: 10.0),
+      child: Column(
+        children: [
+          Container(
+            height: 30.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.call_outlined,
+                  color: Colors.green,
+                ),
+                SizedBox(width: 5.0),
+                Text(
+                  "Call",
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+              ],
+            ),
+            decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(10.0)),
+          ),
+          SizedBox(height:2.0),
+          (formatTime(_message.timestamp.toDate()))
+        ],
       ),
     );
   }
-
-  // await FirebaseFirestore.instance
-  //     .collection(MESSAGES_COLLECTION)
-  //     .doc(_currentUserId)
-  //     .collection(widget.receiver.uid)
-  //     .doc(snapshot.id).delete();
 
   deleteDialog(BuildContext context, String id) {
     showDialog(
@@ -434,6 +461,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   MaterialPageRoute(
                       builder: (context) => ImagePage(
                             imageUrl: message.photoUrl,
+                            imageUrlList: imageUrlList,
                           ))))
           : Icon(Icons.sync_problem);
     } else if (message.type == MESSAGE_TYPE_VIDEO) {
@@ -442,23 +470,7 @@ class _ChatScreenState extends State<ChatScreen> {
               url: message.videoUrl,
             )
           : Icon(Icons.sync_problem);
-    } else if (message.type == "Call") {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.call),
-          SizedBox(width: 10.0),
-          Text(
-            "Call",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      );
     } else if (message.type == MESSAGE_TYPE_AUDIO) {
-      print("Chat screen URL:-${message.audioUrl}");
       return message.audioUrl != null
           ? audioPlayerClass(url: message.audioUrl)
           : Icon(Icons.sync_problem);
@@ -468,40 +480,6 @@ class _ChatScreenState extends State<ChatScreen> {
         style: TextStyle(color: Colors.white, fontSize: 16.0),
       );
     }
-  }
-
-  Future<http.Response> sendNotification(
-      String message, String sender, String receiver) async {
-    //      await firebaseMessaging.requestNotificationPermissions(
-    // const IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false),
-    // );
-    // print("Firebase Token: " + receiver);
-    return await http.post(
-      'https://fcm.googleapis.com/fcm/send',
-      headers: <String, String>{
-        'Authorization': 'key=$SERVER_KEY',
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        // "message": {
-        "to": "$receiver",
-        "collapse_key": "type_a",
-        "priority": "high",
-        "alert": "true",
-        "id": '1',
-        "notification": {
-          "title": "$sender",
-          "body": "$message",
-        },
-        "data": {
-          "title": "$sender",
-          "body": "$message",
-          "sound": "default",
-          "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        }
-        // }
-      }),
-    );
   }
 
   formatTime(DateTime time) {
@@ -521,7 +499,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Text(
       date,
-      style: TextStyle(fontSize: 10.0),
+      style: TextStyle(fontSize: 10.0,
+      color: Theme.of(context).textTheme.bodyText1.color,)
     );
   }
 
@@ -836,7 +815,7 @@ class _ChatScreenState extends State<ChatScreen> {
           receiverId: widget.receiver.uid,
           senderId: _currentUserId,
           imageUploadProvider: _imageUploadProvider);
-             sendNotification("IMAGE", sender.name.toString(),
+      sendNotification("IMAGE", sender.name.toString(),
           widget.receiver.firebaseToken.toString());
       this.setState(() {
         _isEditing = false;
@@ -868,26 +847,75 @@ class _ChatScreenState extends State<ChatScreen> {
           });
         });
     }
-       sendNotification("Video", sender.name.toString(),
-          widget.receiver.firebaseToken.toString());
+    sendNotification("Video", sender.name.toString(),
+        widget.receiver.firebaseToken.toString());
+  }
+
+  Future<void> downloadFile(String imagePath) async {
+    Dio dio = Dio();
+
+    dio.download(forwardedImage ?? noImageAvailable, imagePath,
+        onReceiveProgress: (actualBytes, totalBytes) {});
+  }
+
+  CustomAppBar optionsAppBar(context) {
+    return CustomAppBar(
+      leading: IconButton(
+        icon: Icon(Icons.cancel_outlined),
+        onPressed: () {
+          setState(() {
+            _isAppBarOptions = false;
+          });
+        },
+      ),
+      title: Text(""),
+      centerTitle: false,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.reply),
+          onPressed: () async {
+            var dir = await getExternalStorageDirectory();
+
+            String imageFilePath = Utils.generateRandomString(15);
+            String path = '${dir.path}/${imageFilePath}.jpg';
+            await downloadFile(path);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => forwardPage(
+                          message: forwardMessageText,
+                          imagePath: path,
+                        )));
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () {
+            deleteDialog(context, messageId);
+            setState(() {
+              _isAppBarOptions = false;
+            });
+          },
+        )
+      ],
+    );
   }
 
   CustomAppBar customAppBar(context) {
     return CustomAppBar(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => profilePage(
-              user: widget.receiver,
-            ),
-          )),
+      onTap: () =>
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return profilePage(
+          user: widget.receiver,
+        );
+      })),
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back,
           color: Theme.of(context).iconTheme.color,
         ),
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>ChatListScreen()));
         },
       ),
       centerTitle: false,
@@ -903,13 +931,13 @@ class _ChatScreenState extends State<ChatScreen> {
               size: 30.0,
             ),
             onPressed: () async {
-              Message _message = Message(
-                receiverId: widget.receiver.uid,
-                senderId: sender.uid,
-                message: "Call",
-                timestamp: Timestamp.now(),
-                type: 'Call',
-              );
+              // Message _message = Message(
+              //   receiverId: widget.receiver.uid,
+              //   senderId: sender.uid,
+              //   message: "Call",
+              //   timestamp: Timestamp.now(),
+              //   type: 'Call',
+              // );
               await Permissions.cameraAndMicrophonePermissionsGranted()
                   ? {
                       CallUtils.dial(
@@ -917,17 +945,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         to: widget.receiver,
                         context: context,
                       ),
-                      _chatMethods.addMessageToDb(_message)
+                      // _chatMethods.addMessageToDb(_message)
                     }
                   : [];
             }),
-        // IconButton(
-        //   color: Theme.of(context).iconTheme.color,
-        //   icon: Icon(
-        //     Icons.phone,
-        //   ),
-        //   onPressed: () {},
-        // )
       ],
     );
   }

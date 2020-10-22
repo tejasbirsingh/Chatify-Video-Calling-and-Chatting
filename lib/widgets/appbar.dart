@@ -39,6 +39,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
         ),
       ),
       child: AppBar(
+    
         // backgroundColor: UniversalVariables.blackColor,
         backgroundColor: Theme.of(context).appBarTheme.color,
         iconTheme:Theme.of(context).appBarTheme.iconTheme,
