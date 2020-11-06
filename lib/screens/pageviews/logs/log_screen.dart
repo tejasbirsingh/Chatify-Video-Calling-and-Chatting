@@ -10,14 +10,21 @@ class LogScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        // backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
+           leading: Text(""),
           title: "Calls",
           actions: <Widget>[],
         ),
-        body: Padding(
-          padding: EdgeInsets.only(left: 15),
-          child: LogListContainer(),
+        body: Container(
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [
+          Theme.of(context).backgroundColor,
+          Theme.of(context).scaffoldBackgroundColor
+        ]),),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            child: LogListContainer(),
+          ),
         ),
       ),
     );

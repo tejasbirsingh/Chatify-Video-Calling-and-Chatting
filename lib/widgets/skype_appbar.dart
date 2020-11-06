@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:skype_clone/widgets/appbar.dart';
 
@@ -6,6 +7,7 @@ class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final title;
   final List<Widget> actions;
   final Widget leading;
+  
 
   const SkypeAppBar({
     Key key,
@@ -20,22 +22,13 @@ class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
       color: Theme.of(context).backgroundColor,
       child: CustomAppBar(
         leading : leading,
-        // leading: IconButton(
-        //   icon: Icon(
-        //     Icons.notifications,
-        //   color: Theme.of(context).iconTheme.color,
-        //     // color: Colors.white,
-        //   ),
-        //   onPressed: () {},
-        // ),
+      
         title: (title is String)
             ? Text(
                 title,
-                style: TextStyle(
-                    color: Theme.of(context).textTheme.headline1.color,
-                  // color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+               style: GoogleFonts.oswald(
+                    textStyle: Theme.of(context).textTheme.headline1,
+                    fontSize: 28.0)
               )
             : title,
         centerTitle: true,

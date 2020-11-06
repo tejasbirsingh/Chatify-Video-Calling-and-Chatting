@@ -23,7 +23,6 @@ class _videoPlayerState extends State<videoPlayer> {
       ..initialize().then((_) {
         _videoPlayerController.setLooping(false);
 
-        // _videoPlayerController.seekTo(Duration(seconds: 0));
         setState(() {});
         _videoPlayerController..addListener(() {});
       });
@@ -51,34 +50,44 @@ class _videoPlayerState extends State<videoPlayer> {
                               )));
                 },
                 child: AspectRatio(
-                  // aspectRatio: _videoPlayerController.value.aspectRatio,
-                  aspectRatio: 1/1,
+                  aspectRatio: 1 / 1,
                   child: VideoPlayer(_videoPlayerController),
                 ),
               )
             : Container(),
-        Center(
-            child: _isplaying == true
-                ? IconButton(
-                    icon: Icon(
-                      Icons.pause,
-                    ),
-                    onPressed: () {
-                      _videoPlayerController.pause();
-                      setState(() {
-                        _isplaying = false;
-                      });
-                    })
-                : IconButton(
-                    icon: Icon(
-                      Icons.play_arrow,
-                    ),
-                    onPressed: () {
-                      _videoPlayerController.play();
-                      setState(() {
-                        _isplaying = true;
-                      });
-                    })),
+        Container(
+          decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.9),
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(10.0),
+                  bottomRight: Radius.circular(10.0))),
+          child: Center(
+              child: _isplaying == true
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.pause,
+                        color: Colors.white,
+                        size: 30.0,
+                      ),
+                      onPressed: () {
+                        _videoPlayerController.pause();
+                        setState(() {
+                          _isplaying = false;
+                        });
+                      })
+                  : IconButton(
+                      icon: Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                        size: 30.0,
+                      ),
+                      onPressed: () {
+                        _videoPlayerController.play();
+                        setState(() {
+                          _isplaying = true;
+                        });
+                      })),
+        ),
       ],
     );
   }

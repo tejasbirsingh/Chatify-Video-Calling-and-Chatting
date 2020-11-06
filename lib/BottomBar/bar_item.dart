@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AnimatedBottomBar extends StatefulWidget {
   final List<BarItem> barItems;
@@ -22,22 +23,31 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.only(topLeft:Radius.circular(40.0),topRight: Radius.circular(40.0)),
-      color:Theme.of(context).cardColor,
-      
- 
-      child: Padding(
-        padding: const EdgeInsets.only(
-          bottom: 10.0,
-          top: 10.0,
-          left: 16.0,
-          right: 16.0,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: _buildBarItems(),
+    return Container(
+        decoration: BoxDecoration(
+          
+            gradient: LinearGradient(colors: [
+              Theme.of(context).backgroundColor,
+              Theme.of(context).scaffoldBackgroundColor
+            ]),
+          ),
+      child: Material(
+  
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(40.0), topRight: Radius.circular(40.0)),
+     
+        child: Padding(
+          padding: const EdgeInsets.only(
+            bottom: 10.0,
+            top: 10.0,
+            left: 16.0,
+            right: 16.0,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: _buildBarItems(),
+          ),
         ),
       ),
     );
@@ -68,7 +78,8 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
             children: <Widget>[
               Icon(
                 item.iconData,
-                color: isSelected ? item.color :Theme.of(context).iconTheme.color,
+                color:
+                    isSelected ? item.color : Theme.of(context).iconTheme.color,
                 size: widget.barStyle.iconSize,
               ),
               SizedBox(
@@ -80,10 +91,13 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
                 vsync: this,
                 child: Text(
                   isSelected ? item.text : "",
-                  style: TextStyle(
+                  style:GoogleFonts.paytoneOne(
+                    textStyle: TextStyle(
                       color: item.color,
+                      
                       fontWeight: widget.barStyle.fontWeight,
                       fontSize: widget.barStyle.fontSize),
+                  )
                 ),
               )
             ],

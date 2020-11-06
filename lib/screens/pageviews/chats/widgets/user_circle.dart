@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 
@@ -15,7 +16,6 @@ class UserCircle extends StatelessWidget {
       onTap: () => showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-
         backgroundColor: Theme.of(context).backgroundColor,
         builder: (context) => UserDetailsContainer(),
       ),
@@ -23,27 +23,19 @@ class UserCircle extends StatelessWidget {
         height: 40,
         width: 40,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50.0),
-          // color: UniversalVariables.separatorColor,
-    // color: Theme.of(context).cardColor
-    gradient: LinearGradient(colors: [Colors.green,Colors.teal])
-        ),
+            borderRadius: BorderRadius.circular(50.0),
+            gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
         child: Stack(
           children: <Widget>[
- 
             Align(
               alignment: Alignment.center,
               child: Text(
                 Utils.getInitials(userProvider.getUser.name),
-                // style: TextStyle(
-                //   fontWeight: FontWeight.bold,
-                //   color: UniversalVariables.lightBlueColor,
-                //   fontSize: 13,
-                // ),
-                style: Theme.of(context).textTheme.bodyText1,
+                style: GoogleFonts.anton(
+                  textStyle: Theme.of(context).textTheme.headline1,
+                letterSpacing: 2.0),
               ),
             ),
-          
           ],
         ),
       ),

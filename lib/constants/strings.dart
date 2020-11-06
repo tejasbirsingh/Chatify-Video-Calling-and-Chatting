@@ -8,6 +8,7 @@ const String EMAIL_FIELD = "email";
 
 const String MESSAGE_TYPE_IMAGE = "image";
 const String MESSAGE_TYPE_VIDEO ="video";
+const String MESSAGE_TYPE_FILE ="file";
 const String MESSAGE_TYPE_AUDIO ="audio";
 
 const String CALL_STATUS_DIALLED = "dialled";

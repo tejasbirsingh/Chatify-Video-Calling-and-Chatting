@@ -64,49 +64,32 @@ class _audioPlayerClassState extends State<audioPlayerClass> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    RaisedButton(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                      onPressed: () {
-                        if (_isPlaying == true) {
-                          pauseAudio();
-                          setState(() {
-                            _isPlaying = false;
-                          });
-                        } else {
-                          resumeAudio();
-                          setState(() {
-                            _isPlaying = true;
-                          });
-                        }
-                      },
-                      child: Icon(
-                        _isPlaying ? Icons.pause : Icons.play_arrow,
-                      ),
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          Icon(Icons.mic,
           ),
-          SizedBox(width: 5.0,),
-          RaisedButton(
-             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            onPressed: () async {
+          IconButton(
+            icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+             onPressed: () {
+                if (_isPlaying == true) {
+                  pauseAudio();
+                  setState(() {
+                    _isPlaying = false;
+                  });
+                } else {
+                  resumeAudio();
+                  setState(() {
+                    _isPlaying = true;
+                  });
+                }
+              },
+          ),
+        
+       IconButton(icon: Icon(Icons.play_circle_fill),
+        onPressed: () async {
               setState(() {
                 _isPlaying = true;
               });
               playAudio(widget.url);
-            },
-            child: Icon(Icons.play_circle_fill),
-            color: Colors.white,
-          ),
+            },)
         ],
       ),
     );

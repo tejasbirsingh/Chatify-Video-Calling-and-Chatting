@@ -49,7 +49,7 @@ class HiveMethods implements LogInterface {
 
     List<Log> logList = [];
 
-    for (int i = 0; i < box.length; i++) {
+    for (int i = box.length-1;i>=0; i--) {
       var logMap = box.getAt(i);
 
       logList.add(Log.fromMap(logMap));

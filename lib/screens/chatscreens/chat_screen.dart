@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'dart:io';
 import 'dart:math';
 
@@ -8,17 +8,24 @@ import 'package:file/local.dart';
 import 'package:audio_recorder/audio_recorder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/enum/view_state.dart';
 import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/userData.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:skype_clone/provider/audio_upload_provider.dart';
+import 'package:skype_clone/provider/file_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'dart:io' as Io;
 import 'package:skype_clone/provider/video_upload_provider.dart';
@@ -27,23 +34,30 @@ import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/messageForwarding/forward_list.dart';
-import 'package:skype_clone/screens/chatscreens/text_parsing/image_to_pdf.dart';
+import 'package:skype_clone/screens/chatscreens/text_parsing/firebase_api_handler.dart';
+
 import 'package:skype_clone/screens/chatscreens/push_notification.dart';
+import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/text_recognition_widget.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/audioPlayer.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/file_viewer.dart';
+
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
-import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
+import 'package:skype_clone/screens/home_screen.dart';
+
 import 'package:skype_clone/screens/profile_screen.dart';
 import 'package:skype_clone/utils/call_utilities.dart';
 import 'package:skype_clone/utils/permissions.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import 'package:skype_clone/widgets/appbar.dart';
-import 'package:skype_clone/widgets/custom_tile.dart';
+
 import 'package:video_player/video_player.dart';
 import 'package:video_trimmer/video_trimmer.dart';
+
+import 'widgets/modal_tile.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
@@ -59,7 +73,8 @@ class _ChatScreenState extends State<ChatScreen> {
   ImageUploadProvider _imageUploadProvider;
   VideoUploadProvider _videoUploadProvider;
   AudioUploadProvider _audioUploadProvider;
-  List<String> imageUrlList;
+  FileUploadProvider _fileUploadProvider;
+  List<String> imageUrlList = List<String>();
   final StorageMethods _storageMethods = StorageMethods();
   final ChatMethods _chatMethods = ChatMethods();
   final AuthMethods _authMethods = AuthMethods();
@@ -83,9 +98,10 @@ class _ChatScreenState extends State<ChatScreen> {
   String messageId = "";
   String forwardMessageText = "";
   String forwardedImage = "";
-
+  bool _darkTheme = true;
   bool uploading = false;
   String ocrText = "";
+  String backgroundImage = "";
 
   @override
   void initState() {
@@ -93,7 +109,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _authMethods.getCurrentUser().then((user) {
       _currentUserId = user.uid;
-
+      getbackground();
       setState(() {
         sender = UserData(
           uid: user.uid,
@@ -101,6 +117,20 @@ class _ChatScreenState extends State<ChatScreen> {
           profilePhoto: user.photoURL,
         );
       });
+    });
+  }
+
+  getbackground() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      backgroundImage = prefs.getString('background');
+    });
+  }
+
+  getTheme() async {
+    var prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _darkTheme = prefs.getBool('darkTheme');
     });
   }
 
@@ -113,16 +143,13 @@ class _ChatScreenState extends State<ChatScreen> {
     final picker = ImagePicker();
     final imageFile = await picker.getImage(
         source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
-    var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
-    String img64 = base64Encode(bytes);
-    var url = 'https://api.ocr.space/parse/image';
-    var payload = {"base64Image": "data:image/jpg;base64,${img64.toString()}"};
-    var header = {"apikey": "d938f7220788957"};
-    var post = await http.post(url, body: payload, headers: header);
-    var result = jsonDecode(post.body);
+
+    final text = await FirebaseMLApi.recogniseText(File(imageFile.path));
+
     setState(() {
       uploading = false;
-      ocrText = result['ParsedResults'][0]['ParsedText'];
+
+      ocrText = text;
     });
     textFieldController.text = textFieldController.text + "  " + ocrText;
   }
@@ -145,9 +172,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    getTheme();
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
     _audioUploadProvider = Provider.of<AudioUploadProvider>(context);
+    _fileUploadProvider = Provider.of<FileUploadProvider>(context);
     return PickupLayout(
       scaffold: SafeArea(
         child: Scaffold(
@@ -156,6 +185,19 @@ class _ChatScreenState extends State<ChatScreen> {
               _isAppBarOptions ? optionsAppBar(context) : customAppBar(context),
           body: Stack(
             children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Container(
+                  child: backgroundImage != ''
+                      ? Image.asset(
+                          backgroundImage,
+                          fit: BoxFit.cover,
+                        )
+                      : Text(''),
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                ),
+              ),
               Column(
                 children: <Widget>[
                   Flexible(
@@ -182,7 +224,20 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: CircularProgressIndicator(),
                         )
                       : Container(),
-                  chatControls(),
+                  _fileUploadProvider.getViewState == ViewState.LOADING
+                      ? Container(
+                          alignment: Alignment.centerRight,
+                          margin: EdgeInsets.only(right: 15.0),
+                          child: CircularProgressIndicator(),
+                        )
+                      : Container(),
+                  Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).backgroundColor,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30.0),
+                              topRight: Radius.circular(30.0))),
+                      child: chatControls()),
                   showEmojiPicker
                       ? Container(child: emojiContainer())
                       : Container(),
@@ -222,6 +277,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget messageList() {
+    _chatMethods.markSeen(widget.receiver.uid, _currentUserId);
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection(MESSAGES_COLLECTION)
@@ -233,22 +289,12 @@ class _ChatScreenState extends State<ChatScreen> {
         if (snapshot.data == null) {
           return Center(child: CircularProgressIndicator());
         }
-
-        // SchedulerBinding.instance.addPostFrameCallback((_) {
-        //   _listScrollController.animateTo(
-        //     _listScrollController.position.minScrollExtent,
-        //     duration: Duration(milliseconds: 250),
-        //     curve: Curves.easeInOut,
-        //   );
-        // });
-
         return ListView.builder(
           padding: EdgeInsets.all(10),
           controller: _listScrollController,
           reverse: true,
           itemCount: snapshot.data.docs.length,
           itemBuilder: (context, index) {
-            
             return chatMessageItem(snapshot.data.docs[index]);
           },
         );
@@ -304,9 +350,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget chatMessageItem(DocumentSnapshot snapshot) {
     Message _message = Message.fromMap(snapshot.data());
-    if(_message.type==MESSAGE_TYPE_IMAGE) {
-      imageUrlList.add(_message.photoUrl);
-    }
+
     return _message.type != "Call"
         ? GestureDetector(
             onLongPress: () {
@@ -318,7 +362,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 _isAppBarOptions = true;
                 forwardMessageText = _message.message;
               });
-              // deleteDialog(context, snapshot.id);
             },
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 15),
@@ -366,7 +409,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: Colors.grey.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(10.0)),
           ),
-          SizedBox(height:2.0),
+          SizedBox(height: 2.0),
           (formatTime(_message.timestamp.toDate()))
         ],
       ),
@@ -408,8 +451,133 @@ class _ChatScreenState extends State<ChatScreen> {
         });
   }
 
+  getMessage(Message message) {
+    return Text(
+      message.message,
+      style: TextStyle(color: Colors.white, fontSize: 16.0),
+    );
+  }
+
+  formatTime(DateTime time) {
+    String date = time.day.toString() +
+        "/" +
+        time.month.toString() +
+        "/" +
+        time.year.toString() +
+        "  " +
+        (time.hour > 12 ? time.hour - 12 : time.hour).toString() +
+        ":" +
+        (time.minute.toString().length == 1
+            ? "0" + time.minute.toString()
+            : time.minute.toString()) +
+        " " +
+        (time.hour < 12 ? "am" : "pm").toString();
+
+    return Text(date,
+        style: TextStyle(
+          fontSize: 10.0,
+          color: Theme.of(context).textTheme.bodyText1.color,
+        ));
+  }
+
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(35.0);
+    if (message.type == MESSAGE_TYPE_AUDIO) {
+      return message.audioUrl != null
+          ? Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient:
+                      LinearGradient(colors: [Colors.green, Colors.teal])),
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: audioPlayerClass(url: message.audioUrl))
+          : Icon(Icons.sync_problem);
+    }
+    if (message.type == MESSAGE_TYPE_VIDEO) {
+      return Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
+        child: Container(
+            margin: EdgeInsets.all(5.0),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.50),
+            child: message.videoUrl != null
+                ? videoPlayer(
+                    url: message.videoUrl,
+                  )
+                : Icon(Icons.sync_problem)),
+      );
+    }
+    if (message.type == MESSAGE_TYPE_FILE) {
+      return message.fileUrl != null
+          ? GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => fileViewPage(url: message.fileUrl))),
+              child: Stack(
+                children: [
+                  Container(
+                    child: Center(
+                      child: Text(
+                        'PDF',
+                        style: GoogleFonts.patuaOne(
+                            fontSize: 40.0, color: Colors.black),
+                      ),
+                    ),
+                    height: 80.0,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.0)),
+                    width: 160.0,
+                  ),
+                  Positioned(
+                    bottom: 0.0,
+                    child: Container(
+                      height: 20.0,
+                      width: 160.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                          gradient: LinearGradient(
+                              colors: [Colors.green, Colors.teal])),
+                    ),
+                  ),
+                ],
+              ))
+          : Icon(Icons.sync_problem);
+    }
+    if (message.type == MESSAGE_TYPE_IMAGE) {
+      if (!imageUrlList.contains(message.photoUrl)) {
+        imageUrlList.add(message.photoUrl ?? "");
+      }
+
+      return message.photoUrl != null
+          ? Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient:
+                      LinearGradient(colors: [Colors.green, Colors.teal])),
+              height: MediaQuery.of(context).size.width * 0.6,
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: CachedImage(message.photoUrl,
+                    height: 250,
+                    width: 250,
+                    radius: 10,
+                    isTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ImagePage(
+                                  imageUrl: message.photoUrl,
+                                  imageUrlList: imageUrlList,
+                                )))),
+              ),
+            )
+          : Icon(Icons.sync_problem);
+    }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -438,7 +606,15 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
           child: Padding(
             padding: EdgeInsets.all(10),
-            child: getMessage(message),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                getMessage(message),
+                message.status == 'sent'
+                    ? Icon(Icons.check)
+                    : Icon(Icons.check_box),
+              ],
+            ),
           ),
         ),
         SizedBox(
@@ -449,64 +625,104 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  getMessage(Message message) {
-    if (message.type == MESSAGE_TYPE_IMAGE) {
-      return message.photoUrl != null
-          ? CachedImage(message.photoUrl,
-              height: 250,
-              width: 250,
-              radius: 10,
-              isTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ImagePage(
-                            imageUrl: message.photoUrl,
-                            imageUrlList: imageUrlList,
-                          ))))
-          : Icon(Icons.sync_problem);
-    } else if (message.type == MESSAGE_TYPE_VIDEO) {
-      return message.videoUrl != null
-          ? videoPlayer(
-              url: message.videoUrl,
-            )
-          : Icon(Icons.sync_problem);
-    } else if (message.type == MESSAGE_TYPE_AUDIO) {
-      return message.audioUrl != null
-          ? audioPlayerClass(url: message.audioUrl)
-          : Icon(Icons.sync_problem);
-    } else {
-      return Text(
-        message.message,
-        style: TextStyle(color: Colors.white, fontSize: 16.0),
-      );
-    }
-  }
-
-  formatTime(DateTime time) {
-    String date = time.day.toString() +
-        "/" +
-        time.month.toString() +
-        "/" +
-        time.year.toString() +
-        "  " +
-        (time.hour > 12 ? time.hour - 12 : time.hour).toString() +
-        ":" +
-        (time.minute.toString().length == 1
-            ? "0" + time.minute.toString()
-            : time.minute.toString()) +
-        " " +
-        (time.hour < 12 ? "am" : "pm").toString();
-
-    return Text(
-      date,
-      style: TextStyle(fontSize: 10.0,
-      color: Theme.of(context).textTheme.bodyText1.color,)
-    );
-  }
-
   Widget receiverLayout(Message message) {
     Radius messageRadius = Radius.circular(35);
+    if (message.type == MESSAGE_TYPE_AUDIO) {
+      return message.audioUrl != null
+          ? Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient:
+                      LinearGradient(colors: [Colors.green, Colors.teal])),
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: audioPlayerClass(url: message.audioUrl))
+          : Icon(Icons.sync_problem);
+    }
+    if (message.type == MESSAGE_TYPE_VIDEO) {
+      return Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
+        child: Container(
+            margin: EdgeInsets.all(5.0),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.50),
+            child: message.videoUrl != null
+                ? videoPlayer(
+                    url: message.videoUrl,
+                  )
+                : Icon(Icons.sync_problem)),
+      );
+    }
+    if (message.type == MESSAGE_TYPE_FILE) {
+      return message.fileUrl != null
+          ? GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => fileViewPage(url: message.fileUrl))),
+              child: Stack(
+                children: [
+                  Container(
+                    child: Center(
+                      child: Text(
+                        'PDF',
+                        style: GoogleFonts.patuaOne(
+                            fontSize: 40.0, color: Colors.black),
+                      ),
+                    ),
+                    height: 80.0,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.0)),
+                    width: 160.0,
+                  ),
+                  Positioned(
+                    bottom: 0.0,
+                    child: Container(
+                      height: 20.0,
+                      width: 160.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                          gradient: LinearGradient(
+                              colors: [Colors.green, Colors.teal])),
+                    ),
+                  ),
+                ],
+              ))
+          : Icon(Icons.sync_problem);
+    }
+    if (message.type == MESSAGE_TYPE_IMAGE) {
+      if (!imageUrlList.contains(message.photoUrl)) {
+        imageUrlList.add(message.photoUrl ?? "");
+      }
 
+      return message.photoUrl != null
+          ? Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient:
+                      LinearGradient(colors: [Colors.green, Colors.teal])),
+              height: MediaQuery.of(context).size.width * 0.6,
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: CachedImage(message.photoUrl,
+                    height: 250,
+                    width: 250,
+                    radius: 10,
+                    isTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ImagePage(
+                                  imageUrl: message.photoUrl,
+                                  imageUrlList: imageUrlList,
+                                )))),
+              ),
+            )
+          : Icon(Icons.sync_problem);
+    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -516,7 +732,6 @@ class _ChatScreenState extends State<ChatScreen> {
               maxWidth: MediaQuery.of(context).size.width * 0.50),
           decoration: message.type != "Call"
               ? BoxDecoration(
-                  // color: UniversalVariables.receiverColor,
                   gradient: LinearGradient(
                       colors: [Colors.blue.shade700, Colors.blue.shade900]),
                   borderRadius: BorderRadius.only(
@@ -526,7 +741,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 )
               : BoxDecoration(
-                  // color: UniversalVariables.receiverColor,
                   color: Colors.grey.withOpacity(0.7),
                   borderRadius: BorderRadius.only(
                     bottomRight: messageRadius,
@@ -558,6 +772,7 @@ class _ChatScreenState extends State<ChatScreen> {
       showModalBottomSheet(
           context: context,
           elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.only()),
           backgroundColor: Theme.of(context).backgroundColor,
           builder: (context) {
             return Column(
@@ -602,6 +817,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         title: "File",
                         subtitle: "Share files",
                         icon: Icons.tab,
+                        onTap: () => pickFile(),
                       ),
                       ModalTile(
                         title: "Text Extractor",
@@ -620,19 +836,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => imageToPdf()));
+                                  builder: (context) =>
+                                      //  imageToPdf()
+                                      TextRecognitionWidget(
+                                          receiverId: widget.receiver.uid)));
                         },
                       ),
-                      // ModalTile(
-                      //   title: "Location",
-                      //   subtitle: "Share a location",
-                      //   icon: Icons.add_location,
-                      // ),
-                      // ModalTile(
-                      //   title: "Schedule Call",
-                      //   subtitle: "Schedule a meeting in advance",
-                      //   icon: Icons.schedule,
-                      // ),
                     ],
                   ),
                 ),
@@ -650,6 +859,7 @@ class _ChatScreenState extends State<ChatScreen> {
         message: text,
         timestamp: Timestamp.now(),
         type: 'text',
+        status: 'sent',
       );
 
       setState(() {
@@ -704,9 +914,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   decoration: InputDecoration(
                       hintText: "Type a message",
                       hintStyle: Theme.of(context).textTheme.bodyText2,
-                      //TextStyle(
-                      // color: UniversalVariables.greyColor,
-                      // ),
                       border: OutlineInputBorder(
                           borderRadius: const BorderRadius.all(
                             const Radius.circular(50.0),
@@ -715,7 +922,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       filled: true,
-                      // fillColor: UniversalVariables.separatorColor,
                       fillColor: Theme.of(context).dividerColor),
                 ),
                 IconButton(
@@ -790,6 +996,21 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Future pickFile() async {
+    File path = await FilePicker.getFile(
+        type: FileType.custom, allowedExtensions: ['pdf']);
+
+    if (path != null) {
+      _storageMethods.uploadFile(
+          file: path,
+          receiverId: widget.receiver.uid,
+          senderId: _currentUserId,
+          fileUploadProvider: _fileUploadProvider);
+      sendNotification("FILE", sender.name.toString(),
+          widget.receiver.firebaseToken.toString());
+    }
+  }
+
   Future pickImage({@required ImageSource source}) async {
     this.setState(() {
       _isEditing = true;
@@ -804,17 +1025,19 @@ class _ChatScreenState extends State<ChatScreen> {
           maxHeight: 700,
           maxWidth: 700,
           androidUiSettings: AndroidUiSettings(
-            toolbarColor: Colors.black54,
+            toolbarColor: Theme.of(context).backgroundColor,
             toolbarTitle: "Edit Image",
-            statusBarColor: Colors.black,
+            statusBarColor: Theme.of(context).backgroundColor,
             backgroundColor: Colors.black,
-            toolbarWidgetColor: Colors.white,
+            activeControlsWidgetColor: Colors.teal,
+            toolbarWidgetColor: Theme.of(context).iconTheme.color,
           ));
       _storageMethods.uploadImage(
-          image: cropped,
-          receiverId: widget.receiver.uid,
-          senderId: _currentUserId,
-          imageUploadProvider: _imageUploadProvider);
+        image: cropped,
+        receiverId: widget.receiver.uid,
+        senderId: _currentUserId,
+        imageUploadProvider: _imageUploadProvider,
+      );
       sendNotification("IMAGE", sender.name.toString(),
           widget.receiver.firebaseToken.toString());
       this.setState(() {
@@ -861,7 +1084,10 @@ class _ChatScreenState extends State<ChatScreen> {
   CustomAppBar optionsAppBar(context) {
     return CustomAppBar(
       leading: IconButton(
-        icon: Icon(Icons.cancel_outlined),
+        icon: Icon(
+          Icons.cancel_outlined,
+          color: Theme.of(context).iconTheme.color,
+        ),
         onPressed: () {
           setState(() {
             _isAppBarOptions = false;
@@ -872,7 +1098,10 @@ class _ChatScreenState extends State<ChatScreen> {
       centerTitle: false,
       actions: [
         IconButton(
-          icon: Icon(Icons.reply),
+          icon: Icon(
+            Icons.reply,
+            color: Theme.of(context).iconTheme.color,
+          ),
           onPressed: () async {
             var dir = await getExternalStorageDirectory();
 
@@ -889,7 +1118,7 @@ class _ChatScreenState extends State<ChatScreen> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.delete),
+          icon: Icon(Icons.delete, color: Theme.of(context).iconTheme.color),
           onPressed: () {
             deleteDialog(context, messageId);
             setState(() {
@@ -904,6 +1133,9 @@ class _ChatScreenState extends State<ChatScreen> {
   CustomAppBar customAppBar(context) {
     return CustomAppBar(
       onTap: () =>
+          // Get.to(profilePage(
+          //   user: widget.receiver,
+          // )),
           Navigator.push(context, MaterialPageRoute(builder: (context) {
         return profilePage(
           user: widget.receiver,
@@ -915,19 +1147,36 @@ class _ChatScreenState extends State<ChatScreen> {
           color: Theme.of(context).iconTheme.color,
         ),
         onPressed: () {
-          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>ChatListScreen()));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
         },
       ),
       centerTitle: false,
-      title: Text(
-        widget.receiver.name,
-        style: Theme.of(context).textTheme.headline1,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          CircleAvatar(
+              radius: 20.0,
+              child: CachedImage(
+                widget.receiver.profilePhoto,
+                radius: 40.0,
+              )),
+          SizedBox(
+            width: 6.0,
+          ),
+          Text(
+            widget.receiver.name,
+            style: GoogleFonts.patuaOne(
+                textStyle: Theme.of(context).textTheme.headline1,
+                letterSpacing: 1.5),
+          ),
+        ],
       ),
       actions: <Widget>[
         IconButton(
             color: Theme.of(context).iconTheme.color,
             icon: Icon(
-              Icons.video_call_outlined,
+              Icons.video_call_rounded,
               size: 30.0,
             ),
             onPressed: () async {
@@ -950,53 +1199,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   : [];
             }),
       ],
-    );
-  }
-}
-
-class ModalTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Function onTap;
-
-  const ModalTile({
-    @required this.title,
-    this.subtitle,
-    @required this.icon,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: CustomTile(
-        mini: false,
-        onTap: onTap,
-        leading: Container(
-          margin: EdgeInsets.only(right: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            // color: UniversalVariables.receiverColor,
-            color: Theme.of(context).cardColor,
-          ),
-          padding: EdgeInsets.all(10),
-          child: Icon(
-            icon,
-            color: Theme.of(context).iconTheme.color,
-            size: 38,
-          ),
-        ),
-        // subtitle: Text(
-        //   subtitle,
-        //   style: TextStyle(
-        //     color: UniversalVariables.greyColor,
-        //     fontSize: 14,
-        //   ),
-        // ),
-        title: Text(title, style: Theme.of(context).textTheme.headline1),
-      ),
     );
   }
 }

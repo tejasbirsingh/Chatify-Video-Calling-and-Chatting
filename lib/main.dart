@@ -3,11 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
 import 'package:skype_clone/provider/audio_upload_provider.dart';
+
+import 'package:skype_clone/provider/file_provider.dart';
 import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
@@ -65,6 +68,7 @@ class _MyAppState extends State<MyApp> {
       });
     });
   }
+
 
   Future<void> _getLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -125,6 +129,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(
             create: (_) => AudioUploadProvider(),
           ),
+     
+          ChangeNotifierProvider(create: (_) =>FileUploadProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: MaterialApp(

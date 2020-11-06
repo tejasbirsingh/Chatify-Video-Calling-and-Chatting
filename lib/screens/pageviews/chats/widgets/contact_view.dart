@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/models/userData.dart';
@@ -61,11 +62,11 @@ class ViewLayout extends StatelessWidget {
             ),
           )),
       title: Text(
-        (contact != null ? contact.name : null) != null ? contact.name : "..",
-        style:Theme.of(context).textTheme.headline1
-        // style:
-        //     TextStyle(color: Colors.white, fontFamily: "Arial", fontSize: 19),
-      ),
+          (contact != null ? contact.name : null) != null ? contact.name : "..",
+          style: GoogleFonts.patuaOne(textStyle : Theme.of(context).textTheme.headline1,
+          letterSpacing: 1.5)
+          
+          ),
       subtitle: LastMessageContainer(
         stream: _chatMethods.fetchLastMessageBetween(
           senderId: userProvider.getUser.uid,
@@ -73,27 +74,29 @@ class ViewLayout extends StatelessWidget {
         ),
       ),
       leading: Container(
-          constraints: BoxConstraints(maxHeight: 70, maxWidth: 70),
-          child: Stack(
-            children: <Widget>[
-             
-              OnlineDotIndicator(
-                uid: contact.uid,
+        constraints: BoxConstraints(maxHeight: 70, maxWidth: 70),
+        child: Stack(
+          children: <Widget>[
+            OnlineDotIndicator(
+              uid: contact.uid,
+            ),
+            Center(
+              child: CachedImage(
+                contact.profilePhoto,
+                radius: 60,
+                isRound: true,
+                isTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => profilePage(
+                        user: contact,
+                      ),
+                    )),
               ),
-               Center(
-                 child: CachedImage(
-                  
-                  contact.profilePhoto,
-                  radius: 60,
-                  isRound: true,
-                  isTap: ()=>Navigator.push(context,MaterialPageRoute(builder: (context) => profilePage(user: contact,),)),
-                  
-              ),
-               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,8 @@ import 'dart:io' as Io;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:skype_clone/screens/chatscreens/text_parsing/pdf_view_screen.dart';
-
+import 'package:image/image.dart' as Im;
+import 'package:skype_clone/utils/utilities.dart';
 
 class imageToPdf extends StatefulWidget {
   @override
@@ -37,43 +39,37 @@ class _imageToPdfState extends State<imageToPdf> {
   }
 
   writePdf() async {
-
     final font = await rootBundle.load("fonts/OpenSans-Light.ttf");
     final ttf = pw.Font.ttf(font);
-    pdf.addPage(pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.all(32),
-        build: (pw.Context context) {
-          return <pw.Widget>[
-            pw.Header(
-                child: pw.Text('Document', style: pw.TextStyle(font: ttf))),
-            pw.Paragraph(
-                text: ocrText, style: pw.TextStyle(font: ttf, fontSize: 20.0)),
-          ];
-        }),
-              );
+    pdf.addPage(
+      pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: pw.EdgeInsets.all(32),
+          build: (pw.Context context) {
+            return <pw.Widget>[
+              pw.Header(
+                  child: pw.Text('Document', style: pw.TextStyle(font: ttf))),
+              pw.Paragraph(
+                  text: ocrText,
+                  style: pw.TextStyle(font: ttf, fontSize: 20.0)),
+            ];
+          }),
+    );
   }
 
   Future savePdf() async {
     Io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     setState(() {
-      fileName = generateRandomString(15);
+      fileName = Utils.generateRandomString(15);
     });
     String documentPath = documentDirectory.path;
     Io.File file = Io.File("$documentPath/$fileName.pdf");
     file.writeAsBytesSync(pdf.save());
   }
 
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
-  }
-
-  parseText() async {
+  parseText(ImageSource source) async {
     final imageFile = await ImagePicker()
-        .getImage(source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
+        .getImage(source: source, maxHeight: 970, maxWidth: 670);
     var bytes = Io.File(imageFile.path.toString()).readAsBytesSync();
     String img64 = base64Encode(bytes);
 
@@ -96,16 +92,17 @@ class _imageToPdfState extends State<imageToPdf> {
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-        
-     
           backgroundColor: Theme.of(context).backgroundColor,
           iconTheme: Theme.of(context).iconTheme,
           title: Text(
             "Image to Pdf",
-            style: Theme.of(context).textTheme.headline1,
+            style: GoogleFonts.staatliches(
+                textStyle: TextStyle(
+                    color: Theme.of(context).textTheme.headline1.color,
+                    letterSpacing: 3.0,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28.0)),
           ),
-          
-        
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -114,8 +111,7 @@ class _imageToPdfState extends State<imageToPdf> {
                 padding: const EdgeInsets.only(top: 50.0),
                 child: GestureDetector(
                   onTap: () {
-                    parseText();
-                 
+                    parseText(ImageSource.camera);
                   },
                   child: Padding(
                     padding: EdgeInsets.only(left: 40.0, right: 40.0),
@@ -128,9 +124,31 @@ class _imageToPdfState extends State<imageToPdf> {
                           gradient: LinearGradient(
                               colors: [Colors.green, Colors.teal])),
                       child: Center(
-                        child: Text("PICK IMAGE",
+                        child: Text("Camera",
                             style: Theme.of(context).textTheme.headline1),
                       ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              GestureDetector(
+                onTap: () {
+                  parseText(ImageSource.gallery);
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(left: 40.0, right: 40.0),
+                  child: Container(
+                    height: 40,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        // color: Colors.purple,
+                        gradient: LinearGradient(
+                            colors: [Colors.green, Colors.teal])),
+                    child: Center(
+                      child: Text("Gallery",
+                          style: Theme.of(context).textTheme.headline1),
                     ),
                   ),
                 ),
@@ -166,8 +184,8 @@ class _imageToPdfState extends State<imageToPdf> {
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   onPressed: () async {
-                  await writePdf();
-                  _editingController.clear();
+                    await writePdf();
+                    _editingController.clear();
                   },
                 ),
               ),
@@ -181,7 +199,6 @@ class _imageToPdfState extends State<imageToPdf> {
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   onPressed: () async {
-                    
                     await savePdf();
                     Io.Directory documentDirectory =
                         await getApplicationDocumentsDirectory();

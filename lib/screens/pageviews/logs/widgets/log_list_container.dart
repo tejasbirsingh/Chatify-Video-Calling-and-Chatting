@@ -68,66 +68,69 @@ class _LogListContainerState extends State<LogListContainer> {
                 Log _log = logList[i];
                 bool hasDialled = _log.callStatus == CALL_STATUS_DIALLED;
 
-                return CustomTile(
-                  leading: CachedImage(
-                    hasDialled ? _log.receiverPic : _log.callerPic,
-                    isRound: true,
-                    radius: 45,
-                  ),
-                  mini: false,
-                  onLongPress: () => showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: Theme.of(context).cardColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
-                      title: Text("Delete this Log?",
-                      style:TextStyle(color: Colors.black,
-                      fontSize: 20.0),),
-                      content:
-                          Text("Are you sure you wish to delete this log?",
-                           style: Theme.of(context).textTheme.bodyText1,
+                return Padding(
+                  padding:  EdgeInsets.symmetric(vertical:4.0,horizontal: 4.0),
+                  child: CustomTile(
+                    leading: CachedImage(
+                      hasDialled ? _log.receiverPic : _log.callerPic,
+                      isRound: true,
+                      radius: 45,
+                    ),
+                    mini: false,
+                    onLongPress: () => showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: Theme.of(context).cardColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0)),
+                        title: Text("Delete this Log?",
+                        style:TextStyle(color: Colors.black,
+                        fontSize: 20.0),),
+                        content:
+                            Text("Are you sure you wish to delete this log?",
+                             style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                        actions: [
+                          FlatButton(
+                            child: Text("YES",style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold
+                            ),),
+                            onPressed: () async {
+                              Navigator.maybePop(context);
+                              await LogRepository.deleteLogs(i);
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            },
                           ),
-                      actions: [
-                        FlatButton(
-                          child: Text("YES",style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold
-                          ),),
-                          onPressed: () async {
-                            Navigator.maybePop(context);
-                            await LogRepository.deleteLogs(i);
-                            if (mounted) {
-                              setState(() {});
-                            }
-                          },
-                        ),
-                        FlatButton(
-                          child: Text("NO",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            color: Colors.black
-                          ),),
-                          onPressed: () => Navigator.maybePop(context),
-                        ),
-                      ],
+                          FlatButton(
+                            child: Text("NO",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                              color: Colors.black
+                            ),),
+                            onPressed: () => Navigator.maybePop(context),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    hasDialled ? _log.receiverName : _log.callerName,
-                    style: Theme.of(context).textTheme.bodyText1
-                  ),
-                  icon: getIcon(_log.callStatus,15.0),
-                  subtitle: Text(
-                    Utils.formatDateString(_log.timestamp),
-                    style: TextStyle(
-                      color:Theme.of(context).textTheme.bodyText1.color ,
-                      fontSize: 13,
+                    title: Text(
+                      hasDialled ? _log.receiverName : _log.callerName,
+                      style: Theme.of(context).textTheme.bodyText1
                     ),
+                    icon: getIcon(_log.callStatus,15.0),
+                    subtitle: Text(
+                      Utils.formatDateString(_log.timestamp),
+                      style: TextStyle(
+                        color:Theme.of(context).textTheme.bodyText1.color ,
+                        fontSize: 13,
+                      ),
+                    ),
+                    trailing: getIcon(_log.callStatus,30.0),
                   ),
-                  trailing: getIcon(_log.callStatus,30.0),
                 );
               },
             );

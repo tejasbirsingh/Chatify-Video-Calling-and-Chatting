@@ -26,7 +26,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
 
-        // color: UniversalVariables.blackColor,
+        
         color: Theme.of(context).appBarTheme.color,
        
         border: Border(
@@ -40,7 +40,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
       ),
       child: AppBar(
     
-        // backgroundColor: UniversalVariables.blackColor,
         backgroundColor: Theme.of(context).appBarTheme.color,
         iconTheme:Theme.of(context).appBarTheme.iconTheme,
         elevation: 0,

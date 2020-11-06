@@ -8,6 +8,7 @@ import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 
 import 'package:skype_clone/screens/pageviews/friends/widgets/friend_view.dart';
+import 'package:skype_clone/screens/pageviews/friends/widgets/quite_box.dart';
 
 import 'package:skype_clone/widgets/skype_appbar.dart';
 
@@ -26,39 +27,56 @@ class _contactsPageState extends State<contactsPage> {
         Provider.of<UserProvider>(context, listen: true);
 
     return Scaffold(
-        // backgroundColor: UniversalVariables.blackColor,
-        backgroundColor: Theme.of(context).backgroundColor,
-        appBar: SkypeAppBar(
-          
-          title: Text(
-            'Contacts',
-            style: Theme.of(context).textTheme.headline1,
-          ),
-          actions: [
-            IconButton(icon: Icon(Icons.list,
-            color: Theme.of(context).iconTheme.color,), 
-            onPressed: () {})],
-        ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: _auth.getFriends(uid: userProvider.getUser.uid),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var docList = snapshot.data.docs;
-              if (docList.isEmpty) return Container();
 
-              return ListView.builder(
-                padding: EdgeInsets.all(10.0),
-                itemCount: docList.length,
-                itemBuilder: (context, i) {
-                  Contact user = Contact.fromMap(docList[i].data());
-                  return friendView(user);
-                },
+        appBar: SkypeAppBar(
+          leading: Text(""),
+          title: 'Contacts',
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.more_vert,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "/setting_page");
+              },
+            ),
+          ],
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Theme.of(context).backgroundColor,
+              Theme.of(context).scaffoldBackgroundColor
+            ]),
+          ),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: _auth.getFriends(uid: userProvider.getUser.uid),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var docList = snapshot.data.docs;
+            
+              if (docList.isEmpty) {
+                return QuietBox(
+                  heading: "All your contacts will be shown here",
+                  subtitle:
+                      "Search your friends, add them and start chatting !",
+                );
+              }
+                return ListView.builder(
+                  padding: EdgeInsets.all(10.0),
+                  itemCount: docList.length,
+                  itemBuilder: (context, i) {
+                    Contact user = Contact.fromMap(docList[i].data());
+                    return friendView(user);
+                  },
+                );
+              }
+              return Center(
+                child: CircularProgressIndicator(),
               );
-            }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          },
+            },
+          ),
         ));
   }
 

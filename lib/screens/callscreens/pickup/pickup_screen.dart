@@ -1,4 +1,4 @@
-import 'package:flare_flutter/flare_cache_builder.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:skype_clone/constants/strings.dart';

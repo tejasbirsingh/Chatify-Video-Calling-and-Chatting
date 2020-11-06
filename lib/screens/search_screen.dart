@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/models/userData.dart';
@@ -50,13 +51,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   searchAppBar(BuildContext context) {
     return GradientAppBar(
-   
       gradient: LinearGradient(
-        colors: [
- 
-          Colors.green,
-          Colors.teal
-        ],
+        colors: [Colors.green, Colors.teal],
       ),
       elevation: 0,
       bottom: PreferredSize(
@@ -78,7 +74,10 @@ class _SearchScreenState extends State<SearchScreen> {
               fontSize: 35,
             ),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search,color: Colors.white,),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
               suffixIcon: IconButton(
                 icon: Icon(Icons.close, color: Colors.white),
                 onPressed: () {
@@ -146,11 +145,16 @@ class _SearchScreenState extends State<SearchScreen> {
             radius: 60.0,
             isRound: true,
           ),
-          title: Text(searchedUser.username,
-              style: Theme.of(context).textTheme.bodyText1),
           subtitle: Text(
+            searchedUser.username,
+            style: GoogleFonts.patuaOne(
+                textStyle: Theme.of(context).textTheme.bodyText1),
+          ),
+          title: Text(
             searchedUser.name,
-            style: Theme.of(context).textTheme.bodyText1,
+            style: GoogleFonts.patuaOne(
+                textStyle: Theme.of(context).textTheme.headline1,
+                letterSpacing: 1.0),
           ),
           trailing: IconButton(
             icon: isFriend
@@ -161,13 +165,17 @@ class _SearchScreenState extends State<SearchScreen> {
                 : Icon(Icons.person_add, size: 40.0),
             color: isFriend ? Colors.green : Theme.of(context).iconTheme.color,
             onPressed: () {
-
               _authMethods.addFriend(user.uid, searchedUser.uid);
 
-              final snackbar = SnackBar(content: Text("Friend added!"),);
-                final snackbarFriend = SnackBar(content: Text("Already a friend!"),);
-              isFriend ? Scaffold.of(context).showSnackBar(snackbarFriend) : Scaffold.of(context).showSnackBar(snackbar);
-              
+              final snackbar = SnackBar(
+                content: Text("Friend added!"),
+              );
+              final snackbarFriend = SnackBar(
+                content: Text("Already a friend!"),
+              );
+              isFriend
+                  ? Scaffold.of(context).showSnackBar(snackbarFriend)
+                  : Scaffold.of(context).showSnackBar(snackbar);
             },
           ),
         );
@@ -182,11 +190,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return PickupLayout(
       scaffold: Scaffold(
-        // backgroundColor: UniversalVariables.blackColor,
-        backgroundColor: Theme.of(context).backgroundColor,
+        // backgroundColor: Theme.of(context).backgroundColor,
         appBar: searchAppBar(context),
         body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Theme.of(context).backgroundColor,
+              Theme.of(context).scaffoldBackgroundColor
+            ]),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
           child: buildSuggestions(query, userProvider.getUser),
         ),
       ),

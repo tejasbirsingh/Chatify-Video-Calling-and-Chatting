@@ -23,10 +23,16 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: UniversalVariables.blackColor,
-      backgroundColor: Theme.of(context).backgroundColor,
+
+      // backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: [
+          Container(  decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Theme.of(context).backgroundColor,
+              Theme.of(context).scaffoldBackgroundColor
+            ]),
+          ),),
           Center(
             child: loginButton(),
           ),
@@ -101,5 +107,11 @@ class LoginScreenState extends State<LoginScreen> {
         }));
       }
     });
+    savebackground();
+  }
+
+    void savebackground( ) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString('background', '');
   }
 }

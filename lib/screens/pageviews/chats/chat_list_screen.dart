@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
@@ -16,8 +18,7 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
-        
-        backgroundColor: Theme.of(context).backgroundColor,
+       
         appBar: SkypeAppBar(
           title: 'Chats',
           leading: UserCircle(),
@@ -26,7 +27,7 @@ class ChatListScreen extends StatelessWidget {
               icon: Icon(
                 Icons.more_vert,
                 color: Theme.of(context).iconTheme.color,
-                // color: Colors.white,
+           
               ),
               onPressed: () {
                 Navigator.pushNamed(context, "/setting_page");
@@ -48,6 +49,12 @@ class ChatListContainer extends StatelessWidget {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
 
     return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [
+          Theme.of(context).backgroundColor,
+          Theme.of(context).scaffoldBackgroundColor
+        ]),
+      ),
       child: StreamBuilder<QuerySnapshot>(
           stream: _chatMethods.fetchContacts(
             userId: userProvider.getUser.uid,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+
 
 class CustomTile extends StatelessWidget {
   final Widget leading;
@@ -16,7 +16,7 @@ class CustomTile extends StatelessWidget {
     @required this.leading,
     @required this.title,
     this.icon,
-     this.subtitle,
+    this.subtitle,
     this.trailing,
     this.margin = const EdgeInsets.all(0),
     this.onTap,
@@ -30,24 +30,33 @@ class CustomTile extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-          
-          ),
-        padding: EdgeInsets.symmetric(horizontal: mini ? 10 : 0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: Theme.of(context).canvasColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 0.5,
+              spreadRadius: 0.0,
+              offset: Offset(0.5, 0.5), 
+            )
+          ],
+        ),
+        padding: EdgeInsets.symmetric(horizontal: mini ? 10 : 5),
         margin: margin,
         child: Row(
           children: <Widget>[
+            SizedBox(width: 5),
             leading,
             Expanded(
               child: Container(
                 margin: EdgeInsets.only(left: mini ? 10 : 15),
                 padding: EdgeInsets.symmetric(vertical: mini ? 3 : 20),
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            width: 1,
-                            color: UniversalVariables.separatorColor))),
+                decoration:
+                    BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.0)
+                      
+                        ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -59,7 +68,7 @@ class CustomTile extends StatelessWidget {
                         Row(
                           children: <Widget>[
                             icon ?? Container(),
-                           subtitle ?? Container()
+                            subtitle ?? Container()
                           ],
                         )
                       ],

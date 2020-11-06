@@ -1,9 +1,9 @@
-
 // ignore: camel_case_types
 import 'dart:io';
 import 'dart:math';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image/image.dart' as Im;
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -25,7 +25,6 @@ class settingPage extends StatefulWidget {
   _settingPageState createState() => _settingPageState();
 }
 
-// ignore: camel_case_types
 class _settingPageState extends State<settingPage> {
   bool _darkTheme = true;
   bool _appLocked = false;
@@ -58,18 +57,18 @@ class _settingPageState extends State<settingPage> {
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: true);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    final String noImageUrl =
-        "https://www.google.com/search?q=no+image&rlz=1C1CHBF_enIN802IN802&sxsrf=ALeKk026xztGQvA9DCX0yfejmBRaP8UXTA:1599745232866&tbm=isch&source=iu&ictx=1&fir=NF-z0Y67xzPPBM%252C029W-ajBtZqZzM%252C_&vet=1&usg=AI4_-kQZgZPDLdtCSE-P_wyfcTCySoOtjw&sa=X&ved=2ahUKEwjZ5Ney297rAhUa73MBHRZWD7QQ9QF6BAgKEC4#imgrc=NF-z0Y67xzPPBM";
+
     _darkTheme = (themeNotifier.getTheme() == darkTheme);
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-          centerTitle: true,
-          title: Text('Settings', style: Theme.of(context).textTheme.headline1),
-          iconTheme:Theme.of(context).iconTheme
-         
-        ),
+            centerTitle: true,
+            title: Text('Settings',
+                style: GoogleFonts.oswald(
+                    textStyle: Theme.of(context).textTheme.headline1,
+                    fontSize: 28.0)),
+            iconTheme: Theme.of(context).iconTheme),
         body: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection(USERS_COLLECTION)
@@ -81,252 +80,318 @@ class _settingPageState extends State<settingPage> {
                 String name = snapshot.data.data()['name'];
                 String email = snapshot.data.data()['email'];
                 String status = snapshot.data.data()['status'];
-                return ListView(
-                  children: [
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal:
-                              MediaQuery.of(context).size.width / 2 - 100.0),
-                      title: GestureDetector(
-                        onTap: () =>
-                            _showImageDialog(context, userProvider.getUser),
-                        child: CircleAvatar(
-                          radius: 100.0,
-                          backgroundImage: url != null
-                              ? NetworkImage(url)
-                              : NetworkImage(noImageUrl),
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: Icon(
-                              Icons.photo_camera,
-                              color: Theme.of(context).iconTheme.color,
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      Theme.of(context).backgroundColor,
+                      Theme.of(context).scaffoldBackgroundColor
+                    ]),
+                  ),
+                  child: ListView(
+                    children: [
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width / 2 - 100.0),
+                        title: GestureDetector(
+                          onTap: () =>
+                              _showImageDialog(context, userProvider.getUser),
+                          child: CircleAvatar(
+                            radius: 100.0,
+                            backgroundImage: url != null
+                                ? NetworkImage(url)
+                                : NetworkImage(noImageAvailable),
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: Icon(
+                                Icons.photo_camera,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    ListTile(
-                      title: Text(
-                        'Dark Mode',
-                        style: Theme.of(context).textTheme.headline1,
-                      ),
-                      contentPadding: const EdgeInsets.only(left: 16.0),
-                      trailing: Transform.scale(
-                        scale: 0.8,
-                        child: Switch(
-                          inactiveTrackColor: Theme.of(context).dividerColor,
-                          activeColor: Colors.green,
-                          value: _darkTheme,
-                          onChanged: (val) {
-                            setState(() {
-                              _darkTheme = val;
-                            });
-                            onThemeChanged(val, themeNotifier);
-                          },
+                      ListTile(
+                        leading: Icon(
+                          Icons.color_lens,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          'Dark Mode',
+                          style: GoogleFonts.patuaOne(letterSpacing: 1.0,
+                              textStyle: Theme.of(context).textTheme.headline1),
+                        ),
+                        contentPadding: const EdgeInsets.only(left: 16.0),
+                        trailing: Transform.scale(
+                          scale: 0.8,
+                          child: Switch(
+                            inactiveTrackColor: Theme.of(context).dividerColor,
+                            activeColor: Colors.green,
+                            value: _darkTheme,
+                            onChanged: (val) {
+                              setState(() {
+                                _darkTheme = val;
+                              });
+                              onThemeChanged(val, themeNotifier);
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    isNameEdit == false
-                        ? ListTile(
-                            title: Text(
-                              "Name",
-                              style: Theme.of(context).textTheme.headline1,
-                            ),
-                            subtitle: Text(name,
-                                style: Theme.of(context).textTheme.bodyText1),
-                            trailing: IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Theme.of(context).iconTheme.color,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    isNameEdit = true;
-                                  });
-                                }),
-                          )
-                        : Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Form(
-                              key: _nameKey,
-                              child: TextFormField(
-                                controller: _nameController,
-                                cursorColor: Theme.of(context).iconTheme.color,
-                                style: Theme.of(context).textTheme.bodyText1,
-                                validator: (val) {
-                                  if (val.length < 2)
-                                    return "Name should be atleast of length 2 !";
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      borderSide: BorderSide(
-                                          color: Theme.of(context).splashColor,
-                                          width: 2.0),
-                                    ),
-                                     focusedBorder:OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      borderSide: BorderSide(
-                                          color: Theme.of(context).splashColor,
-                                          width: 2.0),
-                                    ),
-                                    hintText: "Edit Name",
-                                    labelText: "Name",
-                                    hintStyle:
-                                        Theme.of(context).textTheme.bodyText1,
-                                    labelStyle:
-                                        Theme.of(context).textTheme.bodyText1,
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        Icons.check,
-                                        size: 30.0,
-                                        color:
-                                            Theme.of(context).iconTheme.color,
+                      ListTile(
+                        leading: Icon(
+                          Icons.lock,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          'App Locker',
+                         style: GoogleFonts.patuaOne(letterSpacing: 1.0,
+                              textStyle: Theme.of(context).textTheme.headline1),
+                        ),
+                        contentPadding: const EdgeInsets.only(left: 16.0),
+                        trailing: Transform.scale(
+                          scale: 0.8,
+                          child: Switch(
+                            inactiveTrackColor: Theme.of(context).dividerColor,
+                            activeColor: Colors.green,
+                            value: _appLocked,
+                            onChanged: (bool val) {
+                              setState(() {
+                                _appLocked = val;
+                                setAppLocker(val);
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      isNameEdit == false
+                          ? ListTile(
+                              leading: Icon(
+                                Icons.person,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
+                              title: Text(
+                                "Name",
+                              style: GoogleFonts.patuaOne(letterSpacing: 1.0,
+                              textStyle: Theme.of(context).textTheme.headline1),
+                              ),
+                              subtitle: Text(name,
+                                  style: Theme.of(context).textTheme.headline1),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Theme.of(context).iconTheme.color,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isNameEdit = true;
+                                    });
+                                  }),
+                            )
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Form(
+                                key: _nameKey,
+                                child: TextFormField(
+                                  controller: _nameController,
+                                  cursorColor:
+                                      Theme.of(context).iconTheme.color,
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                  validator: (val) {
+                                    if (val.length < 2)
+                                      return "Name should be atleast of length 2 !";
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).splashColor,
+                                            width: 2.0),
                                       ),
-                                      onPressed: () {
-                                        if (_nameKey.currentState.validate()) {
-                                          FirebaseFirestore.instance
-                                              .collection(USERS_COLLECTION)
-                                              .doc(userProvider.getUser.uid)
-                                              .update({
-                                            "name": _nameController.text
-                                          });
-                                          _nameController.clear();
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).splashColor,
+                                            width: 2.0),
+                                      ),
+                                      hintText: "Edit Name",
+                                      labelText: "Name",
+                                      hintStyle:
+                                          Theme.of(context).textTheme.bodyText1,
+                                      labelStyle:
+                                          Theme.of(context).textTheme.bodyText1,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          Icons.check,
+                                          size: 30.0,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
+                                        ),
+                                        onPressed: () {
+                                          if (_nameKey.currentState
+                                              .validate()) {
+                                            FirebaseFirestore.instance
+                                                .collection(USERS_COLLECTION)
+                                                .doc(userProvider.getUser.uid)
+                                                .update({
+                                              "name": _nameController.text
+                                            });
+                                            _nameController.clear();
+                                            setState(() {
+                                              isNameEdit = false;
+                                            });
+                                          }
                                           setState(() {
                                             isNameEdit = false;
                                           });
-                                        }
-                                        setState(() {
-                                          isNameEdit = false;
-                                        });
-                                      },
-                                    )),
+                                        },
+                                      )),
+                                ),
                               ),
                             ),
-                          ),
-                    isStatusEdit == false
-                        ? ListTile(
-                            title: Text(
-                              "Status",
-                              style: Theme.of(context).textTheme.headline1,
-                            ),
-                            subtitle: Text(status ?? "No Status",
-                                style: Theme.of(context).textTheme.bodyText1),
-                            trailing: IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Theme.of(context).iconTheme.color,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    isStatusEdit = true;
-                                  });
-                                }),
-                          )
-                        : Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Form(
-                              key: _statusKey,
-                              child: TextFormField(
-                                controller: _statusController,
-                                cursorColor: Theme.of(context).iconTheme.color,
-                                style: Theme.of(context).textTheme.bodyText1,
-                                validator: (val) {
-                                  if (val.isEmpty) return "Enter the Status";
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      borderSide: BorderSide(
-                                          color: Theme.of(context).splashColor,
-                                          width: 2.0),
-                                    ),
-                                    focusedBorder:OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      borderSide: BorderSide(
-                                          color: Theme.of(context).splashColor,
-                                          width: 2.0),
-                                    ),
-                                    hintText: "Edit Status",
-                                    labelText: "Status",
-                                    hintStyle:
-                                        Theme.of(context).textTheme.bodyText1,
-                                    labelStyle:
-                                        Theme.of(context).textTheme.bodyText1,
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        Icons.check,
-                                        size: 30.0,
-                                        color:
-                                            Theme.of(context).iconTheme.color,
+                      isStatusEdit == false
+                          ? ListTile(
+                              leading: Icon(
+                                Icons.info_outline_rounded,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
+                              title: Text(
+                                "About",
+                               style: GoogleFonts.patuaOne(letterSpacing: 1.0,
+                              textStyle: Theme.of(context).textTheme.headline1),
+                              ),
+                              subtitle: Text(status ?? "No Status",
+                                  style: Theme.of(context).textTheme.headline1),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Theme.of(context).iconTheme.color,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isStatusEdit = true;
+                                    });
+                                  }),
+                            )
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Form(
+                                key: _statusKey,
+                                child: TextFormField(
+                                  controller: _statusController,
+                                  cursorColor:
+                                      Theme.of(context).iconTheme.color,
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                  validator: (val) {
+                                    if (val.isEmpty) return "Enter the Status";
+                                    return null;
+                                  },
+                                  decoration: InputDecoration(
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).splashColor,
+                                            width: 2.0),
                                       ),
-                                      onPressed: () {
-                                        if (_statusKey.currentState
-                                            .validate()) {
-                                          FirebaseFirestore.instance
-                                              .collection(USERS_COLLECTION)
-                                              .doc(userProvider.getUser.uid)
-                                              .update({
-                                            "status": _statusController.text
-                                          });
-                                          _statusController.clear();
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                        borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).splashColor,
+                                            width: 2.0),
+                                      ),
+                                      hintText: "Edit Status",
+                                      labelText: "Status",
+                                      hintStyle:
+                                          Theme.of(context).textTheme.bodyText1,
+                                      labelStyle:
+                                          Theme.of(context).textTheme.bodyText1,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          Icons.check,
+                                          size: 30.0,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
+                                        ),
+                                        onPressed: () {
+                                          if (_statusKey.currentState
+                                              .validate()) {
+                                            FirebaseFirestore.instance
+                                                .collection(USERS_COLLECTION)
+                                                .doc(userProvider.getUser.uid)
+                                                .update({
+                                              "status": _statusController.text
+                                            });
+                                            _statusController.clear();
+                                            setState(() {
+                                              isStatusEdit = false;
+                                            });
+                                          }
                                           setState(() {
                                             isStatusEdit = false;
                                           });
-                                        }
-                                        setState(() {
-                                          isStatusEdit = false;
-                                        });
-                                      },
-                                    )),
+                                        },
+                                      )),
+                                ),
                               ),
                             ),
-                          ),
-                    ListTile(
-                      title: Text(
-                        "Email",
-                        style: Theme.of(context).textTheme.headline1,
-                      ),
-                      subtitle: Text(email,
-                          style: Theme.of(context).textTheme.bodyText1),
-                      trailing:
-                          IconButton(icon: Icon(Icons.edit), onPressed: () {}),
-                    ),
-                    ListTile(
-                      title: Text(
-                        'App Locker',
-                        style: Theme.of(context).textTheme.headline1,
-                      ),
-                      contentPadding: const EdgeInsets.only(left: 16.0),
-                      trailing: Transform.scale(
-                        scale: 0.8,
-                        child: Switch(
-                          inactiveTrackColor: Theme.of(context).dividerColor,
-                          activeColor: Colors.green,
-                          value: _appLocked,
-                          onChanged: (bool val) {
-                            setState(() {
-                              _appLocked = val;
-                              setAppLocker(val);
-                            });
-                          },
+                      ListTile(
+                        leading: Icon(
+                          Icons.email_outlined,
+                          color: Theme.of(context).iconTheme.color,
                         ),
+                        title: Text(
+                          "Email",
+                          style: GoogleFonts.patuaOne(letterSpacing: 1.0,
+                              textStyle: Theme.of(context).textTheme.headline1),
+                        ),
+                        subtitle: Text(email,
+                            style: Theme.of(context).textTheme.headline1),
                       ),
-                    ),
-                  ],
+                      ListTile(
+                        leading: Icon(
+                          FontAwesomeIcons.image,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "Select Chat Background",
+                           style: GoogleFonts.patuaOne(letterSpacing: 1.0,
+                              textStyle: Theme.of(context).textTheme.headline1),
+                        ),
+                        trailing: IconButton(
+                            icon: Icon(
+                              FontAwesomeIcons.solidEdit,
+                              color: Theme.of(context).iconTheme.color,
+                            ),
+                            onPressed: () async {
+                             
+                              PickedFile selectedImage = await ImagePicker()
+                                  .getImage(source: ImageSource.gallery);
+                              File img = File(selectedImage.path);
+                              
+                              savebackground(img.path);
+                            }),
+                      )
+                    ],
+                  ),
                 );
-              
-            }
-            return Center(child: CircularProgressIndicator(),);
-           }
-            ),
+              }
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }),
       ),
     );
   }
@@ -374,7 +439,6 @@ class _settingPageState extends State<settingPage> {
         _isEditing = false;
       });
       return cropped;
-      // return selectedImage;
     } else {
       this.setState(() {
         _isEditing = false;
@@ -442,7 +506,7 @@ class _settingPageState extends State<settingPage> {
               SimpleDialogOption(
                 child: Text(
                   'Cancel',
-                   style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyText1,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -451,6 +515,11 @@ class _settingPageState extends State<settingPage> {
             ],
           );
         }));
+  }
+
+  void savebackground(String path) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString('background', path);
   }
 
   void compressImage() async {
@@ -468,6 +537,5 @@ class _settingPageState extends State<settingPage> {
     setState(() {
       imageFile = newim2;
     });
-    print('Done');
   }
 }

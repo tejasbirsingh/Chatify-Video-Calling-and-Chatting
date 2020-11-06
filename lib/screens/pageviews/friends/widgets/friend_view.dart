@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:skype_clone/models/contact.dart';
@@ -68,8 +69,7 @@ class ViewLayout extends StatelessWidget {
         (friendViewLayout != null ? friendViewLayout.name : null) != null
             ? friendViewLayout.name
             : "..",
-            style:Theme.of(context).textTheme.bodyText1
-        // style:
+            style: GoogleFonts.patuaOne(textStyle : Theme.of(context).textTheme.headline1,   )     // style:
             // TextStyle(color: Colors.white, fontFamily: "Arial", fontSize: 19),
       ),
       trailing: IconButton(icon: Icon(Icons.info,color: Colors.green,),

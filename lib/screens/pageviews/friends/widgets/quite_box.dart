@@ -2,21 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:skype_clone/screens/search_screen.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 
-class QuiteBox extends StatelessWidget {
+class QuietBox extends StatelessWidget {
+  final String heading;
+  final String subtitle;
+
+  QuietBox({
+    @required this.heading,
+    @required this.subtitle,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Container(
-          color: UniversalVariables.separatorColor,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0),  
+            gradient: LinearGradient(colors: [Colors.green,Colors.teal]
+          ),),
+         
           padding: EdgeInsets.symmetric(vertical: 35, horizontal: 25),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                "This is where all the contacts are listed",
+                heading,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -25,7 +36,7 @@ class QuiteBox extends StatelessWidget {
               ),
               SizedBox(height: 25),
               Text(
-                "Search for your friends and family to start calling or chatting with them",
+                subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   letterSpacing: 1.2,
@@ -36,7 +47,9 @@ class QuiteBox extends StatelessWidget {
               SizedBox(height: 25),
               FlatButton(
                 color: UniversalVariables.lightBlueColor,
-                child: Text("START SEARCHING"),
+                child: Text("Search Friends",style: TextStyle(color: Colors.white,
+                fontSize: 18.0),
+                ),
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skype_clone/models/message.dart';
 
 class LastMessageContainer extends StatelessWidget {
@@ -25,21 +26,23 @@ class LastMessageContainer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    message.message,
+                   message.message.length > 20 ?  message.message.substring(0,20) : message.message,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
        
-                    style: TextStyle(
+                    style: GoogleFonts.cuprum(textStyle :TextStyle(
                       color: Colors.grey,
-                      fontSize: 14,
-                    ),
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold
+                    ),)
                   ),
                   
                   Text(dateTimeFormat(message.timestamp.toDate()),
-                    style: TextStyle(
+                    style: GoogleFonts.cuprum(textStyle :TextStyle(
                       color: Colors.grey,
-                      fontSize: 14,
-                    ),)
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold
+                    ),))
                 ],
               ),
             );

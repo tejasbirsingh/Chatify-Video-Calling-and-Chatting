@@ -5,10 +5,7 @@ import 'package:http/http.dart' as http;
 
 Future<http.Response> sendNotification(
       String message, String sender, String receiver) async {
-    //      await firebaseMessaging.requestNotificationPermissions(
-    // const IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false),
-    // );
-    // print("Firebase Token: " + receiver);
+
     return await http.post(
       'https://fcm.googleapis.com/fcm/send',
       headers: <String, String>{

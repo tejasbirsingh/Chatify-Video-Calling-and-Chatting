@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/enum/user_state.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
@@ -20,11 +22,16 @@ class UserDetailsContainer extends StatelessWidget {
     signOut() async {
       final bool isLoggedOut = await AuthMethods().signOut();
       if (isLoggedOut) {
-      
         authMethods.setUserState(
           userId: userProvider.getUser.uid,
           userState: UserState.Offline,
         );
+
+        var prefs = await SharedPreferences.getInstance();
+        prefs.setBool('darkTheme', false);
+        prefs.setString('background','');
+  
+  
 
         // move the user to login screen
         Navigator.pushAndRemoveUntil(
@@ -35,32 +42,31 @@ class UserDetailsContainer extends StatelessWidget {
       }
     }
 
-    return Container(
-      margin: EdgeInsets.only(top: 25),
-      child: Column(
-        children: <Widget>[
-          CustomAppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).iconTheme.color
+    return SafeArea(
+      child: Container(
+        margin: EdgeInsets.only(top: 25),
+        child: Column(
+          children: <Widget>[
+            CustomAppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back,
+                    color: Theme.of(context).iconTheme.color),
+                onPressed: () => Navigator.maybePop(context),
               ),
-              onPressed: () => Navigator.maybePop(context),
+              centerTitle: true,
+              title: ShimmeringLogo(),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () => signOut(),
+                  child: Text("Sign Out",
+                      style: GoogleFonts.cuprum(
+                          textStyle: Theme.of(context).textTheme.bodyText1)),
+                )
+              ],
             ),
-            centerTitle: true,
-            title: ShimmeringLogo(),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => signOut(),
-                child: Text(
-                  "Sign Out",
-                  style: Theme.of(context).textTheme.bodyText1
-                ),
-              )
-            ],
-          ),
-          UserDetailsBody(),
-        ],
+            UserDetailsBody(),
+          ],
+        ),
       ),
     );
   }
@@ -79,21 +85,21 @@ class UserDetailsBody extends StatelessWidget {
           CachedImage(
             user.profilePhoto,
             isRound: true,
-            radius: 50,
+            radius: 65.0,
           ),
           SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                user.name,
-                style:Theme.of(context).textTheme.bodyText1
-              ),
+              Text(user.name,
+                  style: GoogleFonts.patuaOne(
+                      textStyle: Theme.of(context).textTheme.bodyText1,
+                      fontSize: 25.0,
+                      letterSpacing: 1.5)),
               SizedBox(height: 10),
-              Text(
-                user.email,
-                style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1.color),
-              ),
+              Text(user.email,
+                  style: GoogleFonts.cuprum(
+                      textStyle: Theme.of(context).textTheme.bodyText1)),
             ],
           ),
         ],

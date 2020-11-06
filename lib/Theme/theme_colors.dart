@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 final darkTheme = ThemeData(
-    backgroundColor: Colors.black87,
+  
+    // backgroundColor: Colors.black87,
+
+   backgroundColor: HexColor('#000000'),
+    scaffoldBackgroundColor: HexColor('#000000'),
     dialogBackgroundColor: Colors.grey,
+    canvasColor: Colors.black.withOpacity(0.4),
     cardColor: Colors.grey.withOpacity(0.8),
     splashColor: Colors.white,
     dividerColor: Colors.grey,
@@ -27,7 +33,12 @@ final darkTheme = ThemeData(
 
 final lightTheme = ThemeData(
     splashColor: Colors.black,
-    backgroundColor: Colors.white,
+    canvasColor: Colors.white,
+    // backgroundColor: Colors.grey.shade100,
+     backgroundColor: HexColor("#F5E3E6"),
+    scaffoldBackgroundColor:  HexColor("#D9E4F5"),
+ 
+
     dialogBackgroundColor: Colors.grey.shade800,
     cardColor: Colors.grey.shade200,
     dividerColor: Colors.grey,

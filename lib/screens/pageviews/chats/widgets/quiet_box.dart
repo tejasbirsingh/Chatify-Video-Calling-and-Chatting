@@ -17,7 +17,9 @@ class QuietBox extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0), color:Colors.grey,),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0),  
+            gradient: LinearGradient(colors: [Colors.green,Colors.teal]
+          ),),
          
           padding: EdgeInsets.symmetric(vertical: 35, horizontal: 25),
           child: Column(

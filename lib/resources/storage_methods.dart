@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/audio_upload_provider.dart';
+import 'package:skype_clone/provider/file_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
@@ -64,6 +65,20 @@ class StorageMethods {
       return null;
     }
   }
+  Future<String> uploadFileMessage(File file) async {
+    try {
+      _storageReference = FirebaseStorage.instance
+          .ref()
+          .child('${DateTime.now().millisecondsSinceEpoch}');
+      StorageUploadTask storageUploadTask = _storageReference.putFile(
+          file, StorageMetadata(contentType: 'file/pdf'));
+      var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
+
+      return url;
+    } catch (e) {
+      return null;
+    }
+  }
 
   void uploadImage({
     @required File image,
@@ -94,6 +109,19 @@ class StorageMethods {
     String url = await uploadAudioMessage(audio);
     audioUploadProvider.setToIdle();
     chatMethods.setAudioMsg(url, receiverId, senderId);
+  }
+   void uploadFile({
+    @required File file,
+    @required String receiverId,
+    @required String senderId,
+    @required FileUploadProvider fileUploadProvider,
+  }) async {
+    final ChatMethods chatMethods = ChatMethods();
+
+    fileUploadProvider.setToLoading();
+    String url = await uploadFileMessage(file);
+    fileUploadProvider.setToIdle();
+    chatMethods.setFileMsg(url, receiverId, senderId);
   }
 
   void uploadVideo({

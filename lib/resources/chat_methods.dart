@@ -93,7 +93,8 @@ class ChatMethods {
         senderId: senderId,
         photoUrl: url,
         timestamp: Timestamp.now(),
-        type: 'image');
+        type: 'image',
+        status: 'sent');
 
     // create imagemap
     var map = message.toImageMap();
@@ -119,7 +120,8 @@ class ChatMethods {
         senderId: senderId,
         videoUrl: url,
         timestamp: Timestamp.now(),
-        type: 'video');
+        type: 'video',
+        status: 'sent');
 
     // create imagemap
     var map = message.toVideoMap();
@@ -135,6 +137,32 @@ class ChatMethods {
         .collection(message.senderId)
         .add(map);
   }
+
+  void setFileMsg(String url, String receiverId, String senderId) async {
+    Message message;
+
+    message = Message.fileMessage(
+        message: "FILE",
+        receiverId: receiverId,
+        senderId: senderId,
+        fileUrl: url,
+        timestamp: Timestamp.now(),
+        type: 'file',
+        status: 'sent');
+
+    var map = message.tofileMap();
+
+    await _messageCollection
+        .doc(message.senderId)
+        .collection(message.receiverId)
+        .add(map);
+
+    _messageCollection
+        .doc(message.receiverId)
+        .collection(message.senderId)
+        .add(map);
+  }
+
   void setAudioMsg(String url, String receiverId, String senderId) async {
     Message message;
 
@@ -144,9 +172,9 @@ class ChatMethods {
         senderId: senderId,
         audioUrl: url,
         timestamp: Timestamp.now(),
-        type: 'audio');
+        type: 'audio',
+        status: 'sent');
 
- 
     var map = message.toAudioMap();
 
     await _messageCollection
@@ -158,6 +186,22 @@ class ChatMethods {
         .doc(message.receiverId)
         .collection(message.senderId)
         .add(map);
+  }
+
+  markSeen(String receiverId, String senderId) async {
+   await _messageCollection
+        .doc(receiverId)
+        .collection(senderId)
+        .snapshots()
+        .forEach((element) {
+      element.docs.asMap().forEach((idx, value) {
+        if (element.docs[idx].data()['senderId'] == receiverId) {
+          element.docs[idx].data().update('status', (value) => value = 'seen');
+          print(element.docs[idx].data()['status']);
+          
+        }
+      });
+    });
   }
 
   Stream<QuerySnapshot> fetchContacts({String userId}) =>
