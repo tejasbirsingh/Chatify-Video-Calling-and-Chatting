@@ -29,11 +29,7 @@ class UserDetailsContainer extends StatelessWidget {
 
         var prefs = await SharedPreferences.getInstance();
         prefs.setBool('darkTheme', false);
-        prefs.setString('background','');
-  
-  
 
-        // move the user to login screen
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -44,6 +40,12 @@ class UserDetailsContainer extends StatelessWidget {
 
     return SafeArea(
       child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+            Theme.of(context).backgroundColor,
+            Theme.of(context).scaffoldBackgroundColor
+          ]),
+        ),
         margin: EdgeInsets.only(top: 25),
         child: Column(
           children: <Widget>[

@@ -114,7 +114,7 @@ class _profilePageState extends State<profilePage> {
                       'Status',
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
-                    subtitle: Text(widget.user.status,
+                    subtitle: Text(widget.user.status ?? "No Status",
                         style: Theme.of(context).textTheme.headline1),
                   ),
                   Divider(

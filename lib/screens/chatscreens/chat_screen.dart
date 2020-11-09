@@ -43,6 +43,7 @@ import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/file_viewer.dart';
 
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/pdf_widget.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
 import 'package:skype_clone/screens/home_screen.dart';
@@ -172,6 +173,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+   
     getTheme();
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
@@ -180,20 +182,25 @@ class _ChatScreenState extends State<ChatScreen> {
     return PickupLayout(
       scaffold: SafeArea(
         child: Scaffold(
-          backgroundColor: Theme.of(context).backgroundColor,
           appBar:
               _isAppBarOptions ? optionsAppBar(context) : customAppBar(context),
           body: Stack(
             children: [
+              // backgroundImage != null
+              //     ? Image.asset(
+              //         backgroundImage,
+              //         fit: BoxFit.cover,
+              //       )
+              //     : Container(),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Container(
-                  child: backgroundImage != ''
-                      ? Image.asset(
-                          backgroundImage,
-                          fit: BoxFit.cover,
-                        )
-                      : Text(''),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      Theme.of(context).backgroundColor,
+                      Theme.of(context).scaffoldBackgroundColor
+                    ]),
+                  ),
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -277,7 +284,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget messageList() {
-    _chatMethods.markSeen(widget.receiver.uid, _currentUserId);
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection(MESSAGES_COLLECTION)
@@ -371,7 +377,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     : Alignment.centerLeft,
                 child: _message.senderId == _currentUserId
                     ? senderLayout(_message)
-                    : receiverLayout(_message),
+                    : receiverLayout(_message, snapshot.id),
               ),
             ),
           )
@@ -484,68 +490,87 @@ class _ChatScreenState extends State<ChatScreen> {
     Radius messageRadius = Radius.circular(35.0);
     if (message.type == MESSAGE_TYPE_AUDIO) {
       return message.audioUrl != null
-          ? Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  gradient:
-                      LinearGradient(colors: [Colors.green, Colors.teal])),
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: audioPlayerClass(url: message.audioUrl))
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            gradient: LinearGradient(
+                                colors: [Colors.green, Colors.teal])),
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: audioPlayerClass(url: message.audioUrl)),
+                    SizedBox(height: 2.0),
+                    formatTime(message.timestamp.toDate()),
+                  ],
+                ),
+                Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+                    size: 20.0,
+                    color: message.isRead
+                        ? Colors.blue
+                        : Theme.of(context).splashColor)
+              ],
+            )
           : Icon(Icons.sync_problem);
     }
     if (message.type == MESSAGE_TYPE_VIDEO) {
-      return Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
-        child: Container(
-            margin: EdgeInsets.all(5.0),
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.50),
-            child: message.videoUrl != null
-                ? videoPlayer(
-                    url: message.videoUrl,
-                  )
-                : Icon(Icons.sync_problem)),
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    gradient:
+                        LinearGradient(colors: [Colors.green, Colors.teal])),
+                child: Container(
+                    margin: EdgeInsets.all(5.0),
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.50),
+                    child: message.videoUrl != null
+                        ? videoPlayer(
+                            url: message.videoUrl,
+                          )
+                        : Icon(Icons.sync_problem)),
+              ),
+              SizedBox(height: 2.0),
+              formatTime(message.timestamp.toDate()),
+            ],
+          ),
+          Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+              size: 20.0,
+              color:
+                  message.isRead ? Colors.blue : Theme.of(context).splashColor)
+        ],
       );
     }
     if (message.type == MESSAGE_TYPE_FILE) {
       return message.fileUrl != null
-          ? GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => fileViewPage(url: message.fileUrl))),
-              child: Stack(
-                children: [
-                  Container(
-                    child: Center(
-                      child: Text(
-                        'PDF',
-                        style: GoogleFonts.patuaOne(
-                            fontSize: 40.0, color: Colors.black),
-                      ),
-                    ),
-                    height: 80.0,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20.0)),
-                    width: 160.0,
-                  ),
-                  Positioned(
-                    bottom: 0.0,
-                    child: Container(
-                      height: 20.0,
-                      width: 160.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20.0),
-                            bottomRight: Radius.circular(20.0),
-                          ),
-                          gradient: LinearGradient(
-                              colors: [Colors.green, Colors.teal])),
-                    ),
-                  ),
-                ],
-              ))
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Column(
+                  children: [
+                    GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    fileViewPage(url: message.fileUrl))),
+                        child: pdfWidget(message.fileUrl)),
+                    SizedBox(height: 2.0),
+                    formatTime(message.timestamp.toDate()),
+                  ],
+                ),
+                Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+                    size: 20.0,
+                    color: message.isRead
+                        ? Colors.blue
+                        : Theme.of(context).splashColor)
+              ],
+            )
           : Icon(Icons.sync_problem);
     }
     if (message.type == MESSAGE_TYPE_IMAGE) {
@@ -554,143 +579,173 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       return message.photoUrl != null
-          ? Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  gradient:
-                      LinearGradient(colors: [Colors.green, Colors.teal])),
-              height: MediaQuery.of(context).size.width * 0.6,
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: Container(
-                margin: EdgeInsets.all(5.0),
-                child: CachedImage(message.photoUrl,
-                    height: 250,
-                    width: 250,
-                    radius: 10,
-                    isTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ImagePage(
-                                  imageUrl: message.photoUrl,
-                                  imageUrlList: imageUrlList,
-                                )))),
-              ),
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          gradient: LinearGradient(
+                              colors: [Colors.green, Colors.teal])),
+                      height: MediaQuery.of(context).size.width * 0.6,
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: Container(
+                        margin: EdgeInsets.all(5.0),
+                        child: CachedImage(message.photoUrl,
+                            height: 250,
+                            width: 250,
+                            radius: 10,
+                            isTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ImagePage(
+                                          imageUrl: message.photoUrl,
+                                          imageUrlList: imageUrlList,
+                                        )))),
+                      ),
+                    ),
+                    SizedBox(height: 2.0),
+                    formatTime(message.timestamp.toDate()),
+                  ],
+                ),
+                Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+                    size: 20.0,
+                    color: message.isRead
+                        ? Colors.blue
+                        : Theme.of(context).splashColor)
+              ],
             )
           : Icon(Icons.sync_problem);
     }
 
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Container(
-          margin: EdgeInsets.only(top: 10),
-          constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.50),
-          decoration: message.type != "Call"
-              ? BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.green.shade400, Colors.teal.shade600]),
-                  borderRadius: BorderRadius.only(
-                    topLeft: messageRadius,
-                    topRight: messageRadius,
-                    bottomLeft: messageRadius,
-                  ),
-                )
-              : BoxDecoration(
-                  color: Colors.grey.withOpacity(0.7),
-                  borderRadius: BorderRadius.only(
-                    topLeft: messageRadius,
-                    topRight: messageRadius,
-                    bottomLeft: messageRadius,
-                  ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.50),
+              decoration: message.type != "Call"
+                  ? BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        Colors.green.shade400,
+                        Colors.teal.shade600
+                      ]),
+                      borderRadius: BorderRadius.only(
+                        topLeft: messageRadius,
+                        topRight: messageRadius,
+                        bottomLeft: messageRadius,
+                      ),
+                    )
+                  : BoxDecoration(
+                      color: Colors.grey.withOpacity(0.7),
+                      borderRadius: BorderRadius.only(
+                        topLeft: messageRadius,
+                        topRight: messageRadius,
+                        bottomLeft: messageRadius,
+                      ),
+                    ),
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Stack(
+                  children: [
+                    getMessage(message),
+                  ],
                 ),
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                getMessage(message),
-                message.status == 'sent'
-                    ? Icon(Icons.check)
-                    : Icon(Icons.check_box),
-              ],
+              ),
             ),
-          ),
+            SizedBox(
+              height: 2.0,
+            ),
+            formatTime(message.timestamp.toDate()),
+          ],
         ),
-        SizedBox(
-          height: 2.0,
-        ),
-        formatTime(message.timestamp.toDate()),
+        Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+            size: 20.0,
+            color: message.isRead ? Colors.blue : Theme.of(context).splashColor)
       ],
     );
   }
 
-  Widget receiverLayout(Message message) {
+  updateStatus(String uid) async {
+    await FirebaseFirestore.instance
+        .collection(MESSAGES_COLLECTION)
+        .doc(widget.receiver.uid)
+        .collection(_currentUserId)
+        .where('isRead', isEqualTo: false)
+        .get()
+        .then((documentSnapshot) {
+      if (documentSnapshot.docs.length > 0) {
+        for (DocumentSnapshot doc in documentSnapshot.docs) {
+          doc.reference.update({'isRead': true});
+
+          print('updated');
+        }
+      }
+    });
+  }
+
+  Widget receiverLayout(Message message, String uid) {
+    updateStatus(uid);
     Radius messageRadius = Radius.circular(35);
     if (message.type == MESSAGE_TYPE_AUDIO) {
       return message.audioUrl != null
-          ? Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  gradient:
-                      LinearGradient(colors: [Colors.green, Colors.teal])),
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: audioPlayerClass(url: message.audioUrl))
+          ? Column(
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(
+                            colors: [Colors.green, Colors.teal])),
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: audioPlayerClass(url: message.audioUrl)),
+                SizedBox(height: 2.0),
+                formatTime(message.timestamp.toDate()),
+              ],
+            )
           : Icon(Icons.sync_problem);
     }
     if (message.type == MESSAGE_TYPE_VIDEO) {
-      return Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
-        child: Container(
-            margin: EdgeInsets.all(5.0),
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.50),
-            child: message.videoUrl != null
-                ? videoPlayer(
-                    url: message.videoUrl,
-                  )
-                : Icon(Icons.sync_problem)),
+      return Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
+            child: Container(
+                margin: EdgeInsets.all(5.0),
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.50),
+                child: message.videoUrl != null
+                    ? videoPlayer(
+                        url: message.videoUrl,
+                      )
+                    : Icon(Icons.sync_problem)),
+          ),
+          SizedBox(height: 2.0),
+          formatTime(message.timestamp.toDate()),
+        ],
       );
     }
     if (message.type == MESSAGE_TYPE_FILE) {
       return message.fileUrl != null
-          ? GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => fileViewPage(url: message.fileUrl))),
-              child: Stack(
-                children: [
-                  Container(
-                    child: Center(
-                      child: Text(
-                        'PDF',
-                        style: GoogleFonts.patuaOne(
-                            fontSize: 40.0, color: Colors.black),
-                      ),
-                    ),
-                    height: 80.0,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20.0)),
-                    width: 160.0,
-                  ),
-                  Positioned(
-                    bottom: 0.0,
-                    child: Container(
-                      height: 20.0,
-                      width: 160.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20.0),
-                            bottomRight: Radius.circular(20.0),
-                          ),
-                          gradient: LinearGradient(
-                              colors: [Colors.green, Colors.teal])),
-                    ),
-                  ),
-                ],
-              ))
+          ? Column(
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          fileViewPage(url: message.fileUrl))),
+                  child: pdfWidget(message.fileUrl),
+                ),
+                SizedBox(height: 2.0),
+                formatTime(message.timestamp.toDate()),
+              ],
+            )
           : Icon(Icons.sync_problem);
     }
     if (message.type == MESSAGE_TYPE_IMAGE) {
@@ -699,27 +754,33 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       return message.photoUrl != null
-          ? Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  gradient:
-                      LinearGradient(colors: [Colors.green, Colors.teal])),
-              height: MediaQuery.of(context).size.width * 0.6,
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: Container(
-                margin: EdgeInsets.all(5.0),
-                child: CachedImage(message.photoUrl,
-                    height: 250,
-                    width: 250,
-                    radius: 10,
-                    isTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ImagePage(
-                                  imageUrl: message.photoUrl,
-                                  imageUrlList: imageUrlList,
-                                )))),
-              ),
+          ? Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      gradient:
+                          LinearGradient(colors: [Colors.green, Colors.teal])),
+                  height: MediaQuery.of(context).size.width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Container(
+                    margin: EdgeInsets.all(5.0),
+                    child: CachedImage(message.photoUrl,
+                        height: 250,
+                        width: 250,
+                        radius: 10,
+                        isTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ImagePage(
+                                      imageUrl: message.photoUrl,
+                                      imageUrlList: imageUrlList,
+                                    )))),
+                  ),
+                ),
+                SizedBox(height: 2.0),
+                formatTime(message.timestamp.toDate()),
+              ],
             )
           : Icon(Icons.sync_problem);
     }
@@ -852,14 +913,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
     sendMessage() {
       var text = textFieldController.text;
-
       Message _message = Message(
         receiverId: widget.receiver.uid,
         senderId: sender.uid,
         message: text,
         timestamp: Timestamp.now(),
         type: 'text',
-        status: 'sent',
+        isRead: false,
       );
 
       setState(() {
@@ -867,7 +927,6 @@ class _ChatScreenState extends State<ChatScreen> {
       });
 
       textFieldController.text = "";
-
       _chatMethods.addMessageToDb(_message);
       sendNotification(_message.message.toString(), sender.name.toString(),
           widget.receiver.firebaseToken.toString());

@@ -6,7 +6,7 @@ class Message {
   String receiverId;
   String type;
   String message;
-  String status;
+  bool isRead;
 
   Timestamp timestamp;
   String photoUrl;
@@ -20,7 +20,7 @@ class Message {
     this.type,
     this.message,
     this.timestamp,
-    this.status,
+    this.isRead,
   });
 
   Message.imageMessage({
@@ -30,7 +30,7 @@ class Message {
     this.type,
     this.timestamp,
     this.photoUrl,
-     this.status,
+     this.isRead,
   });
 
   Message.videoMessage({
@@ -40,7 +40,7 @@ class Message {
     this.type,
     this.timestamp,
     this.videoUrl,
-     this.status,
+     this.isRead,
   });
   Message.audioMessage({
     this.senderId,
@@ -49,7 +49,7 @@ class Message {
     this.type,
     this.timestamp,
     this.audioUrl,
-     this.status,
+     this.isRead,
   });
   Message.fileMessage({
     this.senderId,
@@ -58,7 +58,7 @@ class Message {
     this.type,
     this.timestamp,
     this.fileUrl,
-     this.status,
+     this.isRead,
   });
 
   Map toMap() {
@@ -72,7 +72,7 @@ class Message {
     map['type'] = this.type;
     map['message'] = encryptedText;
     map['timestamp'] = this.timestamp;
-    map['status'] = this.status;
+    map['isRead'] = this.isRead;
     return map;
   }
 
@@ -84,7 +84,7 @@ class Message {
     map['type'] = this.type;
     map['timestamp'] = this.timestamp;
     map['photoUrl'] = this.photoUrl;
-    map['status'] = this.status;
+    map['isRead'] = this.isRead;
     return map;
   }
 
@@ -96,7 +96,7 @@ class Message {
     map['type'] = this.type;
     map['timestamp'] = this.timestamp;
     map['videoUrl'] = this.videoUrl;
-    map['status'] = this.status;
+    map['isRead'] = this.isRead;
     return map;
   }
 
@@ -108,7 +108,7 @@ class Message {
     map['type'] = this.type;
     map['timestamp'] = this.timestamp;
     map['audioUrl'] = this.audioUrl;
-    map['status'] = this.status;
+    map['isRead'] = this.isRead;
     return map;
   }
 
@@ -120,7 +120,7 @@ class Message {
     map['type'] = this.type;
     map['timestamp'] = this.timestamp;
     map['fileUrl'] = this.fileUrl;
-    map['status'] = this.status;
+    map['isRead'] = this.isRead;
     return map;
   }
 
@@ -144,6 +144,6 @@ class Message {
     this.videoUrl = map['videoUrl'];
     this.audioUrl = map['audioUrl'];
     this.fileUrl = map['fileUrl'];
-    this.status = map['status'];
+    this.isRead = map['isRead'];
   }
 }

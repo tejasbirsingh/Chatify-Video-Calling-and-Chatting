@@ -36,14 +36,14 @@ class _ImagePageState extends State<ImagePage> {
         });
       }
     }
-    
+
     fileName = Utils.generateRandomString(15);
   }
 
   Future<void> downloadFile() async {
     var dir = await getExternalStorageDirectory();
     Dio dio = Dio();
-  
+
     dio.download(
         imageDownloadUrl ?? noImageAvailable, '${dir.path}/${fileName}.jpg',
         onReceiveProgress: (actualBytes, totalBytes) {

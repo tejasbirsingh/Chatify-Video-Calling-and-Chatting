@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:skype_clone/screens/search_screen.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 
@@ -18,7 +19,7 @@ class QuietBox extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Container(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0),  
-            gradient: LinearGradient(colors: [Colors.green,Colors.teal]
+            gradient: LinearGradient(colors:[HexColor('a3bded'),HexColor('6991c7')]
           ),),
          
           padding: EdgeInsets.symmetric(vertical: 35, horizontal: 25),

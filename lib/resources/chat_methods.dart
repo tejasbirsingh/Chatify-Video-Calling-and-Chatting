@@ -94,7 +94,7 @@ class ChatMethods {
         photoUrl: url,
         timestamp: Timestamp.now(),
         type: 'image',
-        status: 'sent');
+        isRead: false);
 
     // create imagemap
     var map = message.toImageMap();
@@ -121,7 +121,7 @@ class ChatMethods {
         videoUrl: url,
         timestamp: Timestamp.now(),
         type: 'video',
-        status: 'sent');
+        isRead: false);
 
     // create imagemap
     var map = message.toVideoMap();
@@ -148,7 +148,7 @@ class ChatMethods {
         fileUrl: url,
         timestamp: Timestamp.now(),
         type: 'file',
-        status: 'sent');
+        isRead: false);
 
     var map = message.tofileMap();
 
@@ -173,7 +173,7 @@ class ChatMethods {
         audioUrl: url,
         timestamp: Timestamp.now(),
         type: 'audio',
-        status: 'sent');
+        isRead: false);
 
     var map = message.toAudioMap();
 
@@ -186,22 +186,6 @@ class ChatMethods {
         .doc(message.receiverId)
         .collection(message.senderId)
         .add(map);
-  }
-
-  markSeen(String receiverId, String senderId) async {
-   await _messageCollection
-        .doc(receiverId)
-        .collection(senderId)
-        .snapshots()
-        .forEach((element) {
-      element.docs.asMap().forEach((idx, value) {
-        if (element.docs[idx].data()['senderId'] == receiverId) {
-          element.docs[idx].data().update('status', (value) => value = 'seen');
-          print(element.docs[idx].data()['status']);
-          
-        }
-      });
-    });
   }
 
   Stream<QuerySnapshot> fetchContacts({String userId}) =>
