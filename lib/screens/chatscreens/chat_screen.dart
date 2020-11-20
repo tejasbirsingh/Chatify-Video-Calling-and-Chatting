@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:dio/dio.dart';
 import 'package:file/local.dart';
 import 'package:audio_recorder/audio_recorder.dart';
@@ -10,13 +11,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:provider/provider.dart';
+import 'package:sensors/sensors.dart';
+import 'package:shake/shake.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:skype_clone/constants/strings.dart';
@@ -27,6 +32,7 @@ import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/audio_upload_provider.dart';
 import 'package:skype_clone/provider/file_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 import 'dart:io' as Io;
 import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
@@ -58,8 +64,6 @@ import 'package:skype_clone/widgets/appbar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
-import 'widgets/modal_tile.dart';
-
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
 
@@ -69,8 +73,13 @@ class ChatScreen extends StatefulWidget {
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   String fileName;
+  bool moreMenu = false;
+  AnimationController animationController;
+  Animation<double> animation;
+  bool isCir = false;
   ImageUploadProvider _imageUploadProvider;
   VideoUploadProvider _videoUploadProvider;
   AudioUploadProvider _audioUploadProvider;
@@ -103,11 +112,18 @@ class _ChatScreenState extends State<ChatScreen> {
   bool uploading = false;
   String ocrText = "";
   String backgroundImage = "";
+  ShakeDetector detector;
 
   @override
   void initState() {
     super.initState();
-
+    detector = ShakeDetector.autoStart(onPhoneShake: () {
+      CallUtils.dial(
+        from: sender,
+        to: widget.receiver,
+        context: context,
+      );
+    });
     _authMethods.getCurrentUser().then((user) {
       _currentUserId = user.uid;
       getbackground();
@@ -119,6 +135,15 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       });
     });
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    animation = CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeInCirc,
+    );
+    animationController.forward();
   }
 
   getbackground() async {
@@ -126,6 +151,20 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       backgroundImage = prefs.getString('background');
     });
+  }
+
+  void toggleMenu() {
+    setState(() {
+      moreMenu = !moreMenu;
+      isCir = true;
+    });
+    if (animationController.status == AnimationStatus.forward ||
+        animationController.status == AnimationStatus.completed) {
+      animationController.reset();
+      animationController.forward();
+    } else {
+      animationController.forward();
+    }
   }
 
   getTheme() async {
@@ -137,6 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    detector.stopListening();
     super.dispose();
   }
 
@@ -173,7 +213,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-   
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
+    // accelerometerEvents.listen((AccelerometerEvent event) {
+    //   print(event);
+    // });
     getTheme();
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
@@ -186,19 +229,19 @@ class _ChatScreenState extends State<ChatScreen> {
               _isAppBarOptions ? optionsAppBar(context) : customAppBar(context),
           body: Stack(
             children: [
-              // backgroundImage != null
-              //     ? Image.asset(
-              //         backgroundImage,
-              //         fit: BoxFit.cover,
-              //       )
-              //     : Container(),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(colors: [
-                      Theme.of(context).backgroundColor,
-                      Theme.of(context).scaffoldBackgroundColor
+                      userProvider.getUser.firstColor != null
+                          ? Color(userProvider.getUser.firstColor ??
+                              Colors.white.value)
+                          : Theme.of(context).backgroundColor,
+                      userProvider.getUser.secondColor != null
+                          ? Color(userProvider.getUser.secondColor ??
+                              Colors.white.value)
+                          : Theme.of(context).scaffoldBackgroundColor,
                     ]),
                   ),
                   height: MediaQuery.of(context).size.height,
@@ -258,10 +301,110 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: CircularProgressIndicator(),
                       ),
                     )
-                  : Center()
+                  : Center(),
+              moreMenu
+                  ? isCir
+                      ? Positioned(
+                          bottom: MediaQuery.of(context).size.height * 0.1,
+                          left: MediaQuery.of(context).size.width * 0.1,
+                          right: MediaQuery.of(context).size.width * 0.1,
+                          child: CircularRevealAnimation(
+                              centerOffset: Offset(
+                                (MediaQuery.of(context).size.height * 0.3) / 2,
+                                (MediaQuery.of(context).size.width * 0.8) / 2,
+                              ),
+                              child: moreMenuOptions(),
+                              animation: animation),
+                        )
+                      : Positioned(
+                          child: moreMenuOptions(),
+                          bottom: MediaQuery.of(context).size.height * 0.1,
+                          left: MediaQuery.of(context).size.width * 0.1,
+                          right: MediaQuery.of(context).size.width * 0.1,
+                        )
+                  : Container(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget moreMenuOptions() {
+    return Visibility(
+      visible: moreMenu,
+      child: Container(
+        padding: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: [Colors.grey.shade300, Colors.grey.shade300]),
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 0.4,
+                spreadRadius: 0.4,
+                offset: Offset(1.0, 1.0),
+              )
+            ]),
+        // height: MediaQuery.of(context).size.height * 0.3,
+        height: 180.0,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: GridView.count(
+          physics: NeverScrollableScrollPhysics(),
+          scrollDirection: Axis.vertical,
+          crossAxisCount: 3,
+          children: [
+            moreMenuItem(Icons.camera, 'Image', () {
+              toggleMenu();
+              pickImage(source: ImageSource.gallery);
+            }, Colors.green),
+            moreMenuItem(Icons.video_label, 'Video', () {
+              toggleMenu();
+              pickVideo();
+            }, Colors.yellow),
+            moreMenuItem(Icons.file_upload, 'File', () {
+              toggleMenu();
+              pickFile();
+            }, Colors.orange),
+            moreMenuItem(Icons.scanner, 'Scan Text', () {
+              setState(() {
+                isWriting = true;
+              });
+              toggleMenu();
+              parseText();
+            }, Colors.white),
+            moreMenuItem(Icons.picture_as_pdf, 'Text to Pdf', () {
+              toggleMenu();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          //  imageToPdf()
+                          TextRecognitionWidget(
+                              receiverId: widget.receiver.uid)));
+            }, Colors.red),
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector moreMenuItem(
+      IconData icon, String name, GestureTapCallback fun, Color color) {
+    return GestureDetector(
+      onTap: fun,
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            size: 30.0,
+            color: color,
+          ),
+          Text(
+            name,
+            style: TextStyle(color: Colors.black, fontSize: 18.0),
+          )
+        ],
       ),
     );
   }
@@ -377,7 +520,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     : Alignment.centerLeft,
                 child: _message.senderId == _currentUserId
                     ? senderLayout(_message)
-                    : receiverLayout(_message, snapshot.id),
+                    : Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: receiverLayout(_message, snapshot.id),
+                      ),
               ),
             ),
           )
@@ -501,7 +647,10 @@ class _ChatScreenState extends State<ChatScreen> {
                             gradient: LinearGradient(
                                 colors: [Colors.green, Colors.teal])),
                         width: MediaQuery.of(context).size.width * 0.4,
-                        child: audioPlayerClass(url: message.audioUrl)),
+                        child: audioPlayerClass(
+                          url: message.audioUrl,
+                          isSender: true,
+                        )),
                     SizedBox(height: 2.0),
                     formatTime(message.timestamp.toDate()),
                   ],
@@ -559,7 +708,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     fileViewPage(url: message.fileUrl))),
-                        child: pdfWidget(message.fileUrl)),
+                        child: pdfWidget(message.fileUrl, true)),
                     SizedBox(height: 2.0),
                     formatTime(message.timestamp.toDate()),
                   ],
@@ -609,6 +758,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     SizedBox(height: 2.0),
                     formatTime(message.timestamp.toDate()),
                   ],
+                ),
+                SizedBox(
+                  width: 2.0,
                 ),
                 Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
                     size: 20.0,
@@ -665,6 +817,9 @@ class _ChatScreenState extends State<ChatScreen> {
             formatTime(message.timestamp.toDate()),
           ],
         ),
+        SizedBox(
+          width: 2.0,
+        ),
         Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
             size: 20.0,
             color: message.isRead ? Colors.blue : Theme.of(context).splashColor)
@@ -700,10 +855,15 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
-                        gradient: LinearGradient(
-                            colors: [Colors.green, Colors.teal])),
+                        gradient: LinearGradient(colors: [
+                          Colors.blue.shade700,
+                          Colors.blue.shade900
+                        ])),
                     width: MediaQuery.of(context).size.width * 0.4,
-                    child: audioPlayerClass(url: message.audioUrl)),
+                    child: audioPlayerClass(
+                      url: message.audioUrl,
+                      isSender: false,
+                    )),
                 SizedBox(height: 2.0),
                 formatTime(message.timestamp.toDate()),
               ],
@@ -716,7 +876,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
+                gradient: LinearGradient(
+                    colors: [Colors.blue.shade700, Colors.blue.shade900])),
             child: Container(
                 margin: EdgeInsets.all(5.0),
                 constraints: BoxConstraints(
@@ -740,7 +901,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) =>
                           fileViewPage(url: message.fileUrl))),
-                  child: pdfWidget(message.fileUrl),
+                  child: pdfWidget(message.fileUrl, false),
                 ),
                 SizedBox(height: 2.0),
                 formatTime(message.timestamp.toDate()),
@@ -759,8 +920,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
-                      gradient:
-                          LinearGradient(colors: [Colors.green, Colors.teal])),
+                      gradient: LinearGradient(colors: [
+                        Colors.blue.shade700,
+                        Colors.blue.shade900
+                      ])),
                   height: MediaQuery.of(context).size.width * 0.6,
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: Container(
@@ -829,89 +992,7 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     }
 
-    addMediaModal(context) {
-      showModalBottomSheet(
-          context: context,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.only()),
-          backgroundColor: Theme.of(context).backgroundColor,
-          builder: (context) {
-            return Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  child: Row(
-                    children: <Widget>[
-                      FlatButton(
-                        child: Icon(
-                          Icons.close,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                        onPressed: () => Navigator.maybePop(context),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Send",
-                              style: Theme.of(context).textTheme.headline1),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  child: ListView(
-                    children: <Widget>[
-                      ModalTile(
-                        title: "Share Photos",
-                        // subtitle: "Share Photos",
-                        icon: Icons.image,
-                        onTap: () => pickImage(source: ImageSource.gallery),
-                      ),
-                      ModalTile(
-                        title: "Share Video",
-                        subtitle: "Share Video",
-                        icon: Icons.video_label,
-                        onTap: () => pickVideo(),
-                      ),
-                      ModalTile(
-                        title: "File",
-                        subtitle: "Share files",
-                        icon: Icons.tab,
-                        onTap: () => pickFile(),
-                      ),
-                      ModalTile(
-                        title: "Text Extractor",
-                        subtitle: "Extract the test from an image",
-                        icon: Icons.scanner,
-                        onTap: () {
-                          parseText();
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ModalTile(
-                        title: "Image Text to Pdf",
-                        subtitle: "Share contacts",
-                        icon: Icons.text_fields_outlined,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      //  imageToPdf()
-                                      TextRecognitionWidget(
-                                          receiverId: widget.receiver.uid)));
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          });
-    }
-
-    sendMessage() {
+    sendMessage(context) {
       var text = textFieldController.text;
       Message _message = Message(
         receiverId: widget.receiver.uid,
@@ -937,14 +1018,18 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Row(
         children: <Widget>[
           GestureDetector(
-            onTap: () => addMediaModal(context),
+            // onTap: () => addMediaModal(context),
+            onTap: () {
+              toggleMenu();
+            },
             child: Container(
               padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [Colors.green, Colors.teal]),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.add, color: Colors.white),
+              child: Icon(moreMenu ? Icons.cancel_sharp : Icons.add,
+                  color: Colors.white),
             ),
           ),
           SizedBox(
@@ -1047,7 +1132,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Icons.send,
                       size: 15,
                     ),
-                    onPressed: () => sendMessage(),
+                    onPressed: () => sendMessage(context),
                   ))
               : Container()
         ],
@@ -1191,6 +1276,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   CustomAppBar customAppBar(context) {
     return CustomAppBar(
+      isLeadingWidth: true,
       onTap: () =>
           // Get.to(profilePage(
           //   user: widget.receiver,
@@ -1212,13 +1298,14 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       centerTitle: false,
       title: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           CircleAvatar(
               radius: 20.0,
               child: CachedImage(
                 widget.receiver.profilePhoto,
-                radius: 40.0,
+                radius: 35.0,
               )),
           SizedBox(
             width: 6.0,
@@ -1226,7 +1313,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Text(
             widget.receiver.name,
             style: GoogleFonts.patuaOne(
-                textStyle: Theme.of(context).textTheme.headline1,
+                textStyle: Theme.of(context).textTheme.bodyText1,
+                fontSize: 20.0,
                 letterSpacing: 1.5),
           ),
         ],
@@ -1235,8 +1323,9 @@ class _ChatScreenState extends State<ChatScreen> {
         IconButton(
             color: Theme.of(context).iconTheme.color,
             icon: Icon(
-              Icons.video_call_rounded,
-              size: 30.0,
+              // Icons.video_call_rounded,
+              FontAwesomeIcons.video,
+              size: 25.0,
             ),
             onPressed: () async {
               // Message _message = Message(

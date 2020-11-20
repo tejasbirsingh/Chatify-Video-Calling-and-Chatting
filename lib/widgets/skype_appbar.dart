@@ -19,10 +19,11 @@ class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       color: Theme.of(context).backgroundColor,
       child: CustomAppBar(
         leading : leading,
-      
+      isLeadingWidth: false,
         title: (title is String)
             ? Text(
                 title,

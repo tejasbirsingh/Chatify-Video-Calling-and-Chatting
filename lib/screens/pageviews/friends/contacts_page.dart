@@ -46,8 +46,14 @@ class _contactsPageState extends State<contactsPage> {
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              Theme.of(context).backgroundColor,
-              Theme.of(context).scaffoldBackgroundColor
+              // Theme.of(context).backgroundColor,
+              // Theme.of(context).scaffoldBackgroundColor
+                userProvider.getUser.firstColor != null
+              ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+              : Theme.of(context).backgroundColor,
+          userProvider.getUser.secondColor != null
+              ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
+              : Theme.of(context).scaffoldBackgroundColor,
             ]),
           ),
           child: StreamBuilder<QuerySnapshot>(

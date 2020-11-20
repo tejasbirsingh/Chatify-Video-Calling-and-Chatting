@@ -1,6 +1,8 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -8,6 +10,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
+
 import 'package:skype_clone/provider/audio_upload_provider.dart';
 
 import 'package:skype_clone/provider/file_provider.dart';
@@ -20,6 +23,7 @@ import 'package:skype_clone/screens/home_screen.dart';
 import 'package:skype_clone/screens/login_screen.dart';
 import 'package:skype_clone/screens/search_screen.dart';
 import 'package:skype_clone/screens/settingPage.dart';
+import 'package:skype_clone/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,7 +72,6 @@ class _MyAppState extends State<MyApp> {
       });
     });
   }
-
 
   Future<void> _getLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -129,8 +132,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(
             create: (_) => AudioUploadProvider(),
           ),
-     
-          ChangeNotifierProvider(create: (_) =>FileUploadProvider()),
+          ChangeNotifierProvider(create: (_) => FileUploadProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: MaterialApp(
@@ -147,7 +149,7 @@ class _MyAppState extends State<MyApp> {
                     future: _authMethods.getCurrentUser(),
                     builder: (context, AsyncSnapshot<User> snapshot) {
                       if (snapshot.data != null) {
-                        return HomeScreen();
+                        return SplashScreen();
                       } else {
                         return LoginScreen(token: token);
                       }

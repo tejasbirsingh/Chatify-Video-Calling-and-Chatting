@@ -200,4 +200,20 @@ class ChatMethods {
           .collection(receiverId)
           .orderBy("timestamp")
           .snapshots();
+
+  Future<int> unreadMessagesCount({
+    @required String senderId,
+    @required String receiverId,
+  }) async {
+    var c=0;
+    await _messageCollection
+        .doc(receiverId)
+        .collection(senderId)
+        .where('isRead', isEqualTo: false)
+        .get()
+        .then((documentSnapshot) {
+      c =  documentSnapshot.docs.length;
+    });
+    return c;
+  }
 }

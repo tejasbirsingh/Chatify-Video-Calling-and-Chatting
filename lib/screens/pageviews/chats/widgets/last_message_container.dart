@@ -8,6 +8,7 @@ class LastMessageContainer extends StatelessWidget {
 
   LastMessageContainer({
     @required this.stream,
+  
   });
 
   @override
@@ -36,7 +37,7 @@ class LastMessageContainer extends StatelessWidget {
                       fontWeight: FontWeight.bold
                     ),)
                   ),
-                  
+             
                   Text(dateTimeFormat(message.timestamp.toDate()),
                     style: GoogleFonts.cuprum(textStyle :TextStyle(
                       color: Colors.grey,

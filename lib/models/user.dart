@@ -6,6 +6,8 @@ class User {
   String status;
   int state;
   String profilePhoto;
+  int firstColor;
+  int secondColor;
 
   User({
     this.uid,
@@ -15,6 +17,8 @@ class User {
     this.status,
     this.state,
     this.profilePhoto,
+    this.firstColor,
+    this.secondColor
   });
 
   Map toMap(User user) {
@@ -26,6 +30,8 @@ class User {
     data["status"] = user.status;
     data["state"] = user.state;
     data["profile_photo"] = user.profilePhoto;
+    data["first_color"] = user.firstColor;
+    data["second_color"] = user.secondColor;
     return data;
   }
 
@@ -38,5 +44,7 @@ class User {
     this.status = mapData['status'];
     this.state = mapData['state'];
     this.profilePhoto = mapData['profile_photo'];
+    this.firstColor = mapData["first_color"];
+    this.secondColor=mapData["second_color"];
   }
 }

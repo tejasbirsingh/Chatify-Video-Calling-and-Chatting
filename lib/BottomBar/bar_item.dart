@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 
 class AnimatedBottomBar extends StatefulWidget {
   final List<BarItem> barItems;
@@ -23,12 +25,19 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = Provider.of<UserProvider>(context);
     return Container(
         decoration: BoxDecoration(
           
             gradient: LinearGradient(colors: [
-              Theme.of(context).backgroundColor,
-              Theme.of(context).scaffoldBackgroundColor
+                  
+                userProvider.getUser.firstColor != null
+              ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+              : Theme.of(context).backgroundColor,
+          userProvider.getUser.secondColor != null
+              ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
+              : Theme.of(context).scaffoldBackgroundColor,
+              
             ]),
           ),
       child: Material(

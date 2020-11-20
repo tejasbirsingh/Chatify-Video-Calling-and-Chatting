@@ -8,6 +8,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final Widget leading;
   final bool centerTitle;
   final GestureTapCallback onTap;
+  final bool isLeadingWidth;
   
 
   const CustomAppBar({
@@ -17,6 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
      this.leading, 
     @required this.centerTitle,
     this.onTap,
+    this.isLeadingWidth
   }) : super(key: key);
 
   @override
@@ -42,7 +44,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
     
         backgroundColor: Theme.of(context).appBarTheme.color,
         iconTheme:Theme.of(context).appBarTheme.iconTheme,
-        elevation: 0,
+        elevation: 0.0,
+        leadingWidth : isLeadingWidth ? 20.0 : 50.0,
         
         leading: leading,
         actions: actions,

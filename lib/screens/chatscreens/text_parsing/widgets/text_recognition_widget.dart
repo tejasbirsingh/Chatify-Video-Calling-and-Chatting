@@ -8,6 +8,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/firebase_api_handler.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/pdf_view_screen.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/controls_widgets.dart';
@@ -38,6 +40,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -52,8 +55,13 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              Theme.of(context).backgroundColor,
-              Theme.of(context).scaffoldBackgroundColor
+              userProvider.getUser.firstColor != null
+                  ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+                  : Theme.of(context).backgroundColor,
+              userProvider.getUser.secondColor != null
+                  ? Color(
+                      userProvider.getUser.secondColor ?? Colors.white.value)
+                  : Theme.of(context).scaffoldBackgroundColor,
             ]),
           ),
           child: Padding(
@@ -83,7 +91,10 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40.0)),
                       onPressed: () async {
-                        await writePdf();
+                        if (ocrText != "" && ocrText != "No text scanned") {
+                          await writePdf();
+                          await savePdf();
+                        }
                       },
                       child: Row(
                         children: [
@@ -106,8 +117,11 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40.0)),
                       onPressed: () async {
-                        await writePdf();
                         await savePdf();
+                        setState(() {
+                          ocrText = "No text scanned";
+                        });
+                        clear();
                         Io.Directory documentDirectory =
                             await getApplicationDocumentsDirectory();
 
@@ -119,7 +133,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
                                   receiverId: widget.receiverId,
                                 )));
                       },
-                      child: Text("Save and View",
+                      child: Text("View",
                           style: Theme.of(context).textTheme.headline1),
                     )
                   ],
@@ -143,7 +157,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
   writePdf() async {
     final font = await rootBundle.load("fonts/OpenSans-Light.ttf");
     final ttf = pw.Font.ttf(font);
-
+ 
     pdf.addPage(
       pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -196,7 +210,6 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
 
     final text = await FirebaseMLApi.recogniseText(image);
     setText(text);
-
     Navigator.of(context).pop();
   }
 

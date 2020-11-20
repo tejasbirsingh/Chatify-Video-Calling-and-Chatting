@@ -15,7 +15,7 @@ Future<void> downloadFile(String url, String fileName) async {
   });
 }
 
-Widget pdfWidget(String url) {
+Widget pdfWidget(String url,bool isSender) {
   String fileName = Utils.generateRandomString(15);
   return Stack(
     children: [
@@ -54,7 +54,7 @@ Widget pdfWidget(String url) {
                 bottomLeft: Radius.circular(20.0),
                 bottomRight: Radius.circular(20.0),
               ),
-              gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
+              gradient: LinearGradient(colors:isSender?  [Colors.green, Colors.teal] : [Colors.blue.shade700, Colors.blue.shade900])),
         ),
       ),
     ],

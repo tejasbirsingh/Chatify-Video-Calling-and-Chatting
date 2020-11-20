@@ -190,17 +190,98 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return PickupLayout(
       scaffold: Scaffold(
-        // backgroundColor: Theme.of(context).backgroundColor,
-        appBar: searchAppBar(context),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              Theme.of(context).backgroundColor,
-              Theme.of(context).scaffoldBackgroundColor
-            ]),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
-          child: buildSuggestions(query, userProvider.getUser),
+        // appBar: searchAppBar(context),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+                  userProvider.getUser.firstColor != null
+                      ? Color(
+                          userProvider.getUser.firstColor ?? Colors.white.value)
+                      : Theme.of(context).backgroundColor,
+                  userProvider.getUser.secondColor != null
+                      ? Color(userProvider.getUser.secondColor ??
+                          Colors.white.value)
+                      : Theme.of(context).scaffoldBackgroundColor,
+                ]),
+              ),
+            ),
+         
+            Positioned(
+                left: MediaQuery.of(context).size.width * 0.09,
+                right: MediaQuery.of(context).size.width * 0.09,
+                top: MediaQuery.of(context).size.height * 0.1,
+                child: Container(
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: (val) {
+                      setState(() {
+                        query = val;
+                      });
+                    },
+                    cursorColor: UniversalVariables.blackColor,
+                    autofocus: true,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 35,
+                    ),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.black,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.close, color: Colors.black),
+                        onPressed: () {
+                          WidgetsBinding.instance.addPostFrameCallback(
+                              (_) => searchController.clear());
+                        },
+                      ),
+                      border: InputBorder.none,
+                      hintText: "Search",
+                      hintStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  height: 60.0,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade400,
+                          blurRadius: 20.0,
+                          spreadRadius: 4.0,
+                        )
+                      ],
+                      borderRadius: BorderRadius.circular(40.0)),
+                  width: MediaQuery.of(context).size.width * 0.8,
+                )),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.2),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    userProvider.getUser.firstColor != null
+                        ? Color(userProvider.getUser.firstColor ??
+                            Colors.white.value)
+                        : Theme.of(context).backgroundColor,
+                    userProvider.getUser.secondColor != null
+                        ? Color(userProvider.getUser.secondColor ??
+                            Colors.white.value)
+                        : Theme.of(context).scaffoldBackgroundColor,
+                  ]),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
+                child: buildSuggestions(query, userProvider.getUser),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -29,6 +29,7 @@ class LoginScreenState extends State<LoginScreen> {
         children: [
           Container(  decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
+              
               Theme.of(context).backgroundColor,
               Theme.of(context).scaffoldBackgroundColor
             ]),
@@ -107,11 +108,8 @@ class LoginScreenState extends State<LoginScreen> {
         }));
       }
     });
-    savebackground();
+
   }
 
-    void savebackground( ) async {
-    var prefs = await SharedPreferences.getInstance();
-    prefs.setString('background', '');
-  }
+ 
 }

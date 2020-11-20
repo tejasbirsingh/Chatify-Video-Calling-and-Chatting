@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-
 import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
@@ -13,21 +12,25 @@ import 'package:skype_clone/screens/pageviews/chats/widgets/user_circle.dart';
 
 import 'package:skype_clone/widgets/skype_appbar.dart';
 
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends StatefulWidget {
+  @override
+  _ChatListScreenState createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
+  
     return PickupLayout(
       scaffold: Scaffold(
-       
         appBar: SkypeAppBar(
           title: 'Chats',
           leading: UserCircle(),
           actions: <Widget>[
             IconButton(
               icon: Icon(
-                Icons.more_vert,
+                FontAwesomeIcons.slidersH,
                 color: Theme.of(context).iconTheme.color,
-           
               ),
               onPressed: () {
                 Navigator.pushNamed(context, "/setting_page");
@@ -35,24 +38,34 @@ class ChatListScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: ChatListContainer(),
+        body: ChatListContainer()
       ),
     );
   }
 }
 
-class ChatListContainer extends StatelessWidget {
+class ChatListContainer extends StatefulWidget {
+  @override
+  _ChatListContainerState createState() => _ChatListContainerState();
+}
+
+class _ChatListContainerState extends State<ChatListContainer> {
   final ChatMethods _chatMethods = ChatMethods();
 
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
-
+    userProvider.refreshUser();
     return Container(
       decoration: BoxDecoration(
+        
         gradient: LinearGradient(colors: [
-          Theme.of(context).backgroundColor,
-          Theme.of(context).scaffoldBackgroundColor
+          userProvider.getUser.firstColor != null
+              ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+              : Theme.of(context).backgroundColor,
+          userProvider.getUser.secondColor != null
+              ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
+              : Theme.of(context).scaffoldBackgroundColor,
         ]),
       ),
       child: StreamBuilder<QuerySnapshot>(
@@ -75,7 +88,7 @@ class ChatListContainer extends StatelessWidget {
                 itemCount: docList.length,
                 itemBuilder: (context, index) {
                   Contact contact = Contact.fromMap(docList[index].data());
-                  return ContactView(contact);
+                  return ContactView(contact, userProvider.getUser.uid);
                 },
               );
             }

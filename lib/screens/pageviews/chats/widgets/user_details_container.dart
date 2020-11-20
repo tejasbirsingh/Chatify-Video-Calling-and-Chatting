@@ -8,7 +8,8 @@ import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/login_screen.dart';
-import 'package:skype_clone/widgets/appbar.dart';
+
+import 'package:skype_clone/widgets/skype_appbar.dart';
 
 import 'shimmering_logo.dart';
 
@@ -42,20 +43,26 @@ class UserDetailsContainer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
-            Theme.of(context).backgroundColor,
-            Theme.of(context).scaffoldBackgroundColor
+            // Theme.of(context).backgroundColor,
+            // Theme.of(context).scaffoldBackgroundColor
+            userProvider.getUser.firstColor != null
+                ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+                : Theme.of(context).backgroundColor,
+            userProvider.getUser.secondColor != null
+                ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
+                : Theme.of(context).scaffoldBackgroundColor,
           ]),
         ),
         margin: EdgeInsets.only(top: 25),
         child: Column(
           children: <Widget>[
-            CustomAppBar(
+            SkypeAppBar(
               leading: IconButton(
                 icon: Icon(Icons.arrow_back,
                     color: Theme.of(context).iconTheme.color),
                 onPressed: () => Navigator.maybePop(context),
               ),
-              centerTitle: true,
+              // centerTitle: true,
               title: ShimmeringLogo(),
               actions: <Widget>[
                 FlatButton(
