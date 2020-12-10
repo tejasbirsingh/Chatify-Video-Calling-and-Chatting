@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:skype_clone/models/contact.dart';
@@ -27,14 +28,13 @@ class _contactsPageState extends State<contactsPage> {
         Provider.of<UserProvider>(context, listen: true);
 
     return Scaffold(
-
         appBar: SkypeAppBar(
           leading: Text(""),
           title: 'Contacts',
           actions: [
             IconButton(
               icon: Icon(
-                Icons.more_vert,
+                FontAwesomeIcons.slidersH,
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () {
@@ -46,14 +46,13 @@ class _contactsPageState extends State<contactsPage> {
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              // Theme.of(context).backgroundColor,
-              // Theme.of(context).scaffoldBackgroundColor
-                userProvider.getUser.firstColor != null
-              ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-              : Theme.of(context).backgroundColor,
-          userProvider.getUser.secondColor != null
-              ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
-              : Theme.of(context).scaffoldBackgroundColor,
+              userProvider.getUser.firstColor != null
+                  ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+                  : Theme.of(context).backgroundColor,
+              userProvider.getUser.secondColor != null
+                  ? Color(
+                      userProvider.getUser.secondColor ?? Colors.white.value)
+                  : Theme.of(context).scaffoldBackgroundColor,
             ]),
           ),
           child: StreamBuilder<QuerySnapshot>(
@@ -61,14 +60,14 @@ class _contactsPageState extends State<contactsPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 var docList = snapshot.data.docs;
-            
-              if (docList.isEmpty) {
-                return QuietBox(
-                  heading: "All your contacts will be shown here",
-                  subtitle:
-                      "Search your friends, add them and start chatting !",
-                );
-              }
+
+                if (docList.isEmpty) {
+                  return QuietBox(
+                    heading: "All your contacts will be shown here",
+                    subtitle:
+                        "Search your friends, add them and start chatting !",
+                  );
+                }
                 return ListView.builder(
                   padding: EdgeInsets.all(10.0),
                   itemCount: docList.length,

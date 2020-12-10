@@ -4,6 +4,7 @@ import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:skype_clone/provider/file_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
@@ -46,76 +47,84 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
     setState(() {
       userId = user.getUser.uid;
     });
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).backgroundColor,
-        iconTheme: Theme.of(context).iconTheme,
-        title: Text(
-          'Pdf File',
-          style: Theme.of(context).textTheme.headline1,
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.reply),
-            onPressed: () {
-              if (file != null && widget.receiverId != null) {
-                _storageMethods.uploadFile(
-                    file: file,
-                    receiverId: widget.receiverId,
-                    senderId: userId,
-                    fileUploadProvider: _fileUploadProvider);
-              }
+    return SafeArea(
+          child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).backgroundColor,
+          iconTheme: Theme.of(context).iconTheme,
+          title: Text(
+            'Pdf File',
+            style: Theme.of(context).textTheme.headline1,
+          ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.reply,color:Colors.lightBlue),
+              onPressed: () {
+                if (file != null && widget.receiverId != null) {
+                  _storageMethods.uploadFile(
+                      file: file,
+                      receiverId: widget.receiverId,
+                      senderId: userId,
+                      fileUploadProvider: _fileUploadProvider);
+                }
 
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-          )
-        ],
-      ),
-      body: Center(
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : PDFViewer(
-                document: document,
-                zoomSteps: 1,
-                lazyLoad: false,
-                navigationBuilder:
-                    (context, page, totalPages, jumpToPage, animateToPage) {
-                  return ButtonBar(
-                    alignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.first_page),
-                        onPressed: () {
-                          jumpToPage(page: 0);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        onPressed: () {
-                          animateToPage(page: page - 2);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.arrow_forward),
-                        onPressed: () {
-                          animateToPage(page: page);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.last_page),
-                        onPressed: () {
-                          jumpToPage(page: totalPages - 1);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.share,color: Colors.teal,),
+              onPressed: (){
+                Share.shareFiles([widget.path], text: 'Share Document');
+              },
+            )
+          ],
+        ),
+        body: Center(
+          child: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : PDFViewer(
+                  document: document,
+                  zoomSteps: 1,
+                  lazyLoad: false,
+                  navigationBuilder:
+                      (context, page, totalPages, jumpToPage, animateToPage) {
+                    return ButtonBar(
+                      alignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.first_page),
+                          onPressed: () {
+                            jumpToPage(page: 0);
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: () {
+                            animateToPage(page: page - 2);
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.arrow_forward),
+                          onPressed: () {
+                            animateToPage(page: page);
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.last_page),
+                          onPressed: () {
+                            jumpToPage(page: totalPages - 1);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+        ),
       ),
     );
   }

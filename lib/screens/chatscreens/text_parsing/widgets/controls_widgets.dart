@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/arc_class.dart';
 
 class ControlsWidget extends StatelessWidget {
   final VoidCallback onClickedCamera;
@@ -15,49 +16,59 @@ class ControlsWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) { 
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100.0,
+      width: MediaQuery.of(context).size.width * 0.8,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-         Row(
-           mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-            RaisedButton(
-              color: Theme.of(context).cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-            onPressed: onClickedGallery,
-            child: Icon(Icons.photo_album_outlined,
-             color: Theme.of(context).iconTheme.color)
+          moreMenuItem(Icons.photo_album_outlined, 'Gallery', onClickedGallery,
+              Colors.pink),
+          moreMenuItem(Icons.camera_enhance_outlined, 'Camera', onClickedCamera,
+              Colors.blue),
+          moreMenuItem(Icons.scanner, 'Scan', onClickedScanText, Colors.orange),
+          moreMenuItem(Icons.clear, 'Clear', onClickedClear, Colors.red),
+        ],
+      ),
+    );
+  }
+
+  GestureDetector moreMenuItem(
+      IconData icon, String name, GestureTapCallback fun, Color color) {
+    return GestureDetector(
+      onTap: fun,
+      child: Column(
+        children: [
+          Container(
+            height: 48.0,
+            width: 48.0,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(50.0),
+            ),
+            child: Stack(
+              children: [
+                MyArc(
+                  diameter: 60.0,
+                  color: color,
+                ),
+                Center(
+                  child: Icon(
+                    icon,
+                    size: 28.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
-         
-           SizedBox(width: 8.0),
-          RaisedButton(
-               color: Theme.of(context).cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-            onPressed: onClickedCamera,
-            child: Icon(Icons.camera_enhance_outlined,
-            color: Theme.of(context).iconTheme.color,)
-          ),
-                     SizedBox(width: 8.0),
-            RaisedButton(
-              
-               color: Theme.of(context).cardColor,
-               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-            onPressed: onClickedClear,
-            child:Icon(Icons.clear,
-             color: Theme.of(context).iconTheme.color),
+          Text(
+            name,
+            style: TextStyle(color: Colors.black, fontSize: 16.0),
           )
-         ],),
-           SizedBox(width: 8.0),
-         RaisedButton(
-           
-              color: Theme.of(context).cardColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-         onPressed: onClickedScanText,
-         child: Text('Scan',
-           style: Theme.of(context).textTheme.headline1),
-          ),
-         
-        ]
-      );}
+        ],
+      ),
+    );
+  }
 }

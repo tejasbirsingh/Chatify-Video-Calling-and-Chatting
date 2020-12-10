@@ -24,11 +24,19 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> friendsList;
   String query = "";
   TextEditingController searchController = TextEditingController();
+  bool _folded = true;
+  animationVariables() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() {
+        _folded = false;
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-
+    animationVariables();
     _authMethods.getCurrentUser().then((User user) {
       _authMethods.fetchAllUsers(user).then((List<UserData> list) {
         setState(() {
@@ -47,56 +55,6 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       });
     });
-  }
-
-  searchAppBar(BuildContext context) {
-    return GradientAppBar(
-      gradient: LinearGradient(
-        colors: [Colors.green, Colors.teal],
-      ),
-      elevation: 0,
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 20),
-        child: Padding(
-          padding: EdgeInsets.only(left: 20),
-          child: TextField(
-            controller: searchController,
-            onChanged: (val) {
-              setState(() {
-                query = val;
-              });
-            },
-            cursorColor: UniversalVariables.blackColor,
-            autofocus: true,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontSize: 35,
-            ),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.close, color: Colors.white),
-                onPressed: () {
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => searchController.clear());
-                },
-              ),
-              border: InputBorder.none,
-              hintText: "Search",
-              hintStyle: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-                color: Color(0x88ffffff),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   buildSuggestions(String query, UserData user) {
@@ -190,7 +148,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return PickupLayout(
       scaffold: Scaffold(
-        // appBar: searchAppBar(context),
         body: Stack(
           children: [
             Container(
@@ -207,12 +164,51 @@ class _SearchScreenState extends State<SearchScreen> {
                 ]),
               ),
             ),
-         
             Positioned(
-                left: MediaQuery.of(context).size.width * 0.09,
-                right: MediaQuery.of(context).size.width * 0.09,
-                top: MediaQuery.of(context).size.height * 0.1,
-                child: Container(
+              top: -10.0,
+              right: -30.0,
+              child: Container(
+                height: 160.0,
+                width: 160.0,
+                decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(80.0)),
+              ),
+            ),
+                 Positioned(
+              top: -20.0,
+              left: -20.0,
+              child: Container(
+                height: 200.0,
+                width: 200.0,
+                decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(80.0)),
+              ),
+            ),
+            Positioned(
+              child: Container(
+                  child: Center(
+                      child: Text(
+                'Search',
+                style:  GoogleFonts.oswald(
+                  textStyle: Theme.of(context).textTheme.headline1,
+                  fontSize: 34.0),
+              ))),
+              top: 10.0,
+              left: MediaQuery.of(context).size.width * 0.3,
+              right: MediaQuery.of(context).size.width * 0.3,
+            ),
+            Padding(
+                padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width * 0.06,
+                  right: MediaQuery.of(context).size.width * 0.06,
+                  top: MediaQuery.of(context).size.height * 0.1,
+                ),
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 400),
+                  height: 60.0,
+                  width: _folded ? 56 : MediaQuery.of(context).size.width,
                   child: TextField(
                     controller: searchController,
                     onChanged: (val) {
@@ -248,7 +244,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   ),
-                  height: 60.0,
                   decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
@@ -258,12 +253,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           spreadRadius: 4.0,
                         )
                       ],
-                      borderRadius: BorderRadius.circular(40.0)),
-                  width: MediaQuery.of(context).size.width * 0.8,
+                      borderRadius: BorderRadius.circular(20.0)),
                 )),
             Padding(
               padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.2),
+                  top: MediaQuery.of(context).size.height * 0.22),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [

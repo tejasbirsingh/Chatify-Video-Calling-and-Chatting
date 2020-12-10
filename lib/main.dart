@@ -1,8 +1,8 @@
-import 'package:animated_splash_screen/animated_splash_screen.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flare_flutter/flare_actor.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,10 +19,10 @@ import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/screens/home_screen.dart';
+
 import 'package:skype_clone/screens/login_screen.dart';
 import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/screens/settingPage.dart';
+import 'package:skype_clone/screens/App%20Settings/setting_page.dart';
 import 'package:skype_clone/screens/splash_screen.dart';
 
 void main() async {

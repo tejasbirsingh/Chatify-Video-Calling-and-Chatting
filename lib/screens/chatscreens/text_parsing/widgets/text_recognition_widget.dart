@@ -13,7 +13,8 @@ import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/firebase_api_handler.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/pdf_view_screen.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/controls_widgets.dart';
-import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/text_area_widget.dart';
+
+import 'package:skype_clone/screens/chatscreens/widgets/arc_class.dart';
 import 'package:skype_clone/utils/utilities.dart';
 
 class TextRecognitionWidget extends StatefulWidget {
@@ -44,12 +45,13 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          elevation: 2.0,
           title: Text("Image to Pdf",
               style: GoogleFonts.oswald(
                   textStyle: TextStyle(
                       color: Theme.of(context).textTheme.headline1.color,
                       fontWeight: FontWeight.bold,
-                      fontSize: 28.0))),
+                      fontSize: 26.0))),
           iconTheme: Theme.of(context).iconTheme,
         ),
         body: Container(
@@ -64,92 +66,113 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
                   : Theme.of(context).scaffoldBackgroundColor,
             ]),
           ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Column(
-              children: [
-                Container(
-                    height: 260.0,
-                    width: 260.0,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color:
-                                Theme.of(context).textTheme.headline1.color)),
-                    child: buildImage()),
-                SizedBox(height: 5.0),
-                ControlsWidget(
-                  onClickedGallery: pickImageGallery,
-                  onClickedCamera: pickImageCamera,
-                  onClickedScanText: scanText,
-                  onClickedClear: clear,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(height: 8.0),
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.44,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Theme.of(context).textTheme.headline1.color)),
+                  child: buildImage()),
+              SizedBox(height: 5.0),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: 100,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).splashColor,
+                  ),
+                  gradient: LinearGradient(colors: [
+                    Theme.of(context).backgroundColor,
+                    Theme.of(context).scaffoldBackgroundColor
+                  ]),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    RaisedButton(
-                      color: Theme.of(context).cardColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40.0)),
-                      onPressed: () async {
-                        if (ocrText != "" && ocrText != "No text scanned") {
-                          await writePdf();
-                          await savePdf();
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.add,
-                            color: Theme.of(context).iconTheme.color,
-                          ),
-                          Text(
-                            "Add Page",
-                            style: Theme.of(context).textTheme.headline1,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
-                    RaisedButton(
-                      color: Theme.of(context).cardColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40.0)),
-                      onPressed: () async {
-                        await savePdf();
-                        setState(() {
-                          ocrText = "No text scanned";
-                        });
-                        clear();
-                        Io.Directory documentDirectory =
-                            await getApplicationDocumentsDirectory();
+                padding: EdgeInsets.all(8),
+                alignment: Alignment.center,
+                child: SelectableText(
+                  ocrText.isEmpty ? 'Scan an Image to get text' : ocrText,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+              ),
+              SizedBox(height: 5.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  moreMenuItem(Icons.add, 'Add', () async {
+                    if (ocrText != "" && ocrText != "No text scanned") {
+                      await writePdf();
+                      await savePdf();
+                      clear();
+                    }
+                  }, Colors.teal),
+                  moreMenuItem(Icons.view_agenda, 'View', () async {
+                    await savePdf();
+                    Io.Directory documentDirectory =
+                        await getApplicationDocumentsDirectory();
+                    String documentPath = documentDirectory.path;
+                    String path = "$documentPath/$fileName.pdf";
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => pdfPreviewScreen(
+                              path: path,
+                              receiverId: widget.receiverId,
+                            )));
+                  }, Colors.amber),
+                  moreMenuItem(
+                      Icons.copy, 'Copy', copyToClipboard, Colors.green),
+                ],
+              ),
+              SizedBox(height: 10.0),
+              ControlsWidget(
+                onClickedGallery: pickImageGallery,
+                onClickedCamera: pickImageCamera,
+                onClickedScanText: scanText,
+                onClickedClear: clear,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                        String documentPath = documentDirectory.path;
-                        String path = "$documentPath/$fileName.pdf";
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => pdfPreviewScreen(
-                                  path: path,
-                                  receiverId: widget.receiverId,
-                                )));
-                      },
-                      child: Text("View",
-                          style: Theme.of(context).textTheme.headline1),
-                    )
-                  ],
+  GestureDetector moreMenuItem(
+      IconData icon, String name, GestureTapCallback fun, Color color) {
+    return GestureDetector(
+      onTap: fun,
+      child: Column(
+        children: [
+          Container(
+            height: 48.0,
+            width: 48.0,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(50.0),
+            ),
+            child: Stack(
+              children: [
+                MyArc(
+                  diameter: 60.0,
+                  color: color,
                 ),
-                SizedBox(height: 5.0),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextAreaWidget(
-                    text: ocrText,
-                    onClickedCopy: copyToClipboard,
+                Center(
+                  child: Icon(
+                    icon,
+                    size: 28.0,
+                    color: Colors.white,
                   ),
                 ),
               ],
             ),
           ),
-        ),
+          Text(
+            name,
+            style: TextStyle(color: Colors.black, fontSize: 16.0),
+          )
+        ],
       ),
     );
   }
@@ -157,7 +180,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
   writePdf() async {
     final font = await rootBundle.load("fonts/OpenSans-Light.ttf");
     final ttf = pw.Font.ttf(font);
- 
+
     pdf.addPage(
       pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -186,6 +209,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
             ? Image.file(
                 image,
                 color: Theme.of(context).iconTheme.color,
+               fit:BoxFit.cover
               )
             : Icon(Icons.photo, size: 80, color: Colors.black),
       );

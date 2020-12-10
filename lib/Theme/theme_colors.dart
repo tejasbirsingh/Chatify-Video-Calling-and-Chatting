@@ -20,7 +20,7 @@ final darkTheme = ThemeData(
       headline1: TextStyle(
           color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0),
       bodyText1: TextStyle(color: Colors.white, fontSize: 18.0),
-      bodyText2: TextStyle(color: Colors.white, fontSize: 14.0),
+      bodyText2: TextStyle(color: Colors.white, fontSize: 16.0),
     ),
     appBarTheme: AppBarTheme(
         centerTitle: true,
@@ -48,7 +48,7 @@ final lightTheme = ThemeData(
       headline1: TextStyle(
           color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20.0),
       bodyText1: TextStyle(color: Colors.black, fontSize: 18.0),
-      bodyText2: TextStyle(color: Colors.white, fontSize: 14.0),
+      bodyText2: TextStyle(color: Colors.black, fontSize: 14.0),
     ),
     appBarTheme: AppBarTheme(
         iconTheme: IconThemeData(color: Colors.white),

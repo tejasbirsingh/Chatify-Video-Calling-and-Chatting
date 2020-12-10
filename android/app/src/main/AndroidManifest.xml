@@ -8,6 +8,9 @@
 <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
 
 <!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices.-->
@@ -19,9 +22,12 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
+       
         android:name=".Application"
         android:label="ChatifyFinal"
         android:icon="@mipmap/ic11_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyA07n5T8K3IGYY1WXzRVoIQpQZep43Ugac"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -36,6 +42,7 @@
              <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
                 android:resource="@drawable/launch_background" />
+           
              <intent-filter>
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -57,6 +64,7 @@
             <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"
                 android:value="ocr" />
+       
 
     </application>
 </manifest>

@@ -1,8 +1,7 @@
 import 'dart:async';
-
 import 'dart:io';
 import 'dart:math';
-
+import 'package:geolocator/geolocator.dart';
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:dio/dio.dart';
 import 'package:file/local.dart';
@@ -15,6 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -44,11 +44,13 @@ import 'package:skype_clone/screens/chatscreens/text_parsing/firebase_api_handle
 
 import 'package:skype_clone/screens/chatscreens/push_notification.dart';
 import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/text_recognition_widget.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/arc_class.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/audioPlayer.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/file_viewer.dart';
 
 import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
+import 'package:skype_clone/screens/chatscreens/widgets/location_class.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/pdf_widget.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
@@ -60,6 +62,7 @@ import 'package:skype_clone/utils/permissions.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import 'package:skype_clone/widgets/appbar.dart';
+import 'package:skype_clone/widgets/gradient_icon.dart';
 
 import 'package:video_player/video_player.dart';
 import 'package:video_trimmer/video_trimmer.dart';
@@ -137,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen>
     });
     animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: Duration(milliseconds: 250),
     );
     animation = CurvedAnimation(
       parent: animationController,
@@ -347,43 +350,109 @@ class _ChatScreenState extends State<ChatScreen>
               )
             ]),
         // height: MediaQuery.of(context).size.height * 0.3,
-        height: 180.0,
+        height: 220.0,
         width: MediaQuery.of(context).size.width * 0.8,
-        child: GridView.count(
-          physics: NeverScrollableScrollPhysics(),
-          scrollDirection: Axis.vertical,
-          crossAxisCount: 3,
-          children: [
-            moreMenuItem(Icons.camera, 'Image', () {
-              toggleMenu();
-              pickImage(source: ImageSource.gallery);
-            }, Colors.green),
-            moreMenuItem(Icons.video_label, 'Video', () {
-              toggleMenu();
-              pickVideo();
-            }, Colors.yellow),
-            moreMenuItem(Icons.file_upload, 'File', () {
-              toggleMenu();
-              pickFile();
-            }, Colors.orange),
-            moreMenuItem(Icons.scanner, 'Scan Text', () {
-              setState(() {
-                isWriting = true;
-              });
-              toggleMenu();
-              parseText();
-            }, Colors.white),
-            moreMenuItem(Icons.picture_as_pdf, 'Text to Pdf', () {
-              toggleMenu();
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          //  imageToPdf()
-                          TextRecognitionWidget(
+        child: Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            childAspectRatio: 0.95,
+            crossAxisCount: 3,
+            children: [
+              moreMenuItem(Icons.camera_enhance, 'Image', () async {
+                bool isBlocked = await _chatMethods.isBlocked(
+                    widget.receiver.uid, _currentUserId);
+                if (isBlocked) {
+                  toggleMenu();
+                  pickImage(source: ImageSource.gallery);
+                } else {
+                  blockedDialog(context);
+                }
+              }, Colors.green),
+              moreMenuItem(Icons.video_label, 'Video', () async {
+                bool isBlocked = await _chatMethods.isBlocked(
+                    widget.receiver.uid, _currentUserId);
+                if (isBlocked) {
+                  toggleMenu();
+                  pickVideo();
+                } else {
+                  blockedDialog(context);
+                }
+              }, Colors.pink),
+              moreMenuItem(Icons.file_copy, 'File', () async {
+                bool isBlocked = await _chatMethods.isBlocked(
+                    widget.receiver.uid, _currentUserId);
+                if (isBlocked) {
+                  toggleMenu();
+                  pickFile();
+                } else {
+                  blockedDialog(context);
+                }
+              }, Colors.orange),
+              moreMenuItem(Icons.scanner, 'Scan Text', () async {
+                bool isBlocked = await _chatMethods.isBlocked(
+                    widget.receiver.uid, _currentUserId);
+                if (isBlocked) {
+                  setState(() {
+                    isWriting = true;
+                  });
+                  toggleMenu();
+                  parseText();
+                } else {
+                  blockedDialog(context);
+                }
+              }, Colors.purple),
+              moreMenuItem(Icons.picture_as_pdf, 'Text to Pdf', () async {
+                bool isBlocked = await _chatMethods.isBlocked(
+                    widget.receiver.uid, _currentUserId);
+                if (isBlocked) {
+                  toggleMenu();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TextRecognitionWidget(
                               receiverId: widget.receiver.uid)));
-            }, Colors.red),
-          ],
+                } else {
+                  blockedDialog(context);
+                }
+              }, Colors.red),
+              moreMenuItem(Icons.location_on, 'Location', () async {
+                bool isBlocked = await _chatMethods.isBlocked(
+                    widget.receiver.uid, _currentUserId);
+                if (isBlocked) {
+                  setState(() {
+                    isWriting = true;
+                  });
+                  toggleMenu();
+                  Position position = await Geolocator.getCurrentPosition(
+                      desiredAccuracy: LocationAccuracy.high);
+
+                  GeoPoint x = GeoPoint(position.latitude, position.longitude);
+                  Message _message = Message(
+                      receiverId: widget.receiver.uid,
+                      senderId: sender.uid,
+                      message: "location",
+                      position: x,
+                      timestamp: Timestamp.now(),
+                      type: 'location',
+                      isRead: false,
+                      isLocation: true);
+
+                  setState(() {
+                    isWriting = false;
+                  });
+
+                  _chatMethods.addMessageToDb(_message);
+                  sendNotification(
+                      _message.message.toString(),
+                      sender.name.toString(),
+                      widget.receiver.firebaseToken.toString());
+                } else {
+                  blockedDialog(context);
+                }
+              }, Colors.blue),
+            ],
+          ),
         ),
       ),
     );
@@ -395,14 +464,32 @@ class _ChatScreenState extends State<ChatScreen>
       onTap: fun,
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 30.0,
-            color: color,
+          Container(
+            height: 60.0,
+            width: 60.0,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(50.0),
+            ),
+            child: Stack(
+              children: [
+                MyArc(
+                  diameter: 60.0,
+                  color: color,
+                ),
+                Center(
+                  child: Icon(
+                    icon,
+                    size: 30.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
           Text(
             name,
-            style: TextStyle(color: Colors.black, fontSize: 18.0),
+            style: TextStyle(color: Colors.black, fontSize: 16.0),
           )
         ],
       ),
@@ -634,6 +721,36 @@ class _ChatScreenState extends State<ChatScreen>
 
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(35.0);
+    if (message.isLocation = true && message.type == MESSAGE_TYPE_LOCATION) {
+      return GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => showMap(
+                  receiver: widget.receiver,
+                  isSender: true,
+                  pos: message.position,
+                ))),
+        child: Container(
+            height: 60.0,
+            width: MediaQuery.of(context).size.width * 0.3,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 30.0,
+                  color: Colors.orange,
+                ),
+                Text(
+                  'Location',
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                )
+              ],
+            )),
+      );
+    }
     if (message.type == MESSAGE_TYPE_AUDIO) {
       return message.audioUrl != null
           ? Row(
@@ -848,6 +965,37 @@ class _ChatScreenState extends State<ChatScreen>
   Widget receiverLayout(Message message, String uid) {
     updateStatus(uid);
     Radius messageRadius = Radius.circular(35);
+    if (message.isLocation = true && message.type == 'location') {
+      return GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => showMap(
+                  receiver: widget.receiver,
+                  isSender: false,
+                  pos: message.position,
+                ))),
+        child: Container(
+            height: 60.0,
+            width: MediaQuery.of(context).size.width * 0.3,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                gradient: LinearGradient(
+                    colors: [Colors.blue.shade700, Colors.blue.shade900])),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 30.0,
+                  color: Colors.orange,
+                ),
+                Text(
+                  'Location',
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                )
+              ],
+            )),
+      );
+    }
     if (message.type == MESSAGE_TYPE_AUDIO) {
       return message.audioUrl != null
           ? Column(
@@ -992,7 +1140,7 @@ class _ChatScreenState extends State<ChatScreen>
       });
     }
 
-    sendMessage(context) {
+    sendMessage(context) async {
       var text = textFieldController.text;
       Message _message = Message(
         receiverId: widget.receiver.uid,
@@ -1008,9 +1156,22 @@ class _ChatScreenState extends State<ChatScreen>
       });
 
       textFieldController.text = "";
-      _chatMethods.addMessageToDb(_message);
-      sendNotification(_message.message.toString(), sender.name.toString(),
-          widget.receiver.firebaseToken.toString());
+
+      bool isBlocked =
+          await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
+      bool isMuted =
+          await _chatMethods.isMuted(widget.receiver.uid, _currentUserId);
+
+      if (isBlocked) {
+        _chatMethods.addMessageToDb(_message);
+
+        if (!isMuted) {
+          sendNotification(_message.message.toString(), sender.name.toString(),
+              widget.receiver.firebaseToken.toString());
+        }
+      } else {
+        blockedDialog(context);
+      }
     }
 
     return Container(
@@ -1018,9 +1179,15 @@ class _ChatScreenState extends State<ChatScreen>
       child: Row(
         children: <Widget>[
           GestureDetector(
-            // onTap: () => addMediaModal(context),
-            onTap: () {
+            onTap: () async {
               toggleMenu();
+              // bool isBlocked = await _chatMethods.isBlocked(
+              //     widget.receiver.uid, _currentUserId);
+              // if (isBlocked) {
+              //   toggleMenu();
+              // } else {
+              //   blockedDialog(context);
+              // }
             },
             child: Container(
               padding: EdgeInsets.all(5),
@@ -1071,15 +1238,21 @@ class _ChatScreenState extends State<ChatScreen>
                 IconButton(
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
-                  onPressed: () {
-                    if (!showEmojiPicker) {
-                      // keyboard is visible
-                      hideKeyboard();
-                      showEmojiContainer();
+                  onPressed: () async {
+                    bool isBlocked = await _chatMethods.isBlocked(
+                        widget.receiver.uid, _currentUserId);
+                    if (isBlocked) {
+                      if (!showEmojiPicker) {
+                        // keyboard is visible
+                        hideKeyboard();
+                        showEmojiContainer();
+                      } else {
+                        //keyboard is hidden
+                        showKeyboard();
+                        hideEmojiContainer();
+                      }
                     } else {
-                      //keyboard is hidden
-                      showKeyboard();
-                      hideEmojiContainer();
+                      blockedDialog(context);
                     }
                   },
                   icon: Icon(
@@ -1107,11 +1280,18 @@ class _ChatScreenState extends State<ChatScreen>
                         )
                       : IconButton(
                           icon: Icon(Icons.mic_none_outlined),
-                          onPressed: () {
-                            _start();
-                            setState(() {
-                              isRecordStart = true;
-                            });
+                          onPressed: () async {
+                            bool isBlocked = await _chatMethods.isBlocked(
+                                widget.receiver.uid, _currentUserId);
+
+                            if (isBlocked) {
+                              _start();
+                              setState(() {
+                                isRecordStart = true;
+                              });
+                            } else {
+                              blockedDialog(context);
+                            }
                           },
                         ),
                 ),
@@ -1119,7 +1299,15 @@ class _ChatScreenState extends State<ChatScreen>
               ? Container()
               : GestureDetector(
                   child: Icon(Icons.camera_alt),
-                  onTap: () => pickImage(source: ImageSource.camera),
+                  onTap: () async {
+                    bool isBlocked = await _chatMethods.isBlocked(
+                        widget.receiver.uid, _currentUserId);
+                    if (isBlocked) {
+                      pickImage(source: ImageSource.camera);
+                    } else {
+                      blockedDialog(context);
+                    }
+                  },
                 ),
           isWriting
               ? Container(
@@ -1155,6 +1343,32 @@ class _ChatScreenState extends State<ChatScreen>
     }
   }
 
+  Future<AlertDialog> blockedDialog(BuildContext context) {
+    showDialog<AlertDialog>(
+        context: context,
+        barrierDismissible: false,
+        builder: ((context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(5.0),
+            actionsPadding: EdgeInsets.all(5.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            backgroundColor: Theme.of(context).cardColor,
+            title: Text('You have been blocked!'),
+            actions: [
+              InkWell(
+                child: Text(
+                  'OK',
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+                onTap: () => Navigator.pop(context),
+              )
+            ],
+          );
+        }));
+  }
+
   Future pickImage({@required ImageSource source}) async {
     this.setState(() {
       _isEditing = true;
@@ -1176,14 +1390,21 @@ class _ChatScreenState extends State<ChatScreen>
             activeControlsWidgetColor: Colors.teal,
             toolbarWidgetColor: Theme.of(context).iconTheme.color,
           ));
-      _storageMethods.uploadImage(
-        image: cropped,
-        receiverId: widget.receiver.uid,
-        senderId: _currentUserId,
-        imageUploadProvider: _imageUploadProvider,
-      );
-      sendNotification("IMAGE", sender.name.toString(),
-          widget.receiver.firebaseToken.toString());
+      bool isBlocked =
+          await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
+      if (isBlocked) {
+        _storageMethods.uploadImage(
+          image: cropped,
+          receiverId: widget.receiver.uid,
+          senderId: _currentUserId,
+          imageUploadProvider: _imageUploadProvider,
+        );
+        sendNotification("IMAGE", sender.name.toString(),
+            widget.receiver.firebaseToken.toString());
+      } else {
+        blockedDialog(context);
+      }
+
       this.setState(() {
         _isEditing = false;
       });
@@ -1322,10 +1543,17 @@ class _ChatScreenState extends State<ChatScreen>
       actions: <Widget>[
         IconButton(
             color: Theme.of(context).iconTheme.color,
-            icon: Icon(
-              // Icons.video_call_rounded,
+            icon: GradientIcon(
               FontAwesomeIcons.video,
-              size: 25.0,
+              25.0,
+              LinearGradient(
+                colors: <Color>[
+                  Colors.blue.shade500,
+                  Colors.lightBlue.shade800
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             onPressed: () async {
               // Message _message = Message(
@@ -1335,17 +1563,70 @@ class _ChatScreenState extends State<ChatScreen>
               //   timestamp: Timestamp.now(),
               //   type: 'Call',
               // );
-              await Permissions.cameraAndMicrophonePermissionsGranted()
-                  ? {
-                      CallUtils.dial(
-                        from: sender,
-                        to: widget.receiver,
-                        context: context,
-                      ),
-                      // _chatMethods.addMessageToDb(_message)
-                    }
-                  : [];
+              bool isBlocked = await _chatMethods.isBlocked(
+                  widget.receiver.uid, _currentUserId);
+              if (isBlocked) {
+                await Permissions.cameraAndMicrophonePermissionsGranted()
+                    ? {
+                        CallUtils.dial(
+                          from: sender,
+                          to: widget.receiver,
+                          context: context,
+                        ),
+                        // _chatMethods.addMessageToDb(_message)
+                      }
+                    : [];
+              } else {
+                blockedDialog(context);
+              }
             }),
+        SizedBox(width: 2),
+        PopupMenuButton(
+          padding: EdgeInsets.all(4.0),
+          color: Theme.of(context).canvasColor,
+          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            icon: Icon(Icons.menu),
+            itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 1,
+                    child: FutureBuilder(
+                      future: _chatMethods.isBlocked(
+                          _currentUserId, widget.receiver.uid),
+                      builder: (context, AsyncSnapshot<bool> snapshot) =>
+                          GestureDetector(
+                        onTap: () {
+                          _chatMethods.addToBlockedList(
+                              senderId: _currentUserId,
+                              receiverId: widget.receiver.uid);
+                        },
+                        child: Text(
+                            snapshot.data == true ? 'Block' : 'Unblock',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: FutureBuilder(
+                      future: _chatMethods.isMuted(
+                          _currentUserId, widget.receiver.uid),
+                      builder: (context, AsyncSnapshot<bool> snapshot) =>
+                          GestureDetector(
+                        onTap: () {
+                          _chatMethods.addToMutedList(
+                              senderId: _currentUserId,
+                              receiverId: widget.receiver.uid);
+                             
+                        },
+                        child:  Text(
+                            snapshot.data == false ? 'Mute' : 'Unmute',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                      ),
+                    ),
+                  )
+                ])
       ],
     );
   }

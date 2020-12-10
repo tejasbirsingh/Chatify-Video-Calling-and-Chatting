@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
+import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:video_trimmer/trim_editor.dart';
 import 'package:video_trimmer/video_trimmer.dart';
@@ -21,7 +22,7 @@ class _TrimmerViewState extends State<TrimmerView> {
   StorageMethods _storageMethods = StorageMethods();
   double _startValue = 0.0;
   double _endValue = 0.0;
-
+ChatMethods _chatMethods = ChatMethods();
   bool _isPlaying = false;
   bool _progressVisibility = false;
 
@@ -51,7 +52,7 @@ class _TrimmerViewState extends State<TrimmerView> {
 
     return Scaffold(
       appBar: AppBar(
-        title:"Video Trimmer".text.white.bold.make(),
+        title: "Video Trimmer".text.white.bold.make(),
       ),
       body: Builder(
         builder: (context) => Center(
@@ -75,25 +76,27 @@ class _TrimmerViewState extends State<TrimmerView> {
                       onPressed: _progressVisibility
                           ? null
                           : () async {
-                              _saveVideo().then((outputPath) {
+                              _saveVideo().then((outputPath) async{
                                 // print('OUTPUT PATH: $outputPath');
                                 final snackBar = SnackBar(
                                     content: Text('Video Saved successfully'));
                                 Scaffold.of(context).showSnackBar(snackBar);
-
-                                   _storageMethods.uploadVideo(
-                              video: File(outputPath),
-                              receiverId: widget.receiver,
-                              senderId: widget.sender,
-                              videoUploadProvider: _videoUploadProvider);
-                               Navigator.pop(context);
+                        
+                                _storageMethods.uploadVideo(
+                                    video: File(outputPath),
+                                    receiverId: widget.receiver,
+                                    senderId: widget.sender,
+                                    videoUploadProvider: _videoUploadProvider);
+                                Navigator.pop(context);
                               });
                             },
                       child: Row(
                         children: [
                           Text("Send"),
-                          Icon(Icons.send,color: Colors.green,)
-
+                          Icon(
+                            Icons.send,
+                            color: Colors.green,
+                          )
                         ],
                       ),
                     ),

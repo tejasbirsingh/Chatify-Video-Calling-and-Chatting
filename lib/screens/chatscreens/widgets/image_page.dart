@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/utils/utilities.dart';
@@ -62,14 +64,14 @@ class _ImagePageState extends State<ImagePage> {
 
   @override
   Widget build(BuildContext context) {
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+      child: Scaffold(     
         appBar: AppBar(
           iconTheme: Theme.of(context).iconTheme,
           actions: [
             IconButton(
-              icon: Icon(Icons.download_rounded),
+              icon: Icon(Icons.download_sharp),
               onPressed: () async {
                 downloadFile();
                 setState(() {
@@ -86,9 +88,20 @@ class _ImagePageState extends State<ImagePage> {
         body: Stack(
           children: [
             Container(
-                color: Theme.of(context).backgroundColor,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    userProvider.getUser.firstColor != null
+                        ? Color(userProvider.getUser.firstColor ??
+                            Colors.white.value)
+                        : Theme.of(context).backgroundColor,
+                    userProvider.getUser.secondColor != null
+                        ? Color(userProvider.getUser.secondColor ??
+                            Colors.white.value)
+                        : Theme.of(context).scaffoldBackgroundColor,
+                  ]),
+                ),
                 padding: EdgeInsets.symmetric(vertical: 20.0),
-                height: MediaQuery.of(context).size.height * 0.8,
+                height: MediaQuery.of(context).size.height ,
                 width: MediaQuery.of(context).size.width,
                 child: CarouselSlider(
                   options: CarouselOptions(
@@ -98,9 +111,9 @@ class _ImagePageState extends State<ImagePage> {
                         });
                       },
                       enlargeCenterPage: true,
-                      height: MediaQuery.of(context).size.height,
+                      height: MediaQuery.of(context).size.height,                      
                       enableInfiniteScroll: false,
-                      viewportFraction: 0.8,
+                      viewportFraction: 0.95,
                       enlargeStrategy: CenterPageEnlargeStrategy.scale,
                       initialPage: initialPage),
                   items: widget.imageUrlList
@@ -137,43 +150,7 @@ class _ImagePageState extends State<ImagePage> {
                 : Text(""),
           ],
         ),
-        // body: Stack(
-        //   children: [
-        //     Container(
-        //         child: Hero(
-        //       tag: widget.imageUrl,
-        //       child: PhotoView(
-        //         imageProvider: NetworkImage(
-        //           widget.imageUrl,
-        //         ),
 
-        //         //enableRotation: true,
-        //       ),
-        //     )),
-        // _isDownloading
-        //     ? Center(
-        //         child: Column(
-        //         children: [
-        //           Text(
-        //             downloadedMessage ?? '',
-        //             style: TextStyle(color: Colors.white, fontSize: 20.0),
-        //           ),
-        //           SizedBox(
-        //             height: 10,
-        //           ),
-        //           Padding(
-        //             padding: EdgeInsets.symmetric(
-        //                 horizontal: MediaQuery.of(context).size.width * 0.2),
-        //             child: LinearProgressIndicator(
-        //               value: _percentage,
-        //               backgroundColor: Colors.green,
-        //             ),
-        //           ),
-        //         ],
-        //       ))
-        //     : Text(""),
-        //   ],
-        // ),
       ),
     );
   }

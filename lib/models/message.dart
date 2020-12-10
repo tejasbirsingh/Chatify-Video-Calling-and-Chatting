@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:skype_clone/encryption/encryptText.dart';
 
 class Message {
@@ -7,6 +8,9 @@ class Message {
   String type;
   String message;
   bool isRead;
+  bool isLocation;
+  GeoPoint position;
+
 
   Timestamp timestamp;
   String photoUrl;
@@ -21,6 +25,8 @@ class Message {
     this.message,
     this.timestamp,
     this.isRead,
+    this.isLocation,
+    this.position
   });
 
   Message.imageMessage({
@@ -73,6 +79,8 @@ class Message {
     map['message'] = encryptedText;
     map['timestamp'] = this.timestamp;
     map['isRead'] = this.isRead;
+    map["isLocation"] = this.isLocation;
+    map["position"] = this.position;
     return map;
   }
 
@@ -145,5 +153,7 @@ class Message {
     this.audioUrl = map['audioUrl'];
     this.fileUrl = map['fileUrl'];
     this.isRead = map['isRead'];
+    this.isLocation=map["isLocation"];
+    this.position =map["position"];
   }
 }

@@ -51,8 +51,7 @@ class ViewLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final UserProvider user =
-        Provider.of<UserProvider>(context, listen: true);
+    final UserProvider user = Provider.of<UserProvider>(context, listen: true);
     return friendCustomTile(
       mini: false,
       onLongPress: () {
@@ -66,14 +65,23 @@ class ViewLayout extends StatelessWidget {
             ),
           )),
       title: Text(
-        (friendViewLayout != null ? friendViewLayout.name : null) != null
-            ? friendViewLayout.name
-            : "..",
-            style: GoogleFonts.patuaOne(textStyle : Theme.of(context).textTheme.headline1,   )     // style:
-            // TextStyle(color: Colors.white, fontFamily: "Arial", fontSize: 19),
+          (friendViewLayout != null ? friendViewLayout.name : null) != null
+              ? friendViewLayout.name
+              : "..",
+          style: GoogleFonts.patuaOne(
+            textStyle: Theme.of(context).textTheme.headline1,
+          ) // style:
+
+          ),
+      trailing: IconButton(
+        icon: Icon(
+          Icons.remove_circle,
+          color: Colors.red,
+        ),
+        onPressed: () {
+          _authMethods.removeFriend(user.getUser.uid, friendViewLayout.uid);
+        },
       ),
-      trailing: IconButton(icon: Icon(Icons.info,color: Colors.green,),
-      onPressed: (){},),
       leading: Container(
         constraints: BoxConstraints(maxHeight: 70, maxWidth: 70),
         child: Stack(

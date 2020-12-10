@@ -7,7 +7,7 @@ class UniversalVariables {
   static final Color greyColor = Color(0xff8f8f8f);
   static final Color userCircleBackground = Color(0xff2b2b33);
   static final Color onlineDotColor = Color(0xff46dc64);
-  static final Color lightBlueColor = Color(0xff0077d7);
+  static final Color lightBlueColor = Colors.lightBlue;
   static final Color separatorColor = Color(0xff272c35);
 
   static final Color gradientColorStart = Color(0xff00b6f3);

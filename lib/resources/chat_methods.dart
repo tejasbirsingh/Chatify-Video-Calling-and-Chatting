@@ -84,6 +84,70 @@ class ChatMethods {
     }
   }
 
+  DocumentReference getBlockedDocument({String of, String forContact}) =>
+      _userCollection.doc(of).collection(BLOCKED_CONTACTS).doc(forContact);
+
+  addToBlockedList({String senderId, String receiverId}) async {
+    Timestamp currentTime = Timestamp.now();
+
+    await addToSenderBlockedList(senderId, receiverId, currentTime);
+  }
+
+  Future<void> addToSenderBlockedList(
+    String senderId,
+    String receiverId,
+    currentTime,
+  ) async {
+    DocumentSnapshot senderSnapshot =
+        await getBlockedDocument(of: senderId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      Contact receiverContact = Contact(
+        uid: receiverId,
+        addedOn: currentTime,
+      );
+
+      var receiverMap = receiverContact.toMap(receiverContact);
+
+      await getBlockedDocument(of: senderId, forContact: receiverId)
+          .set(receiverMap);
+    } else {
+      await getBlockedDocument(of: senderId, forContact: receiverId).delete();
+    }
+  }
+
+  DocumentReference getMutedDocument({String of, String forContact}) =>
+      _userCollection.doc(of).collection(MUTED_CONTACTS).doc(forContact);
+
+  addToMutedList({String senderId, String receiverId}) async {
+    Timestamp currentTime = Timestamp.now();
+
+    await addToSenderMutedList(senderId, receiverId, currentTime);
+  }
+
+  Future<void> addToSenderMutedList(
+    String senderId,
+    String receiverId,
+    currentTime,
+  ) async {
+    DocumentSnapshot senderSnapshot =
+        await getMutedDocument(of: senderId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      Contact receiverContact = Contact(
+        uid: receiverId,
+        addedOn: currentTime,
+      );
+
+      var receiverMap = receiverContact.toMap(receiverContact);
+
+      await getMutedDocument(of: senderId, forContact: receiverId)
+          .set(receiverMap);
+    } else {
+      await getMutedDocument(of: senderId, forContact: receiverId).delete();
+    }
+  }
+
   void setImageMsg(String url, String receiverId, String senderId) async {
     Message message;
 
@@ -191,6 +255,31 @@ class ChatMethods {
   Stream<QuerySnapshot> fetchContacts({String userId}) =>
       _userCollection.doc(userId).collection(CONTACTS_COLLECTION).snapshots();
 
+  Stream<QuerySnapshot> fetchBlockedUsers({String userId}) =>
+      _userCollection.doc(userId).collection(BLOCKED_CONTACTS).snapshots();
+
+  Future<bool> isBlocked(String userId, String receiverId) async {
+    DocumentSnapshot senderSnapshot =
+        await getBlockedDocument(of: userId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> isMuted(String userId, String receiverId) async {
+    DocumentSnapshot senderSnapshot =
+        await getMutedDocument(of: userId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   Stream<QuerySnapshot> fetchLastMessageBetween({
     @required String senderId,
     @required String receiverId,
@@ -205,14 +294,14 @@ class ChatMethods {
     @required String senderId,
     @required String receiverId,
   }) async {
-    var c=0;
+    var c = 0;
     await _messageCollection
         .doc(receiverId)
         .collection(senderId)
         .where('isRead', isEqualTo: false)
         .get()
         .then((documentSnapshot) {
-      c =  documentSnapshot.docs.length;
+      c = documentSnapshot.docs.length;
     });
     return c;
   }

@@ -13,23 +13,23 @@ class LogScreen extends StatelessWidget {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
     return PickupLayout(
       scaffold: Scaffold(
-        // backgroundColor: Theme.of(context).backgroundColor,
         appBar: SkypeAppBar(
-           leading: Text(""),
+          leading: Text(""),
           title: "Calls",
           actions: <Widget>[],
         ),
         body: Container(
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [
-          // Theme.of(context).backgroundColor,
-          // Theme.of(context).scaffoldBackgroundColor
-            userProvider.getUser.firstColor != null
-              ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-              : Theme.of(context).backgroundColor,
-          userProvider.getUser.secondColor != null
-              ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
-              : Theme.of(context).scaffoldBackgroundColor,
-        ]),),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              userProvider.getUser.firstColor != null
+                  ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+                  : Theme.of(context).backgroundColor,
+              userProvider.getUser.secondColor != null
+                  ? Color(
+                      userProvider.getUser.secondColor ?? Colors.white.value)
+                  : Theme.of(context).scaffoldBackgroundColor,
+            ]),
+          ),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             child: LogListContainer(),
