@@ -31,60 +31,62 @@ class _fileViewPageState extends State<fileViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      
-         appBar: AppBar(
-          backgroundColor: Theme.of(context).backgroundColor,
-          iconTheme: Theme.of(context).iconTheme,
-          title: Text('Pdf Document'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
+    return SafeArea(
+          child: Scaffold(
+        
+           appBar: AppBar(
+            backgroundColor: Theme.of(context).appBarTheme.color,
+            iconTheme: Theme.of(context).iconTheme,
+            title: Text('Pdf Document'),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
 
+          ),
+          body: Center(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : PDFViewer(
+                    document: document,
+                    zoomSteps: 1,
+                  
+                    lazyLoad: false,
+                       navigationBuilder:
+                        (context, page, totalPages, jumpToPage, animateToPage) {
+                      return ButtonBar(
+                        alignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.first_page),
+                            onPressed: () {
+                              jumpToPage(page: 0);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.arrow_back),
+                            onPressed: () {
+                              animateToPage(page: page - 2);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.arrow_forward),
+                            onPressed: () {
+                              animateToPage(page: page);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.last_page),
+                            onPressed: () {
+                              jumpToPage(page: totalPages - 1);
+                            },
+                          ),
+                        ],
+                      );
+                    }, 
+                  ),
+          ),
         ),
-        body: Center(
-          child: _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : PDFViewer(
-                  document: document,
-                  zoomSteps: 1,
-                
-                  lazyLoad: false,
-                     navigationBuilder:
-                      (context, page, totalPages, jumpToPage, animateToPage) {
-                    return ButtonBar(
-                      alignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(Icons.first_page),
-                          onPressed: () {
-                            jumpToPage(page: 0);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          onPressed: () {
-                            animateToPage(page: page - 2);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_forward),
-                          onPressed: () {
-                            animateToPage(page: page);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.last_page),
-                          onPressed: () {
-                            jumpToPage(page: totalPages - 1);
-                          },
-                        ),
-                      ],
-                    );
-                  }, 
-                ),
-        ),
-      );
+    );
   }
 }

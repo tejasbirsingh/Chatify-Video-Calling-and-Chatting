@@ -10,13 +10,12 @@ class Message {
   bool isRead;
   bool isLocation;
   GeoPoint position;
-
-
   Timestamp timestamp;
   String photoUrl;
   String videoUrl;
   String audioUrl;
   String fileUrl;
+  Message replyMessage;
 
   Message({
     this.senderId,
@@ -26,7 +25,8 @@ class Message {
     this.timestamp,
     this.isRead,
     this.isLocation,
-    this.position
+    this.position,
+    this.replyMessage
   });
 
   Message.imageMessage({
@@ -37,6 +37,7 @@ class Message {
     this.timestamp,
     this.photoUrl,
      this.isRead,
+
   });
 
   Message.videoMessage({
@@ -81,6 +82,7 @@ class Message {
     map['isRead'] = this.isRead;
     map["isLocation"] = this.isLocation;
     map["position"] = this.position;
+    map["reply"] = this.replyMessage ==null ? null : this.replyMessage.toMap();
     return map;
   }
 
@@ -155,5 +157,6 @@ class Message {
     this.isRead = map['isRead'];
     this.isLocation=map["isLocation"];
     this.position =map["position"];
+    this.replyMessage=map["reply"]==null ? null : Message.fromMap(map['reply']);
   }
 }

@@ -74,7 +74,7 @@ class AuthMethods {
     return docs.length == 0 ? true : false;
   }
 
-  Future<void> addDataToDb(User currentUser,String token) async {
+  Future<void> addDataToDb(User currentUser, String token) async {
     String username = Utils.getUsername(currentUser.email);
 
     UserData user = UserData(
@@ -82,10 +82,11 @@ class AuthMethods {
         email: currentUser.email,
         name: currentUser.displayName,
         profilePhoto: currentUser.photoURL,
-        firebaseToken:token,
+        firebaseToken: token,
         username: username,
         firstColor: null,
-        secondColor: null
+        secondColor: null,
+        
         );
 
     firestore
@@ -107,15 +108,15 @@ class AuthMethods {
     return userList;
   }
 
-  Future<List<String>> fetchAllFriends(User curruser) async{
-   
+  Future<List<String>> fetchAllFriends(User curruser) async {
     List<String> userList = List<String>();
-    QuerySnapshot querySnapshot = await  _userCollection.doc(curruser.uid).collection("following").get();
+    QuerySnapshot querySnapshot =
+        await _userCollection.doc(curruser.uid).collection("following").get();
 
-    for(var i=0;i<querySnapshot.docs.length;i++){     
-        userList.add(querySnapshot.docs[i].data()['contact_id']);      
+    for (var i = 0; i < querySnapshot.docs.length; i++) {
+      userList.add(querySnapshot.docs[i].data()['contact_id']);
     }
-    
+
     return userList;
   }
 
@@ -141,22 +142,23 @@ class AuthMethods {
   Stream<DocumentSnapshot> getUserStream({@required String uid}) =>
       _userCollection.doc(uid).snapshots();
 
-
   Stream<QuerySnapshot> getFriends({String uid}) =>
       _userCollection.doc(uid).collection("following").snapshots();
 
-  Future<void> addFriend(String currUserId, String followingUserId) async {
+  Stream<QuerySnapshot> getFriendsStatus({String uid}) =>
+      _userCollection.doc(uid).collection("following").snapshots();
 
-    Contact follower =Contact(uid:followingUserId,addedOn: Timestamp.now());
-    var senderMap =follower.toMap(follower);
+  Future<void> addFriend(String currUserId, String followingUserId) async {
+    Contact follower = Contact(uid: followingUserId, addedOn: Timestamp.now());
+    var senderMap = follower.toMap(follower);
     await _userCollection
         .doc(currUserId)
         .collection('following')
         .doc(followingUserId)
         .set(senderMap);
 
-    Contact following=Contact(uid:currUserId,addedOn: Timestamp.now());
-  var receiverMap = following.toMap(following);
+    Contact following = Contact(uid: currUserId, addedOn: Timestamp.now());
+    var receiverMap = following.toMap(following);
     return _userCollection
         .doc(followingUserId)
         .collection("followers")
@@ -177,5 +179,4 @@ class AuthMethods {
         .doc(currUserId)
         .delete();
   }
-
 }

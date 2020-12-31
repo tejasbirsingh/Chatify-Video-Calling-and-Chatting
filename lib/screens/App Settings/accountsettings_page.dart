@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image/image.dart' as Im;
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,6 +19,9 @@ import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/resources/update_methods.dart';
+import 'package:skype_clone/screens/login_screen.dart';
+import 'package:skype_clone/screens/status_view/allStatusPage.dart';
+import 'package:skype_clone/screens/status_view/status_screen.dart';
 import 'package:skype_clone/utils/utilities.dart';
 
 class accountsSettingPage extends StatefulWidget {
@@ -47,7 +52,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
             leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () => Navigator.pop(context)),
-      centerTitle: false,
+            centerTitle: false,
             title: Text('Account',
                 style: GoogleFonts.oswald(
                     textStyle: Theme.of(context).textTheme.headline1,
@@ -309,6 +314,24 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                         subtitle: Text(email,
                             style: Theme.of(context).textTheme.headline1),
                       ),
+                      // InkWell(
+                      //   onTap: deleteAccountDialog(context),
+                      //   child: ListTile(
+                      //     leading: Icon(
+                      //       CupertinoIcons.delete,
+                      //       color: Colors.red,
+                      //     ),
+                      //     title: Text(
+                      //       "Delete Account",
+                      //       style: GoogleFonts.patuaOne(
+                      //           letterSpacing: 1.0,
+                      //           fontWeight: FontWeight.bold,
+                      //           fontSize: 18.0,
+                      //           textStyle:
+                      //               Theme.of(context).textTheme.bodyText1),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 );
@@ -319,6 +342,50 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
             }),
       ),
     );
+  }
+
+  deleteAccountDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
+            backgroundColor: Theme.of(context).cardColor,
+            title: Text(
+              "Delete this message ?",
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+            actions: [
+              TextButton(
+                child:
+                    Text('Yes', style: Theme.of(context).textTheme.bodyText1),
+                onPressed: () async {
+                  final FirebaseMessaging _firebaseMessaging =
+                      FirebaseMessaging();
+                  String token;
+                  User user = FirebaseAuth.instance.currentUser;
+                  user.delete();
+                  await _firebaseMessaging.getToken().then((deviceToken) {
+                    setState(() {
+                      token = deviceToken.toString();
+                    });
+                  });
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => LoginScreen(
+                                token: token,
+                              )));
+                },
+              ),
+              TextButton(
+                child: Text('No', style: Theme.of(context).textTheme.bodyText1),
+                onPressed: () => Navigator.pop(context),
+              )
+            ],
+          );
+        });
   }
 
   Future<AlertDialog> _showImageDialog(BuildContext context, UserData user) {

@@ -63,6 +63,7 @@ import 'package:skype_clone/utils/universal_variables.dart';
 import 'package:skype_clone/utils/utilities.dart';
 import 'package:skype_clone/widgets/appbar.dart';
 import 'package:skype_clone/widgets/gradient_icon.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 import 'package:video_player/video_player.dart';
 import 'package:video_trimmer/video_trimmer.dart';
@@ -80,6 +81,7 @@ class _ChatScreenState extends State<ChatScreen>
     with SingleTickerProviderStateMixin {
   String fileName;
   bool moreMenu = false;
+  Message replyMessage;
   AnimationController animationController;
   Animation<double> animation;
   bool isCir = false;
@@ -429,14 +431,15 @@ class _ChatScreenState extends State<ChatScreen>
 
                   GeoPoint x = GeoPoint(position.latitude, position.longitude);
                   Message _message = Message(
-                      receiverId: widget.receiver.uid,
-                      senderId: sender.uid,
-                      message: "location",
-                      position: x,
-                      timestamp: Timestamp.now(),
-                      type: 'location',
-                      isRead: false,
-                      isLocation: true);
+                    receiverId: widget.receiver.uid,
+                    senderId: sender.uid,
+                    message: "location",
+                    position: x,
+                    timestamp: Timestamp.now(),
+                    type: 'location',
+                    isRead: false,
+                    isLocation: true,
+                  );
 
                   setState(() {
                     isWriting = false;
@@ -691,10 +694,74 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   getMessage(Message message) {
-    return Text(
+    bool lineColor = message.senderId == _currentUserId;
+    final replyMessage = message.replyMessage;
+    final isReplying = replyMessage != null;
+    final messageWidget = Text(
       message.message,
       style: TextStyle(color: Colors.white, fontSize: 16.0),
     );
+    if (message.replyMessage == null) {
+      return messageWidget;
+    } else {
+      return Column(
+        crossAxisAlignment:
+            isReplying ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        children: [
+          !isReplying
+              ? Container()
+              : isReplying
+                  ? Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              topRight: Radius.circular(10.0))),
+                      child: IntrinsicHeight(
+                          child: Row(
+                        children: [
+                          Container(
+                            color: lineColor ? Colors.blue : Colors.green,
+                            width: 4,
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      widget.receiver.name,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 8.0,
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                replyMessage.message,
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ))
+                        ],
+                      )),
+                    )
+                  : Container(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: messageWidget,
+          )
+        ],
+      );
+    }
   }
 
   formatTime(DateTime time) {
@@ -921,11 +988,13 @@ class _ChatScreenState extends State<ChatScreen>
                     ),
               child: Padding(
                 padding: EdgeInsets.all(10),
-                child: Stack(
-                  children: [
-                    getMessage(message),
-                  ],
-                ),
+                child: SwipeTo(
+                    iconColor: Colors.white,
+                    onRightSwipe: () {
+                      replyToMessage(message);
+                      textFieldFocus.requestFocus();
+                    },
+                    child: getMessage(message)),
               ),
             ),
             SizedBox(
@@ -1122,7 +1191,13 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
           child: Padding(
             padding: EdgeInsets.all(10),
-            child: getMessage(message),
+            child: SwipeTo(
+                iconColor: Colors.white,
+                onRightSwipe: () {
+                  replyToMessage(message);
+                  textFieldFocus.requestFocus();
+                },
+                child: getMessage(message)),
           ),
         ),
         SizedBox(
@@ -1142,14 +1217,16 @@ class _ChatScreenState extends State<ChatScreen>
 
     sendMessage(context) async {
       var text = textFieldController.text;
+      textFieldFocus.unfocus();
+
       Message _message = Message(
-        receiverId: widget.receiver.uid,
-        senderId: sender.uid,
-        message: text,
-        timestamp: Timestamp.now(),
-        type: 'text',
-        isRead: false,
-      );
+          receiverId: widget.receiver.uid,
+          senderId: sender.uid,
+          message: text,
+          timestamp: Timestamp.now(),
+          type: 'text',
+          isRead: false,
+          replyMessage: replyMessage);
 
       setState(() {
         isWriting = false;
@@ -1172,6 +1249,7 @@ class _ChatScreenState extends State<ChatScreen>
       } else {
         blockedDialog(context);
       }
+      cancelReply();
     }
 
     return Container(
@@ -1203,63 +1281,68 @@ class _ChatScreenState extends State<ChatScreen>
             width: 5,
           ),
           Expanded(
-            child: Stack(
-              alignment: Alignment.centerRight,
+            child: Column(
               children: [
-                TextField(
-                  controller: textFieldController,
-                  focusNode: textFieldFocus,
-                  maxLines: 4,
-                  minLines: 1,
-                  textInputAction: TextInputAction.newline,
-                  // scrollPadding: EdgeInsets.all(3),
-                  onTap: () => hideEmojiContainer(),
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  onChanged: (val) {
-                    (val.length > 0 && val.trim() != "")
-                        ? setWritingTo(true)
-                        : setWritingTo(false);
-                  },
-                  decoration: InputDecoration(
-                      hintText: "Type a message",
-                      hintStyle: Theme.of(context).textTheme.bodyText2,
-                      border: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                            const Radius.circular(50.0),
-                          ),
-                          borderSide: BorderSide.none),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      filled: true,
-                      fillColor: Theme.of(context).dividerColor),
-                ),
-                IconButton(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onPressed: () async {
-                    bool isBlocked = await _chatMethods.isBlocked(
-                        widget.receiver.uid, _currentUserId);
-                    if (isBlocked) {
-                      if (!showEmojiPicker) {
-                        // keyboard is visible
-                        hideKeyboard();
-                        showEmojiContainer();
-                      } else {
-                        //keyboard is hidden
-                        showKeyboard();
-                        hideEmojiContainer();
-                      }
-                    } else {
-                      blockedDialog(context);
-                    }
-                  },
-                  icon: Icon(
-                    Icons.emoji_emotions_sharp,
-                    size: 30.0,
-                    color: Colors.yellow,
-                  ),
+                replyMessage != null ? replyMessageWidget() : Container(),
+                Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    TextField(
+                      controller: textFieldController,
+                      focusNode: textFieldFocus,
+                      maxLines: 4,
+                      minLines: 1,
+                      textInputAction: TextInputAction.newline,
+                      // scrollPadding: EdgeInsets.all(3),
+                      onTap: () => hideEmojiContainer(),
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                      onChanged: (val) {
+                        (val.length > 0 && val.trim() != "")
+                            ? setWritingTo(true)
+                            : setWritingTo(false);
+                      },
+                      decoration: InputDecoration(
+                          hintText: "Type a message",
+                          hintStyle: Theme.of(context).textTheme.bodyText2,
+                          border: OutlineInputBorder(
+                              borderRadius: const BorderRadius.all(
+                                const Radius.circular(50.0),
+                              ),
+                              borderSide: BorderSide.none),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          filled: true,
+                          fillColor: Theme.of(context).dividerColor),
+                    ),
+                    IconButton(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onPressed: () async {
+                        bool isBlocked = await _chatMethods.isBlocked(
+                            widget.receiver.uid, _currentUserId);
+                        if (isBlocked) {
+                          if (!showEmojiPicker) {
+                            // keyboard is visible
+                            hideKeyboard();
+                            showEmojiContainer();
+                          } else {
+                            //keyboard is hidden
+                            showKeyboard();
+                            hideEmojiContainer();
+                          }
+                        } else {
+                          blockedDialog(context);
+                        }
+                      },
+                      icon: Icon(
+                        Icons.emoji_emotions_sharp,
+                        size: 30.0,
+                        color: Colors.yellow,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -1329,12 +1412,12 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Future pickFile() async {
-    File path = await FilePicker.getFile(
-        type: FileType.custom, allowedExtensions: ['pdf']);
+    FilePickerResult path = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
 
     if (path != null) {
       _storageMethods.uploadFile(
-          file: path,
+          file: File(path.paths[0]),
           receiverId: widget.receiver.uid,
           senderId: _currentUserId,
           fileUploadProvider: _fileUploadProvider);
@@ -1385,7 +1468,7 @@ class _ChatScreenState extends State<ChatScreen>
           androidUiSettings: AndroidUiSettings(
             toolbarColor: Theme.of(context).backgroundColor,
             toolbarTitle: "Edit Image",
-            statusBarColor: Theme.of(context).backgroundColor,
+            // statusBarColor: Theme.of(context).backgroundColor,
             backgroundColor: Colors.black,
             activeControlsWidgetColor: Colors.teal,
             toolbarWidgetColor: Theme.of(context).iconTheme.color,
@@ -1448,6 +1531,7 @@ class _ChatScreenState extends State<ChatScreen>
 
   CustomAppBar optionsAppBar(context) {
     return CustomAppBar(
+      isLeadingWidth: false,
       leading: IconButton(
         icon: Icon(
           Icons.cancel_outlined,
@@ -1483,7 +1567,7 @@ class _ChatScreenState extends State<ChatScreen>
           },
         ),
         IconButton(
-          icon: Icon(Icons.delete, color: Theme.of(context).iconTheme.color),
+          icon: Icon(Icons.delete, color: Colors.red),
           onPressed: () {
             deleteDialog(context, messageId);
             setState(() {
@@ -1582,10 +1666,16 @@ class _ChatScreenState extends State<ChatScreen>
             }),
         SizedBox(width: 2),
         PopupMenuButton(
-          padding: EdgeInsets.all(4.0),
-          color: Theme.of(context).canvasColor,
-          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            icon: Icon(Icons.menu),
+            padding: EdgeInsets.all(4.0),
+            color: Theme.of(context).canvasColor,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
+            child: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).iconTheme.color,
+              size: 30.0,
+            ),
+            // child: Icon(Icons.menu),
             itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 1,
@@ -1600,9 +1690,9 @@ class _ChatScreenState extends State<ChatScreen>
                               receiverId: widget.receiver.uid);
                         },
                         child: Text(
-                            snapshot.data == true ? 'Block' : 'Unblock',
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
+                          snapshot.data == true ? 'Block' : 'Unblock',
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
                       ),
                     ),
                   ),
@@ -1617,17 +1707,75 @@ class _ChatScreenState extends State<ChatScreen>
                           _chatMethods.addToMutedList(
                               senderId: _currentUserId,
                               receiverId: widget.receiver.uid);
-                             
                         },
-                        child:  Text(
-                            snapshot.data == false ? 'Mute' : 'Unmute',
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
+                        child: Text(
+                          snapshot.data == false ? 'Mute' : 'Unmute',
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
                       ),
                     ),
                   )
                 ])
       ],
+    );
+  }
+
+  void replyToMessage(Message message) {
+    setState(() {
+      replyMessage = message;
+    });
+  }
+
+  void cancelReply() {
+    setState(() {
+      replyMessage = null;
+    });
+  }
+
+  replyMessageWidget() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.2),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0))),
+      child: IntrinsicHeight(
+          child: Row(
+        children: [
+          Container(
+            color: Colors.green,
+            width: 4,
+          ),
+          SizedBox(width: 8),
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.receiver.name,
+                      style: TextStyle(color:Colors.white,fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  GestureDetector(
+                    child: Icon(Icons.close, color:Colors.red,size: 16.0),
+                    onTap: cancelReply,
+                  ),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                ],
+              ),
+              Text(
+                replyMessage.message,
+                style: TextStyle(color: Colors.white),
+              )
+            ],
+          ))
+        ],
+      )),
     );
   }
 }

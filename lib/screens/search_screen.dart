@@ -147,118 +147,11 @@ class _SearchScreenState extends State<SearchScreen> {
         Provider.of<UserProvider>(context, listen: true);
 
     return PickupLayout(
-      scaffold: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  userProvider.getUser.firstColor != null
-                      ? Color(
-                          userProvider.getUser.firstColor ?? Colors.white.value)
-                      : Theme.of(context).backgroundColor,
-                  userProvider.getUser.secondColor != null
-                      ? Color(userProvider.getUser.secondColor ??
-                          Colors.white.value)
-                      : Theme.of(context).scaffoldBackgroundColor,
-                ]),
-              ),
-            ),
-            Positioned(
-              top: -10.0,
-              right: -30.0,
-              child: Container(
-                height: 160.0,
-                width: 160.0,
-                decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(80.0)),
-              ),
-            ),
-                 Positioned(
-              top: -20.0,
-              left: -20.0,
-              child: Container(
-                height: 200.0,
-                width: 200.0,
-                decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(80.0)),
-              ),
-            ),
-            Positioned(
-              child: Container(
-                  child: Center(
-                      child: Text(
-                'Search',
-                style:  GoogleFonts.oswald(
-                  textStyle: Theme.of(context).textTheme.headline1,
-                  fontSize: 34.0),
-              ))),
-              top: 10.0,
-              left: MediaQuery.of(context).size.width * 0.3,
-              right: MediaQuery.of(context).size.width * 0.3,
-            ),
-            Padding(
-                padding: EdgeInsets.only(
-                  left: MediaQuery.of(context).size.width * 0.06,
-                  right: MediaQuery.of(context).size.width * 0.06,
-                  top: MediaQuery.of(context).size.height * 0.1,
-                ),
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 400),
-                  height: 60.0,
-                  width: _folded ? 56 : MediaQuery.of(context).size.width,
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (val) {
-                      setState(() {
-                        query = val;
-                      });
-                    },
-                    cursorColor: UniversalVariables.blackColor,
-                    autofocus: true,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 35,
-                    ),
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.black,
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.close, color: Colors.black),
-                        onPressed: () {
-                          WidgetsBinding.instance.addPostFrameCallback(
-                              (_) => searchController.clear());
-                        },
-                      ),
-                      border: InputBorder.none,
-                      hintText: "Search",
-                      hintStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade400,
-                          blurRadius: 20.0,
-                          spreadRadius: 4.0,
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(20.0)),
-                )),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.22),
-              child: Container(
+      scaffold: SafeArea(
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
                     userProvider.getUser.firstColor != null
@@ -271,11 +164,128 @@ class _SearchScreenState extends State<SearchScreen> {
                         : Theme.of(context).scaffoldBackgroundColor,
                   ]),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
-                child: buildSuggestions(query, userProvider.getUser),
               ),
-            ),
-          ],
+              Positioned(
+                top: -10.0,
+                right: -30.0,
+                child: Container(
+                  height: 160.0,
+                  width: 160.0,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(80.0)),
+                ),
+              ),
+              Positioned(
+                top: -20.0,
+                left: -20.0,
+                child: Container(
+                  height: 200.0,
+                  width: 200.0,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(80.0)),
+                ),
+              ),
+              Positioned(
+                top: 10.0,
+                left: 20.0,
+                  child: IconButton(
+                      
+                icon: Icon(Icons.arrow_back,size: 30.0,),
+                onPressed: () => Navigator.of(context).pop(),
+              )),
+              Positioned(
+                child: Container(
+                    child: Center(
+                        child: Text(
+                  'Search',
+                  style: GoogleFonts.oswald(
+                      textStyle: Theme.of(context).textTheme.headline1,
+                      fontSize: 34.0),
+                ))),
+                top: 10.0,
+                left: MediaQuery.of(context).size.width * 0.3,
+                right: MediaQuery.of(context).size.width * 0.3,
+              ),
+              Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.06,
+                    right: MediaQuery.of(context).size.width * 0.06,
+                    top: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 400),
+                    height: 60.0,
+                    width: _folded ? 56 : MediaQuery.of(context).size.width,
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (val) {
+                        setState(() {
+                          query = val;
+                        });
+                      },
+                      cursorColor: UniversalVariables.blackColor,
+                      autofocus: true,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 35,
+                      ),
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.black,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.close, color: Colors.black),
+                          onPressed: () {
+                            WidgetsBinding.instance.addPostFrameCallback(
+                                (_) => searchController.clear());
+                          },
+                        ),
+                        border: InputBorder.none,
+                        hintText: "Search",
+                        hintStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade400,
+                            blurRadius: 20.0,
+                            spreadRadius: 4.0,
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(20.0)),
+                  )),
+              Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.22),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      userProvider.getUser.firstColor != null
+                          ? Color(userProvider.getUser.firstColor ??
+                              Colors.white.value)
+                          : Theme.of(context).backgroundColor,
+                      userProvider.getUser.secondColor != null
+                          ? Color(userProvider.getUser.secondColor ??
+                              Colors.white.value)
+                          : Theme.of(context).scaffoldBackgroundColor,
+                    ]),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
+                  child: buildSuggestions(query, userProvider.getUser),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -15,6 +15,7 @@ import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
 import 'package:skype_clone/screens/pageviews/friends/contacts_page.dart';
 import 'package:skype_clone/screens/pageviews/logs/log_screen.dart';
 import 'package:skype_clone/screens/search_screen.dart';
+import 'package:skype_clone/screens/status_view/allStatusPage.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -112,11 +113,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return PickupLayout(
       scaffold: SafeArea(
         child: Scaffold(
+          floatingActionButton: Container(
+            height: 60.0,
+            width: 60.0,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(60.0),
+                gradient: LinearGradient(
+                    colors: [Colors.green.shade400, Colors.teal.shade700])),
+            child: IconButton(
+              icon: Icon(
+                Icons.search,
+                size: 30.0,
+                color: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SearchScreen())),
+            ),
+          ),
           backgroundColor: Theme.of(context).backgroundColor,
           body: PageView(
             children: <Widget>[
               ChatListScreen(),
-              SearchScreen(),
+              // SearchScreen(),
+              allStatusPage(),
               Center(child: contactsPage()),
               LogScreen(),
             ],

@@ -8,8 +8,10 @@ final List<BarItem> barItems = [
       iconData: FontAwesomeIcons.comment,
       color: Colors.indigo,
     ),
-    BarItem(text: "Search", iconData: Icons.search, color: Colors.green),
-    BarItem(
+    // BarItem(text: "Search", iconData: Icons.search, color: Colors.green),
+      BarItem(text: "Status", iconData: Icons.add, color: Colors.green),
+    BarItem
+    (
       text: "Contacts",
       iconData: FontAwesomeIcons.userFriends, 
       color: Colors.pinkAccent,

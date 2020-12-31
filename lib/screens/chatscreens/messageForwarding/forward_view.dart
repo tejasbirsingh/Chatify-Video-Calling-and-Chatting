@@ -108,9 +108,9 @@ class ViewLayout extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyText1
         
           ),
-      trailing: Icon(Icons.reply),
+      trailing: Icon(Icons.reply, color: Colors.green,),
       leading: Container(
-        constraints: BoxConstraints(maxHeight: 70, maxWidth: 70),
+        constraints: BoxConstraints(maxHeight: 80, maxWidth: 70),
         child: Stack(
           children: <Widget>[
             OnlineDotIndicator(

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
@@ -22,18 +24,12 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
-
       // backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: [
-          Container(  decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              
-              Theme.of(context).backgroundColor,
-              Theme.of(context).scaffoldBackgroundColor
-            ]),
-          ),),
+        
           Center(
             child: loginButton(),
           ),
@@ -56,8 +52,10 @@ class LoginScreenState extends State<LoginScreen> {
         child: Text(
           "LOGIN",
           style: TextStyle(
-            color: Theme.of(context).textTheme.bodyText1.color,
-              fontSize: 35, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+              color: Theme.of(context).textTheme.bodyText1.color,
+              fontSize: 35,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2),
         ),
         onPressed: () => performLogin(),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -66,7 +64,6 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   void performLogin() async {
-  
     setState(() {
       isLoginPressed = true;
     });
@@ -74,19 +71,19 @@ class LoginScreenState extends State<LoginScreen> {
     UserCredential user = await _authMethods.signIn();
 
     if (user != null) {
-      authenticateUser(user,widget.token);
+      authenticateUser(user, widget.token);
     }
     setState(() {
       isLoginPressed = false;
     });
   }
+
   setAppLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLocked', false);
-    
   }
 
-  void authenticateUser(UserCredential user,String token) {
+  void authenticateUser(UserCredential user, String token) {
     _authMethods.authenticateUser(user).then((isNewUser) {
       setState(() {
         isLoginPressed = false;
@@ -94,22 +91,19 @@ class LoginScreenState extends State<LoginScreen> {
 
       if (isNewUser) {
         setAppLocker();
-        _authMethods.addDataToDb(user.user,token).then((value) {
+        _authMethods.addDataToDb(user.user, token).then((value) {
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) {
             return HomeScreen();
           }));
         });
       } else {
-          setAppLocker();
+        setAppLocker();
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
           return HomeScreen();
         }));
       }
     });
-
   }
-
- 
 }

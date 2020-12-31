@@ -62,6 +62,7 @@ class showMapState extends State<showMap> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor:  Theme.of(context).appBarTheme.color,
           title: widget.isSender ? Text("Your Location"):Text("${widget.receiver.name.split(' ')[0]}'s Location"),
         ),
         body: Container(

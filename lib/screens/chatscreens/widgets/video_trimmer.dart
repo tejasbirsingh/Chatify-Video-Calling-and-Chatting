@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
-import 'package:video_trimmer/trim_editor.dart';
+
 import 'package:video_trimmer/video_trimmer.dart';
-import 'package:video_trimmer/video_viewer.dart';
+
 import 'package:velocity_x/velocity_x.dart';
 
 class TrimmerView extends StatefulWidget {

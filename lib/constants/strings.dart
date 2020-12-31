@@ -4,6 +4,7 @@ const String CALL_COLLECTION = "call";
 const String CONTACTS_COLLECTION = "contacts";
 const String BLOCKED_CONTACTS = "blocked";
 const String MUTED_CONTACTS = "muted";
+const String STATUS = "status";
 
 const String TIMESTAMP_FIELD = "timestamp";
 const String EMAIL_FIELD = "email";

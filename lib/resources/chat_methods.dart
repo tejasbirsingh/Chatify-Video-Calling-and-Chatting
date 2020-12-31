@@ -305,4 +305,12 @@ class ChatMethods {
     });
     return c;
   }
+
+  void addStatus(String url, String senderId) async {
+ 
+    await _userCollection
+        .doc(senderId)
+        .collection(STATUS)
+        .add({'url': url, 'timestamp': Timestamp.now()});
+  }
 }

@@ -24,7 +24,7 @@
     <application
        
         android:name=".Application"
-        android:label="ChatifyFinal"
+        android:label="Chatify"
         android:icon="@mipmap/ic11_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyA07n5T8K3IGYY1WXzRVoIQpQZep43Ugac"/>

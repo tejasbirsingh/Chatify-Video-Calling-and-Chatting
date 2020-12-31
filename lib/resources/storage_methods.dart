@@ -65,6 +65,7 @@ class StorageMethods {
       return null;
     }
   }
+
   Future<String> uploadFileMessage(File file) async {
     try {
       _storageReference = FirebaseStorage.instance
@@ -110,7 +111,8 @@ class StorageMethods {
     audioUploadProvider.setToIdle();
     chatMethods.setAudioMsg(url, receiverId, senderId);
   }
-   void uploadFile({
+
+  void uploadFile({
     @required File file,
     @required String receiverId,
     @required String senderId,
@@ -135,5 +137,15 @@ class StorageMethods {
     String url = await uploadVideoToStorage(video);
     videoUploadProvider.setToIdle();
     chatMethods.setVideoMsg(url, receiverId, senderId);
+  }
+
+  void uploadStatus({
+    @required File image,
+    @required String uploader,
+  }) async {
+    final ChatMethods chatMethods = ChatMethods();
+    String url = await uploadImageToStorage(image);
+
+    chatMethods.addStatus(url, uploader);
   }
 }

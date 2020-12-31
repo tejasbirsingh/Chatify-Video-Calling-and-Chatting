@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-
 final darkTheme = ThemeData(
-
-    // backgroundColor: Colors.black87,
 
     backgroundColor: HexColor('#000000'),
     scaffoldBackgroundColor: HexColor('#000000'),

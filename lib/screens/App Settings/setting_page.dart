@@ -3,15 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:skype_clone/constants/strings.dart';
-
 import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-
+import 'package:skype_clone/screens/App%20Settings/about_page.dart';
 import 'package:skype_clone/screens/App%20Settings/accountsettings_page.dart';
 import 'package:skype_clone/screens/App%20Settings/customization_page.dart';
 import 'package:skype_clone/screens/App%20Settings/privacy_page.dart';
@@ -80,7 +75,7 @@ class _settingPageState extends State<settingPage> {
                       ),
                       child: ListTile(
                           leading: Icon(
-                            Icons.person,
+                            CupertinoIcons.person,
                             color: Colors.green,
                             size: 30.0,
                           ),
@@ -123,8 +118,7 @@ class _settingPageState extends State<settingPage> {
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => privacyPage()),
+                        MaterialPageRoute(builder: (context) => privacyPage()),
                       ),
                       child: ListTile(
                           leading: Icon(
@@ -141,6 +135,29 @@ class _settingPageState extends State<settingPage> {
                           ),
                           subtitle: Text(
                             'App Locker, Blocked Contacts',
+                            style: Theme.of(context).textTheme.bodyText2,
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios)),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => aboutPage()),
+                      ),
+                      child: ListTile(
+                          leading: Icon(
+                            Icons.info,
+                            color: Colors.red,
+                            size: 30.0,
+                          ),
+                          title: Text(
+                            'About',
+                            style: GoogleFonts.patuaOne(
+                                letterSpacing: 1.0,
+                                textStyle:
+                                    Theme.of(context).textTheme.headline1),
+                          ),
+                          subtitle: Text(
+                            'Developer, version',
                             style: Theme.of(context).textTheme.bodyText2,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
