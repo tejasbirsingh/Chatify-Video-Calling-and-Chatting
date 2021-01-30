@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Contact  {
   String uid;
   Timestamp addedOn;
+  
 
   Contact({
     this.uid,

@@ -6,12 +6,14 @@ class ControlsWidget extends StatelessWidget {
   final VoidCallback onClickedGallery;
   final VoidCallback onClickedScanText;
   final VoidCallback onClickedClear;
+  final BuildContext context;
 
   const ControlsWidget({
     @required this.onClickedCamera,
     @required this.onClickedGallery,
     @required this.onClickedScanText,
     @required this.onClickedClear,
+    @required this.context,
     Key key,
   }) : super(key: key);
 
@@ -65,7 +67,7 @@ class ControlsWidget extends StatelessWidget {
           ),
           Text(
             name,
-            style: TextStyle(color: Colors.black, fontSize: 16.0),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyText1.color, fontSize: 16.0),
           )
         ],
       ),

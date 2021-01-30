@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  advance_pdf_viewer: ^1.2.0
+  advance_pdf_viewer: ^1.2.1+2
   agora_rtc_engine: ^3.1.2
   animated_splash_screen: ^1.0.1+2
   audio_recorder: ^1.0.2
@@ -64,7 +64,7 @@ dependencies:
   intl: ^0.16.1
   local_auth: ^0.6.3+1
   path_provider: ^1.6.0
-  pdf: ^1.11.2
+  pdf: ^2.0.0
   permission_handler: ^3.0.0
   photo_view: ^0.10.1
   provider: ^4.0.3

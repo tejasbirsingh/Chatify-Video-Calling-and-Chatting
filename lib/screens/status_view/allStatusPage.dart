@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/widgets/skype_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,13 +28,14 @@ class allStatusPage extends StatefulWidget {
 class _allStatusPageState extends State<allStatusPage> {
   StorageMethods _storageMethods = StorageMethods();
   AuthMethods _authMethods = AuthMethods();
+  UserProvider userProvider;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final CollectionReference _userCollection =
       _firestore.collection(USERS_COLLECTION);
   @override
   Widget build(BuildContext context) {
-    final UserProvider userProvider = Provider.of<UserProvider>(context);
+    userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
       child: Scaffold(
         appBar: SkypeAppBar(
@@ -121,13 +123,14 @@ class _allStatusPageState extends State<allStatusPage> {
                   StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection(USERS_COLLECTION)
-                          .doc(userProvider.getUser.uid)
+                          .doc(userProvider.getUser.uid??"")
                           .collection(STATUS)
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           var docList = snapshot.data.docs;
-                          return Card(
+                        if(docList.isNotEmpty){
+                            return Card(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             color: Theme.of(context).cardColor,
@@ -161,14 +164,20 @@ class _allStatusPageState extends State<allStatusPage> {
                                           .headline1),
                                   trailing: IconButton(
                                     onPressed: () async {
+                                      UserData newUser = userProvider.getUser;
+                                      newUser.hasStatus = false;
+                                      if (docList.length == 1)
+                                        _userCollection
+                                            .doc(userProvider.getUser.uid)
+                                            .set(newUser.toMap(newUser));
                                       String url = docList[0]['url'];
                                       docList[0].reference.delete();
                                       if (url != null) {
                                         StorageReference storageReference =
                                             await FirebaseStorage.instance
                                                 .getReferenceFromUrl(url);
-                                              // print(url);
-                                           
+                                        // print(url);
+
                                         await storageReference
                                             .delete()
                                             .then((value) => print('deleted'));
@@ -180,6 +189,8 @@ class _allStatusPageState extends State<allStatusPage> {
                               ),
                             ),
                           );
+                          
+                        }
                         }
                         return Container();
                       }),
@@ -202,8 +213,7 @@ class _allStatusPageState extends State<allStatusPage> {
 
                         if (docList.isEmpty) {
                           return QuietBox(
-                            heading:
-                                "Status of your contacts will be shown here",
+                            heading: "Friends status will be shown here",
                             subtitle: "",
                           );
                         }
@@ -216,6 +226,7 @@ class _allStatusPageState extends State<allStatusPage> {
                               itemBuilder: (context, i) {
                                 Contact user =
                                     Contact.fromMap(docList[i].data());
+                                                         
                                 return statusView(user);
                               },
                             ),
@@ -234,6 +245,14 @@ class _allStatusPageState extends State<allStatusPage> {
         ),
       ),
     );
+  }
+
+  Future<UserData> hasStatus(String uid) async {
+    // DocumentSnapshot s = await _userCollection.doc(uid).get();
+    // UserData u = UserData.fromMap(s.data());
+    // return u.hasStatus;
+    UserData user = await _authMethods.getUserDetailsById(uid);
+    return user;
   }
 
   Future<QuerySnapshot> getStatus(String uid) async {
@@ -263,5 +282,8 @@ class _allStatusPageState extends State<allStatusPage> {
         uploader: userId,
       );
     }
+    UserData newUser = userProvider.getUser;
+    newUser.hasStatus = true;
+    _userCollection.doc(userProvider.getUser.uid).set(newUser.toMap(newUser));
   }
 }

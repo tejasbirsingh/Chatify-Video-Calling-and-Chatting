@@ -11,7 +11,7 @@ Future<void> downloadFile(String url, String fileName) async {
 
   dio.download(url ?? noImageAvailable, '${dir.path}/${fileName}.pdf',
       onReceiveProgress: (actualBytes, totalBytes) {
-    var percentage = actualBytes / totalBytes * 100;
+
   });
 }
 

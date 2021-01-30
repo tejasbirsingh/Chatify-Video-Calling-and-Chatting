@@ -19,11 +19,11 @@ class _fileViewPageState extends State<fileViewPage> {
   void initState() {
     super.initState();
     loadDocument();
+    // print(widget.url);
   }
 
   loadDocument() async {
     document = await PDFDocument.fromURL(widget.url);
-
     setState(() => _isLoading = false);
   }
 

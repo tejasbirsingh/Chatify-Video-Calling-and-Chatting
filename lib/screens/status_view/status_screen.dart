@@ -56,9 +56,8 @@ class _statusPageState extends State<statusPage> {
 
                 if (docList.isEmpty) {
                   return QuietBox(
-                    heading: "All your contacts will be shown here",
-                    subtitle:
-                        "Search your friends, add them and start chatting !",
+                    heading: "Status will be shown here",
+                    subtitle:                        "",
                   );
                 }
                 docList.reversed;

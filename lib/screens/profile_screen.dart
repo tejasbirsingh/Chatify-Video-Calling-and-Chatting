@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:skype_clone/constants/strings.dart';
+import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/chat_methods.dart';
@@ -16,6 +19,7 @@ class profilePage extends StatefulWidget {
 }
 
 class _profilePageState extends State<profilePage> {
+  String currUserId;
   bool _first = true;
   ChatMethods _chatMethods = ChatMethods();
   double _fontSize = 60;
@@ -41,6 +45,7 @@ class _profilePageState extends State<profilePage> {
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
+  currUserId  = userProvider.getUser.uid;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
@@ -200,6 +205,7 @@ class _profilePageState extends State<profilePage> {
                       ),
                     ),
                   ),
+                  messageList()
                 ],
               ),
             ),
@@ -208,4 +214,31 @@ class _profilePageState extends State<profilePage> {
       ),
     );
   }
+   Widget messageList() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection(MESSAGES_COLLECTION)
+          .doc(currUserId)
+          .collection(widget.user.uid)
+          .orderBy(TIMESTAMP_FIELD, descending: true)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.data == null) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return ListView.builder(
+          padding: EdgeInsets.all(10),
+          // controller: _listScrollController,
+          reverse: true,
+          itemCount: snapshot.data.docs.length,
+          itemBuilder: (context, index) {
+            Message message = Message.fromMap(snapshot.data.docs[index].data());
+            return Container(child:Text(message.message));
+            // return chatMessageItem(snapshot.data.docs[index]);
+          },
+        );
+      },
+    );
+  }
+
 }

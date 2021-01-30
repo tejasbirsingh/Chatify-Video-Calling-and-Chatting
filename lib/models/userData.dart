@@ -9,6 +9,7 @@ class UserData {
   String firebaseToken;
   int firstColor;
   int secondColor;
+  bool hasStatus;
 
   UserData(
       {this.uid,
@@ -20,7 +21,8 @@ class UserData {
       this.profilePhoto,
       this.firebaseToken,
       this.firstColor,
-      this.secondColor});
+      this.secondColor,
+      this.hasStatus});
 
   Map toMap(UserData user) {
     var data = Map<String, dynamic>();
@@ -34,6 +36,7 @@ class UserData {
     data["firebase_token"] = user.firebaseToken;
     data["first_color"] = user.firstColor;
     data["second_color"] = user.secondColor;
+    data["hasstatus"] = user.hasStatus;
     return data;
   }
 
@@ -49,5 +52,6 @@ class UserData {
     this.firebaseToken = mapData['firebase_token'];
     this.firstColor = mapData["first_color"];
     this.secondColor = mapData["second_color"];
+    this.hasStatus = mapData["hasstatus"];
   }
 }

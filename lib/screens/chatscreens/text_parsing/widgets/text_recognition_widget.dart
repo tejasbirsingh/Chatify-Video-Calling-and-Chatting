@@ -103,14 +103,14 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   moreMenuItem(Icons.add, 'Add', () async {
-                    if (ocrText != "" && ocrText != "No text scanned") {
+                    if (ocrText != "" && ocrText != "No text scanned" && ocrText!="No selected image") {
                       await writePdf();
                       await savePdf();
                       clear();
                     }
                   }, Colors.teal),
                   moreMenuItem(Icons.view_agenda, 'View', () async {
-                    await savePdf();
+                    // await savePdf();
                     Io.Directory documentDirectory =
                         await getApplicationDocumentsDirectory();
                     String documentPath = documentDirectory.path;
@@ -127,6 +127,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
               ),
               SizedBox(height: 10.0),
               ControlsWidget(
+                context:context,
                 onClickedGallery: pickImageGallery,
                 onClickedCamera: pickImageCamera,
                 onClickedScanText: scanText,
@@ -170,7 +171,7 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
           ),
           Text(
             name,
-            style: TextStyle(color: Colors.black, fontSize: 16.0),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyText1.color, fontSize: 16.0),
           )
         ],
       ),
@@ -201,14 +202,14 @@ class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
     Io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String documentPath = documentDirectory.path;
     Io.File file = Io.File("$documentPath/$fileName.pdf");
-    file.writeAsBytesSync(pdf.save());
+    file.writeAsBytes(await pdf.save());
   }
 
   Widget buildImage() => Container(
         child: image != null
             ? Image.file(
                 image,
-                color: Theme.of(context).iconTheme.color,
+                // color: Theme.of(context).iconTheme.color,
                fit:BoxFit.cover
               )
             : Icon(Icons.photo, size: 80, color: Colors.black),

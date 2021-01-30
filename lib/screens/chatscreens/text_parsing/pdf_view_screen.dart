@@ -27,6 +27,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
   final StorageMethods _storageMethods = StorageMethods();
   final ChatMethods _chatMethods = ChatMethods();
   File file;
+
   @override
   void initState() {
     super.initState();
@@ -34,9 +35,13 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
     file = File(widget.path);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   loadDocument() async {
     document = await PDFDocument.fromAsset(widget.path);
-
     setState(() => _isLoading = false);
   }
 
@@ -48,7 +53,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
       userId = user.getUser.uid;
     });
     return SafeArea(
-          child: Scaffold(
+      child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).backgroundColor,
           iconTheme: Theme.of(context).iconTheme,
@@ -62,7 +67,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.reply,color:Colors.lightBlue),
+              icon: Icon(Icons.reply, color: Colors.lightBlue),
               onPressed: () {
                 if (file != null && widget.receiverId != null) {
                   _storageMethods.uploadFile(
@@ -77,8 +82,11 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.share,color: Colors.teal,),
-              onPressed: (){
+              icon: Icon(
+                Icons.share,
+                color: Colors.teal,
+              ),
+              onPressed: () {
                 Share.shareFiles([widget.path], text: 'Share Document');
               },
             )

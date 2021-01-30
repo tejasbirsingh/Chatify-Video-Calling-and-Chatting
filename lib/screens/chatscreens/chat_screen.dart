@@ -219,9 +219,7 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
-    // accelerometerEvents.listen((AccelerometerEvent event) {
-    //   print(event);
-    // });
+   
     getTheme();
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
@@ -595,7 +593,7 @@ class _ChatScreenState extends State<ChatScreen>
             onLongPress: () {
               setState(() {
                 _message.type == MESSAGE_TYPE_IMAGE
-                    ? {forwardedImage = _message.photoUrl}
+                    ? forwardedImage = _message.photoUrl
                     : [];
                 messageId = snapshot.id;
                 _isAppBarOptions = true;
@@ -611,7 +609,7 @@ class _ChatScreenState extends State<ChatScreen>
                 child: _message.senderId == _currentUserId
                     ? senderLayout(_message)
                     : Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
+                        padding: EdgeInsets.only(left: 8.0),
                         child: receiverLayout(_message, snapshot.id),
                       ),
               ),
@@ -959,49 +957,50 @@ class _ChatScreenState extends State<ChatScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 10),
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.50),
-              decoration: message.type != "Call"
-                  ? BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                        Colors.green.shade400,
-                        Colors.teal.shade600
-                      ]),
-                      borderRadius: BorderRadius.only(
-                        topLeft: messageRadius,
-                        topRight: messageRadius,
-                        bottomLeft: messageRadius,
+        SwipeTo(
+          iconColor: Colors.white,
+          onLeftSwipe: () {
+            replyToMessage(message);
+            textFieldFocus.requestFocus();
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.50),
+                decoration: message.type != "Call"
+                    ? BoxDecoration(
+                        gradient: LinearGradient(colors: [
+                          Colors.green.shade400,
+                          Colors.teal.shade600
+                        ]),
+                        borderRadius: BorderRadius.only(
+                          topLeft: messageRadius,
+                          topRight: messageRadius,
+                          bottomLeft: messageRadius,
+                        ),
+                      )
+                    : BoxDecoration(
+                        color: Colors.grey.withOpacity(0.7),
+                        borderRadius: BorderRadius.only(
+                          topLeft: messageRadius,
+                          topRight: messageRadius,
+                          bottomLeft: messageRadius,
+                        ),
                       ),
-                    )
-                  : BoxDecoration(
-                      color: Colors.grey.withOpacity(0.7),
-                      borderRadius: BorderRadius.only(
-                        topLeft: messageRadius,
-                        topRight: messageRadius,
-                        bottomLeft: messageRadius,
-                      ),
-                    ),
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: SwipeTo(
-                    iconColor: Colors.white,
-                    onRightSwipe: () {
-                      replyToMessage(message);
-                      textFieldFocus.requestFocus();
-                    },
-                    child: getMessage(message)),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: getMessage(message),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 2.0,
-            ),
-            formatTime(message.timestamp.toDate()),
-          ],
+              SizedBox(
+                height: 2.0,
+              ),
+              formatTime(message.timestamp.toDate()),
+            ],
+          ),
         ),
         SizedBox(
           width: 2.0,
@@ -1166,38 +1165,43 @@ class _ChatScreenState extends State<ChatScreen>
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          margin: EdgeInsets.only(top: 12),
-          constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.50),
-          decoration: message.type != "Call"
-              ? BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.blue.shade700, Colors.blue.shade900]),
-                  borderRadius: BorderRadius.only(
-                    bottomRight: messageRadius,
-                    topRight: messageRadius,
-                    bottomLeft: messageRadius,
-                  ),
-                )
-              : BoxDecoration(
-                  color: Colors.grey.withOpacity(0.7),
-                  borderRadius: BorderRadius.only(
-                    bottomRight: messageRadius,
-                    topRight: messageRadius,
-                    bottomLeft: messageRadius,
-                  ),
-                ),
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: SwipeTo(
-                iconColor: Colors.white,
-                onRightSwipe: () {
-                  replyToMessage(message);
-                  textFieldFocus.requestFocus();
-                },
-                child: getMessage(message)),
+        SwipeTo(
+          iconColor: Colors.white,
+          onRightSwipe: () {
+            replyToMessage(message);
+            textFieldFocus.requestFocus();
+          },
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              margin: EdgeInsets.only(top: 12),
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.50),
+              decoration: message.type != "Call"
+                  ? BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Colors.blue.shade700, Colors.blue.shade900]),
+                      borderRadius: BorderRadius.only(
+                        bottomRight: messageRadius,
+                        topRight: messageRadius,
+                        bottomLeft: messageRadius,
+                      ),
+                    )
+                  : BoxDecoration(
+                      color: Colors.grey.withOpacity(0.7),
+                      borderRadius: BorderRadius.only(
+                        bottomRight: messageRadius,
+                        topRight: messageRadius,
+                        bottomLeft: messageRadius,
+                      ),
+                    ),
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: getMessage(message),
+              ),
+            ),
           ),
         ),
         SizedBox(
@@ -1756,11 +1760,12 @@ class _ChatScreenState extends State<ChatScreen>
                   Expanded(
                     child: Text(
                       widget.receiver.name,
-                      style: TextStyle(color:Colors.white,fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                   GestureDetector(
-                    child: Icon(Icons.close, color:Colors.red,size: 16.0),
+                    child: Icon(Icons.close, color: Colors.red, size: 16.0),
                     onTap: cancelReply,
                   ),
                   SizedBox(

@@ -149,6 +149,7 @@ class AuthMethods {
       _userCollection.doc(uid).collection("following").snapshots();
 
   Future<void> addFriend(String currUserId, String followingUserId) async {
+    
     Contact follower = Contact(uid: followingUserId, addedOn: Timestamp.now());
     var senderMap = follower.toMap(follower);
     await _userCollection
