@@ -7,22 +7,32 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final List<Widget> actions;
   final Widget leading;
   final bool centerTitle;
+  final GestureTapCallback onTap;
+  final bool isLeadingWidth;
+  
 
   const CustomAppBar({
-    Key key,
-    @required this.title,
-    @required this.actions,
-    @required this.leading, 
-    @required this.centerTitle,
+    Key? key,
+    required this.title,
+    required this.actions,
+    required this.leading, 
+    required this.centerTitle,
+    required this.onTap,
+    required this.isLeadingWidth
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: UniversalVariables.blackColor,
+
+        
+        color: Theme.of(context).appBarTheme.foregroundColor,
+       
         border: Border(
+          
           bottom: BorderSide(
             color: UniversalVariables.separatorColor,
             width: 1.4,
@@ -31,12 +41,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
         ),
       ),
       child: AppBar(
-        backgroundColor: UniversalVariables.blackColor,
-        elevation: 0,
+    
+        backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
+        iconTheme:Theme.of(context).appBarTheme.iconTheme,
+        elevation: 0.0,
+        leadingWidth : isLeadingWidth ? 20.0 : 50.0,
+        
         leading: leading,
         actions: actions,
         centerTitle: centerTitle,
-        title: title,
+        title: GestureDetector(child: title,
+        onTap: onTap,),
       ),
     );
   }

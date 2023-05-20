@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+// import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -14,7 +14,7 @@ class CallScreen extends StatefulWidget {
   final Call call;
 
   CallScreen({
-    @required this.call,
+    required this.call,
   });
 
   @override
@@ -23,10 +23,10 @@ class CallScreen extends StatefulWidget {
 
 class _CallScreenState extends State<CallScreen> {
   final CallMethods callMethods = CallMethods();
-
-  UserProvider userProvider;
-  StreamSubscription callStreamSubscription;
-
+  int? _remoteUid;
+  UserProvider? userProvider;
+  StreamSubscription? callStreamSubscription;
+  RtcEngine? _engine;
   static final _users = <int>[];
   final _infoStrings = <String>[];
   bool muted = false;
@@ -51,11 +51,16 @@ class _CallScreenState extends State<CallScreen> {
 
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
-    await AgoraRtcEngine.enableWebSdkInteroperability(true);
-    await AgoraRtcEngine.setParameters(
-        '''{\"che.video.lowBitRateStreamParameter\":{\"width\":320,\"height\":180,\"frameRate\":15,\"bitRate\":140}}''');
-    await AgoraRtcEngine.joinChannel(null, widget.call.channelId, null, 0);
-    
+    // await _engine!.enableWebSdkInteroperability(true);
+    VideoEncoderConfiguration configuration = VideoEncoderConfiguration(dimensions: VideoDimensions(width: 1920, height: 1080));
+    await _engine!.setVideoEncoderConfiguration(configuration);
+
+    await _engine!.joinChannel(
+        token: widget.call.callerId!,
+        channelId: widget.call.channelId!,
+        options: const ChannelMediaOptions(),
+        uid: 0);
+    // print(widget.call.channelId);
   }
 
   addPostFrameCallback() {
@@ -63,10 +68,10 @@ class _CallScreenState extends State<CallScreen> {
       userProvider = Provider.of<UserProvider>(context, listen: false);
 
       callStreamSubscription = callMethods
-          .callStream(uid: userProvider.getUser.uid)
+          .callStream(uid: userProvider!.getUser.uid)
           .listen((DocumentSnapshot ds) {
         // defining the logic
-        switch (ds.data) {
+        switch (ds.data()) {
           case null:
             // snapshot is null which means that call is hanged and documents are deleted
             Navigator.pop(context);
@@ -81,112 +86,82 @@ class _CallScreenState extends State<CallScreen> {
 
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
-    await AgoraRtcEngine.create(APP_ID);
-    await AgoraRtcEngine.enableVideo();
+    _engine = createAgoraRtcEngine();
+    await _engine!.initialize(const RtcEngineContext(
+      appId: APP_ID,
+      channelProfile: ChannelProfileType.channelProfileCommunication,
+    ));
+    await _engine!.enableVideo();
+    await _engine!.startPreview();
+    await _engine!.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
   }
 
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
-    AgoraRtcEngine.onError = (dynamic code) {
+    _engine!.registerEventHandler(RtcEngineEventHandler(
+        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+      debugPrint("local user ${connection.localUid} joined");
       setState(() {
-        final info = 'onError: $code';
+        final info = 'onJoinChannel: ${connection.channelId}, uid: ${connection.localUid}';
         _infoStrings.add(info);
       });
-    };
-
-    AgoraRtcEngine.onJoinChannelSuccess = (
-      String channel,
-      int uid,
-      int elapsed,
-    ) {
-      setState(() {
-        final info = 'onJoinChannel: $channel, uid: $uid';
-        _infoStrings.add(info);
-      });
-    };
-
-    AgoraRtcEngine.onUserJoined = (int uid, int elapsed) {
-      setState(() {
-        final info = 'onUserJoined: $uid';
-        _infoStrings.add(info);
-        _users.add(uid);
-      });
-    };
-
-    AgoraRtcEngine.onUpdatedUserInfo = (AgoraUserInfo userInfo, int i) {
-      setState(() {
-        final info = 'onUpdatedUserInfo: ${userInfo.toString()}';
-        _infoStrings.add(info);
-      });
-    };
-
-    AgoraRtcEngine.onRejoinChannelSuccess = (String string, int a, int b) {
-      setState(() {
-        final info = 'onRejoinChannelSuccess: $string';
-        _infoStrings.add(info);
-      });
-    };
-
-    AgoraRtcEngine.onUserOffline = (int a, int b) {
-      callMethods.endCall(call: widget.call);
-      setState(() {
-        final info = 'onUserOffline: a: ${a.toString()}, b: ${b.toString()}';
-        _infoStrings.add(info);
-      });
-    };
-
-    AgoraRtcEngine.onRegisteredLocalUser = (String s, int i) {
-      setState(() {
-        final info = 'onRegisteredLocalUser: string: s, i: ${i.toString()}';
-        _infoStrings.add(info);
-      });
-    };
-
-    AgoraRtcEngine.onLeaveChannel = () {
+    }, onLeaveChannel: (RtcConnection connection, RtcStats rtcStats) {
       setState(() {
         _infoStrings.add('onLeaveChannel');
         _users.clear();
       });
-    };
-
-    AgoraRtcEngine.onConnectionLost = () {
+    }, onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+      debugPrint("remote user $remoteUid joined");
       setState(() {
-        final info = 'onConnectionLost';
+        final info = 'userJoined: ${connection.localUid}';
+        _remoteUid = remoteUid;
         _infoStrings.add(info);
+        _users.add(connection.localUid!);
       });
-    };
-
-    AgoraRtcEngine.onUserOffline = (int uid, int reason) {
-      // if call was picked
-
+    }, onUserOffline: (RtcConnection connection, int remoteUid,
+            UserOfflineReasonType reason) {
       setState(() {
-        final info = 'userOffline: $uid';
+        final info = 'userOffline: ${connection.localUid}';
+         _remoteUid = null;
         _infoStrings.add(info);
-        _users.remove(uid);
+        _users.remove(connection.localUid);
       });
-    };
-
-    AgoraRtcEngine.onFirstRemoteVideoFrame = (
-      int uid,
-      int width,
-      int height,
-      int elapsed,
-    ) {
+    }, onFirstRemoteVideoFrame: (RtcConnection connection, uid, width, height, elapsed) {
       setState(() {
         final info = 'firstRemoteVideo: $uid ${width}x $height';
         _infoStrings.add(info);
       });
-    };
+    }));
   }
 
-  /// Helper function to get list of native views
-  List<Widget> _getRenderViews() {
-    final List<AgoraRenderWidget> list = [
-      AgoraRenderWidget(0, local: true, preview: true),
-    ];
-    _users.forEach((int uid) => list.add(AgoraRenderWidget(uid)));
-    return list;
+List<Widget> _remoteVideo() {
+  List<StatefulWidget> list = [];
+    if (_remoteUid != null) {
+      return [AgoraVideoView(
+        controller: VideoViewController.remote(
+          rtcEngine: _engine!,
+          canvas: VideoCanvas(uid: _remoteUid),
+          connection: RtcConnection(channelId: widget.call.channelId),
+        ),
+      )];
+    } else {
+      return [const Text(
+        'Please wait for remote user to join',
+        textAlign: TextAlign.center,
+      )];
+    }
+
   }
+
+  // List<Widget> _getRenderViews() {
+  //   final List<StatefulWidget> list = [];
+  //   // if (widget.call.callerId == ClientRole.Broadcaster) {
+  //   //   list.add(RtcLocalView.SurfaceView());
+  //   // }
+  //     list.add(SurfaceView());
+  //   _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
+  //   return list;
+  // }
 
   /// Video view wrapper
   Widget _videoView(view) {
@@ -205,7 +180,7 @@ class _CallScreenState extends State<CallScreen> {
 
   /// Video layout wrapper
   Widget _viewRows() {
-    final views = _getRenderViews();
+    final views = _remoteVideo();
     switch (views.length) {
       case 1:
         return Container(
@@ -241,65 +216,15 @@ class _CallScreenState extends State<CallScreen> {
     return Container();
   }
 
-  /// Info panel to show logs
-  // Widget _panel() {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(vertical: 48),
-  //     alignment: Alignment.bottomCenter,
-  //     child: FractionallySizedBox(
-  //       heightFactor: 0.5,
-  //       child: Container(
-  //         padding: const EdgeInsets.symmetric(vertical: 48),
-  //         child: ListView.builder(
-  //           reverse: true,
-  //           itemCount: _infoStrings.length,
-  //           itemBuilder: (BuildContext context, int index) {
-  //             if (_infoStrings.isEmpty) {
-  //               return null;
-  //             }
-  //             return Padding(
-  //               padding: const EdgeInsets.symmetric(
-  //                 vertical: 3,
-  //                 horizontal: 10,
-  //               ),
-  //               child: Row(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Flexible(
-  //                     child: Container(
-  //                       padding: const EdgeInsets.symmetric(
-  //                         vertical: 2,
-  //                         horizontal: 5,
-  //                       ),
-  //                       decoration: BoxDecoration(
-  //                         color: Colors.yellowAccent,
-  //                         borderRadius: BorderRadius.circular(5),
-  //                       ),
-  //                       child: Text(
-  //                         _infoStrings[index],
-  //                         style: TextStyle(color: Colors.blueGrey),
-  //                       ),
-  //                     ),
-  //                   )
-  //                 ],
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   void _onToggleMute() {
     setState(() {
       muted = !muted;
     });
-    AgoraRtcEngine.muteLocalAudioStream(muted);
+    _engine!.muteLocalAudioStream(muted);
   }
 
   void _onSwitchCamera() {
-    AgoraRtcEngine.switchCamera();
+    _engine!.switchCamera();
   }
 
   /// Toolbar layout
@@ -323,9 +248,12 @@ class _CallScreenState extends State<CallScreen> {
             padding: const EdgeInsets.all(12.0),
           ),
           RawMaterialButton(
-            onPressed: () => callMethods.endCall(
-              call: widget.call,
-            ),
+            onPressed: () {
+              callMethods.endCall(
+                call: widget.call,
+              );
+              Navigator.pop(context);
+            },
             child: Icon(
               Icons.call_end,
               color: Colors.white,
@@ -358,9 +286,9 @@ class _CallScreenState extends State<CallScreen> {
     // clear users
     _users.clear();
     // destroy sdk
-    AgoraRtcEngine.leaveChannel();
-    AgoraRtcEngine.destroy();
-    callStreamSubscription.cancel();
+    _engine!.leaveChannel();
+    // _engine!.destroy();
+    callStreamSubscription!.cancel();
     super.dispose();
   }
 

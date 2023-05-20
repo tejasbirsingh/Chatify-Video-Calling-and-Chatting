@@ -19,27 +19,24 @@ class ChatMethods {
 
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     addToContacts(senderId: message.senderId, receiverId: message.receiverId);
 
-    return await _messageCollection
-        .doc(message.receiverId)
-        .collection(message.senderId)
+    await _messageCollection
+        .doc(message.receiverId!)
+        .collection(message.senderId!)
         .add(map);
   }
 
-  DocumentReference getContactsDocument({String of, String forContact}) =>
-      _userCollection
-          .doc(of)
-          .collection(CONTACTS_COLLECTION)
-          .doc(forContact);
+  DocumentReference getContactsDocument({String? of, String? forContact}) =>
+      _userCollection.doc(of).collection(CONTACTS_COLLECTION).doc(forContact);
 
-  addToContacts({String senderId, String receiverId}) async {
+  addToContacts({String? senderId, String? receiverId}) async {
     Timestamp currentTime = Timestamp.now();
 
-    await addToSenderContacts(senderId, receiverId, currentTime);
+    await addToSenderContacts(senderId!, receiverId!, currentTime);
     await addToReceiverContacts(senderId, receiverId, currentTime);
   }
 
@@ -87,6 +84,70 @@ class ChatMethods {
     }
   }
 
+  DocumentReference getBlockedDocument({String? of, String? forContact}) =>
+      _userCollection.doc(of).collection(BLOCKED_CONTACTS).doc(forContact);
+
+  addToBlockedList({String? senderId, String? receiverId}) async {
+    Timestamp currentTime = Timestamp.now();
+
+    await addToSenderBlockedList(senderId, receiverId, currentTime);
+  }
+
+  Future<void> addToSenderBlockedList(
+    String? senderId,
+    String? receiverId,
+    currentTime,
+  ) async {
+    DocumentSnapshot senderSnapshot =
+        await getBlockedDocument(of: senderId!, forContact: receiverId!).get();
+
+    if (!senderSnapshot.exists) {
+      Contact receiverContact = Contact(
+        uid: receiverId,
+        addedOn: currentTime,
+      );
+
+      var receiverMap = receiverContact.toMap(receiverContact);
+
+      await getBlockedDocument(of: senderId, forContact: receiverId)
+          .set(receiverMap);
+    } else {
+      await getBlockedDocument(of: senderId, forContact: receiverId).delete();
+    }
+  }
+
+  DocumentReference getMutedDocument({String? of, String? forContact}) =>
+      _userCollection.doc(of).collection(MUTED_CONTACTS).doc(forContact);
+
+  addToMutedList({String? senderId, String? receiverId}) async {
+    Timestamp currentTime = Timestamp.now();
+
+    await addToSenderMutedList(senderId!, receiverId!, currentTime);
+  }
+
+  Future<void> addToSenderMutedList(
+    String senderId,
+    String receiverId,
+    currentTime,
+  ) async {
+    DocumentSnapshot senderSnapshot =
+        await getMutedDocument(of: senderId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      Contact receiverContact = Contact(
+        uid: receiverId,
+        addedOn: currentTime,
+      );
+
+      var receiverMap = receiverContact.toMap(receiverContact);
+
+      await getMutedDocument(of: senderId, forContact: receiverId)
+          .set(receiverMap);
+    } else {
+      await getMutedDocument(of: senderId, forContact: receiverId).delete();
+    }
+  }
+
   void setImageMsg(String url, String receiverId, String senderId) async {
     Message message;
 
@@ -96,7 +157,8 @@ class ChatMethods {
         senderId: senderId,
         photoUrl: url,
         timestamp: Timestamp.now(),
-        type: 'image');
+        type: 'image',
+        isRead: false);
 
     // create imagemap
     var map = message.toImageMap();
@@ -104,27 +166,150 @@ class ChatMethods {
     // var map = Map<String, dynamic>();
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     _messageCollection
         .doc(message.receiverId)
-        .collection(message.senderId)
+        .collection(message.senderId!)
         .add(map);
   }
 
-  Stream<QuerySnapshot> fetchContacts({String userId}) => _userCollection
-      .doc(userId)
-      .collection(CONTACTS_COLLECTION)
-      .snapshots();
+  void setVideoMsg(String? url, String? receiverId, String? senderId) async {
+    Message message;
+
+    message = Message.videoMessage(
+        message: "VIDEO",
+        receiverId: receiverId,
+        senderId: senderId,
+        videoUrl: url,
+        timestamp: Timestamp.now(),
+        type: 'video',
+        isRead: false);
+
+    // create imagemap
+    var map = message.toVideoMap();
+
+    // var map = Map<String, dynamic>();
+    await _messageCollection
+        .doc(message.senderId)
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
+
+    _messageCollection
+        .doc(message.receiverId)
+        .collection(message.senderId!)
+        .add(map);
+  }
+
+  void setFileMsg(String? url, String? receiverId, String? senderId) async {
+    Message message;
+
+    message = Message.fileMessage(
+        message: "FILE",
+        receiverId: receiverId,
+        senderId: senderId,
+        fileUrl: url,
+        timestamp: Timestamp.now(),
+        type: 'file',
+        isRead: false);
+
+    var map = message.tofileMap();
+
+    await _messageCollection
+        .doc(message.senderId)
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
+
+    _messageCollection
+        .doc(message.receiverId)
+        .collection(message.senderId!)
+        .add(map as Map<String, dynamic>);
+  }
+
+  void setAudioMsg(String? url, String? receiverId, String? senderId) async {
+    Message message;
+
+    message = Message.audioMessage(
+        message: "AUDIO",
+        receiverId: receiverId,
+        senderId: senderId,
+        audioUrl: url,
+        timestamp: Timestamp.now(),
+        type: 'audio',
+        isRead: false);
+
+    var map = message.toAudioMap();
+
+    await _messageCollection
+        .doc(message.senderId)
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
+
+    _messageCollection
+        .doc(message.receiverId)
+        .collection(message.senderId!)
+        .add(map);
+  }
+
+  Stream<QuerySnapshot> fetchContacts({String? userId}) =>
+      _userCollection.doc(userId).collection(CONTACTS_COLLECTION).snapshots();
+
+  Stream<QuerySnapshot> fetchBlockedUsers({String? userId}) =>
+      _userCollection.doc(userId).collection(BLOCKED_CONTACTS).snapshots();
+
+  Future<bool> isBlocked(String? userId, String? receiverId) async {
+    DocumentSnapshot senderSnapshot =
+        await getBlockedDocument(of: userId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> isMuted(String userId, String receiverId) async {
+    DocumentSnapshot senderSnapshot =
+        await getMutedDocument(of: userId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   Stream<QuerySnapshot> fetchLastMessageBetween({
-    @required String senderId,
-    @required String receiverId,
+    required String senderId,
+    required String receiverId,
   }) =>
       _messageCollection
           .doc(senderId)
           .collection(receiverId)
           .orderBy("timestamp")
           .snapshots();
+
+  Future<int> unreadMessagesCount({
+    required String senderId,
+    required String receiverId,
+  }) async {
+    var c = 0;
+    await _messageCollection
+        .doc(receiverId)
+        .collection(senderId)
+        .where('isRead', isEqualTo: false)
+        .get()
+        .then((documentSnapshot) {
+      c = documentSnapshot.docs.length;
+    });
+    return c;
+  }
+
+  void addStatus(String url, String senderId) async {
+    await _userCollection
+        .doc(senderId)
+        .collection(STATUS)
+        .add({'url': url, 'timestamp': Timestamp.now()});
+  }
 }

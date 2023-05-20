@@ -3,10 +3,10 @@ import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 
 class UserProvider with ChangeNotifier {
-  UserData _user;
+  UserData? _user;
   AuthMethods _authMethods = AuthMethods();
 
-  UserData get getUser => _user;
+  UserData get getUser => _user ?? UserData();
 
   Future<void> refreshUser() async {
     UserData user = await _authMethods.getUserDetails();

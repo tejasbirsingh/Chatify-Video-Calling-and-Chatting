@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/call.dart';
 import 'package:skype_clone/models/log.dart';
+import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/call_methods.dart';
 import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
 import 'package:skype_clone/screens/callscreens/call_screen.dart';
+
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:skype_clone/utils/permissions.dart';
 
 class PickupScreen extends StatefulWidget {
   final Call call;
 
   PickupScreen({
-    @required this.call,
+    required this.call,
   });
 
   @override
@@ -26,7 +34,7 @@ class _PickupScreenState extends State<PickupScreen> {
 
   bool isCallMissed = true;
 
-  addToLocalStorage({@required String callStatus}) {
+  addToLocalStorage({required String callStatus}) {
     Log log = Log(
       callerName: widget.call.callerName,
       callerPic: widget.call.callerPic,
@@ -40,60 +48,73 @@ class _PickupScreenState extends State<PickupScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    FlutterRingtonePlayer.playRingtone();
+  }
+
+  @override
   void dispose() {
     if (isCallMissed) {
       addToLocalStorage(callStatus: CALL_STATUS_MISSED);
     }
+    FlutterRingtonePlayer.stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: true);
+
     return Scaffold(
       body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+            userProvider.getUser.firstColor != null
+                ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+                : Theme.of(context).colorScheme.background,
+            userProvider.getUser.secondColor != null
+                ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
+                : Theme.of(context).scaffoldBackgroundColor,
+          ]),
+        ),
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(vertical: 100),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "Incoming...",
-              style: TextStyle(
-                fontSize: 30,
-              ),
+              "Incoming Call",
+              style: GoogleFonts.patuaOne(
+                  textStyle: TextStyle(
+                      fontSize: 30,
+                      color: Theme.of(context).textTheme.displayLarge!.color)),
             ),
-            SizedBox(height: 50),
+            SizedBox(height: 30),
             CachedImage(
-              widget.call.callerPic,
-              isRound: true,
-              radius: 180,
+              widget.call.callerPic!,
+              isRound: false,
+              radius: 200,
+              height: 200.0,
+              width: 200.0,
             ),
             SizedBox(height: 15),
-            Text(
-              widget.call.callerName,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
+            Text(widget.call.callerName!,
+                style: Theme.of(context).textTheme.displayLarge),
             SizedBox(height: 75),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.call_end),
-                  color: Colors.redAccent,
-                  onPressed: () async {
-                    isCallMissed = false;
-                    addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                    await callMethods.endCall(call: widget.call);
-                  },
-                ),
-                SizedBox(width: 25),
-                IconButton(
-                    icon: Icon(Icons.call),
+                Container(
+                  decoration: BoxDecoration(
                     color: Colors.green,
-                    onPressed: () async {
+                    borderRadius: BorderRadius.circular(60.0),
+                  ),
+                 
+                  child: GestureDetector(
+                    onTap: () async {
+                      FlutterRingtonePlayer.stop();
                       isCallMissed = false;
                       addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
                       await Permissions.cameraAndMicrophonePermissionsGranted()
@@ -104,9 +125,42 @@ class _PickupScreenState extends State<PickupScreen> {
                                     CallScreen(call: widget.call),
                               ),
                             )
-                          // ignore: unnecessary_statements
-                          : {};
-                    }),
+                       
+                          : [];
+                    },
+                    child: Container(
+                      width: 70.0,
+                      height: 70.0,
+                      child: FlareActor(
+                        "assets/call_pick.flr",
+                        animation: 'Record2',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 35),
+                Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(60.0),
+                    ),
+                
+                    child: GestureDetector(
+                      onTap: () async {
+                        FlutterRingtonePlayer.stop();
+                        isCallMissed = false;
+                        addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                        await callMethods.endCall(call: widget.call);
+                      },
+                      child: Container(
+                        width: 70.0,
+                        height: 70.0,
+                        child: FlareActor(
+                          "assets/call_end.flr",
+                          animation: 'Record2',
+                        ),
+                      ),
+                    )),
               ],
             ),
           ],

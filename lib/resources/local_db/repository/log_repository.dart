@@ -5,9 +5,9 @@ import 'package:skype_clone/resources/local_db/db/sqlite_methods.dart';
 
 class LogRepository {
   static var dbObject;
-  static bool isHive;
+  static bool? isHive;
 
-  static init({@required bool isHive, @required String dbName}) {
+  static init({required bool isHive, required String dbName}) {
     dbObject = isHive ? HiveMethods() : SqliteMethods();
     dbObject.openDb(dbName);
     dbObject.init();
