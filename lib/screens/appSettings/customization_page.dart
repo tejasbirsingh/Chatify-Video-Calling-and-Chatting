@@ -6,16 +6,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skype_clone/Theme/theme_colors.dart';
-import 'package:skype_clone/constants/constants.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/provider/theme_provider.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/widgets/gradient_icon.dart';
+import 'package:chatify/Theme/theme_colors.dart';
+import 'package:chatify/constants/constants.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/provider/theme_provider.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/widgets/gradient_icon.dart';
 
 /* 
-Class responsible for showing customization page to
-change the theme and colors.
+  Class responsible for showing customization page to
+  change the theme and colors.
 */
 class CustomizationPage extends StatefulWidget {
   @override
@@ -264,14 +264,10 @@ class _CustomizationPageState extends State<CustomizationPage>
                             color: Colors.red,
                           ),
                           onPressed: () async {
-                            FirebaseFirestore.instance
-                                .collection(USERS_COLLECTION)
-                                .doc(userProvider.getUser.uid)
-                                .update({Constants.FIRST_COLOR: null});
-                            FirebaseFirestore.instance
-                                .collection(USERS_COLLECTION)
-                                .doc(userProvider.getUser.uid)
-                                .update({Constants.SECOND_COLOR: null});
+                            setBackgroundColor(
+                                userProvider, Constants.FIRST_COLOR, null);
+                            setBackgroundColor(
+                                userProvider, Constants.SECOND_COLOR, null);
                             userProvider.refreshUser();
                           }),
                     ),
@@ -284,6 +280,14 @@ class _CustomizationPageState extends State<CustomizationPage>
             );
           }),
     );
+  }
+
+  void setBackgroundColor(
+      UserProvider userProvider, String key, String? value) {
+    FirebaseFirestore.instance
+        .collection(USERS_COLLECTION)
+        .doc(userProvider.getUser.uid)
+        .update({key: value});
   }
 
   void backgroundColor(String name, Color color) async {

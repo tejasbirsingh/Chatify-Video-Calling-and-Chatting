@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/message.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/message.dart';
 import 'package:meta/meta.dart';
 
 class ChatMethods {

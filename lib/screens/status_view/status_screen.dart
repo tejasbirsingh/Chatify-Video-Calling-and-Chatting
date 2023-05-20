@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/contact.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/contact.dart';
 
-import 'package:skype_clone/screens/pageviews/chats/widgets/quiet_box.dart';
+import 'package:chatify/screens/pageviews/chats/widgets/quiet_box.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 

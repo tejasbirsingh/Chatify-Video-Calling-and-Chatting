@@ -8,18 +8,18 @@ import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skype_clone/Theme/theme_colors.dart';
-import 'package:skype_clone/provider/audio_upload_provider.dart';
-import 'package:skype_clone/provider/file_provider.dart';
-import 'package:skype_clone/provider/image_upload_provider.dart';
-import 'package:skype_clone/provider/theme_provider.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/provider/video_upload_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/screens/App%20Settings/setting_page.dart';
-import 'package:skype_clone/screens/login_screen.dart';
-import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/screens/splash_screen.dart';
+import 'package:chatify/Theme/theme_colors.dart';
+import 'package:chatify/provider/audio_upload_provider.dart';
+import 'package:chatify/provider/file_provider.dart';
+import 'package:chatify/provider/image_upload_provider.dart';
+import 'package:chatify/provider/theme_provider.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/provider/video_upload_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/screens/appSettings/setting_page.dart';
+import 'package:chatify/screens/login_screen.dart';
+import 'package:chatify/screens/search_screen.dart';
+import 'package:chatify/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -137,7 +137,7 @@ class _MyAppState extends State<MyApp> {
             initialRoute: '/',
             routes: {
               '/search_screen': (context) => SearchScreen(),
-              '/setting_page': (context) => settingPage(),
+              '/setting_page': (context) => SettingsPage(),
             },
             theme: themeNotifier.getTheme(),
             home: _authorizedOrNot == true || _isLocked == false

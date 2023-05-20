@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skype_clone/constants/constants.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/enum/user_state.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-import 'package:skype_clone/screens/login_screen.dart';
-import 'package:skype_clone/widgets/skype_appbar.dart';
+import 'package:chatify/constants/constants.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/enum/user_state.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/screens/login_screen.dart';
+import 'package:chatify/widgets/skype_appbar.dart';
 import 'shimmering_logo.dart';
 
 /*

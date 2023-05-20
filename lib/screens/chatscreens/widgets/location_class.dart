@@ -7,7 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:skype_clone/models/userData.dart';
+import 'package:chatify/models/userData.dart';
 
 class showMap extends StatefulWidget {
   final GeoPoint pos;

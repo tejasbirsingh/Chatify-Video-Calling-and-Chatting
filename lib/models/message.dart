@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:skype_clone/encryption/encryptText.dart';
+import 'package:chatify/encryption/encryptText.dart';
 
 class Message {
   String? senderId;

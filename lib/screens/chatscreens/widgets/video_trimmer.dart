@@ -1,9 +1,9 @@
 // import 'dart:io';
 // import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
-// import 'package:skype_clone/provider/video_upload_provider.dart';
-// import 'package:skype_clone/resources/chat_methods.dart';
-// import 'package:skype_clone/resources/storage_methods.dart';
+// import 'package:chatify/provider/video_upload_provider.dart';
+// import 'package:chatify/resources/chat_methods.dart';
+// import 'package:chatify/resources/storage_methods.dart';
 
 // import 'package:video_trimmer/video_trimmer.dart';
 

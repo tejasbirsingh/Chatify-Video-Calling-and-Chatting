@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/resources/auth_methods.dart';
 
 class UserProvider with ChangeNotifier {
   UserData? _user;

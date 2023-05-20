@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/call.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/call.dart';
 
 class CallMethods {
   final CollectionReference callCollection =

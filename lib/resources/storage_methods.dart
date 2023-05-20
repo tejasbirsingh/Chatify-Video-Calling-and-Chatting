@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/audio_upload_provider.dart';
-import 'package:skype_clone/provider/file_provider.dart';
-import 'package:skype_clone/provider/image_upload_provider.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/audio_upload_provider.dart';
+import 'package:chatify/provider/file_provider.dart';
+import 'package:chatify/provider/image_upload_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:skype_clone/provider/video_upload_provider.dart';
-import 'package:skype_clone/resources/chat_methods.dart';
+import 'package:chatify/provider/video_upload_provider.dart';
+import 'package:chatify/resources/chat_methods.dart';
 
 class StorageMethods {
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;

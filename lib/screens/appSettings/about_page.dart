@@ -1,15 +1,19 @@
+import 'package:chatify/constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/provider/user_provider.dart';
+import 'package:chatify/provider/user_provider.dart';
 
-class aboutPage extends StatefulWidget {
+/*
+  It contains app specific details.
+*/
+class AboutPage extends StatefulWidget {
   @override
-  _aboutPageState createState() => _aboutPageState();
+  _AboutPageState createState() => _AboutPageState();
 }
 
-class _aboutPageState extends State<aboutPage> {
+class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
@@ -20,7 +24,7 @@ class _aboutPageState extends State<aboutPage> {
                 icon: Icon(Icons.arrow_back),
                 onPressed: () => Navigator.pop(context)),
             centerTitle: false,
-            title: Text('About',
+            title: Text(Strings.about,
                 style: GoogleFonts.oswald(
                     textStyle: Theme.of(context).textTheme.displayLarge,
                     fontSize: 26.0)),
@@ -52,12 +56,12 @@ class _aboutPageState extends State<aboutPage> {
                       size: 32.0,
                     ),
                     title: Text(
-                      'Developer',
+                      Strings.developer,
                       style: GoogleFonts.patuaOne(
                           letterSpacing: 1.0,
                           textStyle: Theme.of(context).textTheme.displayLarge),
                     ),
-                    subtitle: Text('Tejas Bir Singh',
+                    subtitle: Text(Strings.developerName,
                         style: Theme.of(context).textTheme.bodyLarge),
                     contentPadding: const EdgeInsets.only(left: 16.0),
                   ),
@@ -68,12 +72,12 @@ class _aboutPageState extends State<aboutPage> {
                       size: 32.0,
                     ),
                     title: Text(
-                      'App Version',
+                      Strings.appVersion,
                       style: GoogleFonts.patuaOne(
                           letterSpacing: 1.0,
                           textStyle: Theme.of(context).textTheme.displayLarge),
                     ),
-                    subtitle: Text('v 0.2.0',
+                    subtitle: Text(Strings.appVersionNumber,
                         style: Theme.of(context).textTheme.bodyLarge),
                     contentPadding: const EdgeInsets.only(left: 16.0),
                   ),

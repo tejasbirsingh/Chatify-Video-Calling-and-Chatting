@@ -1,23 +1,27 @@
+import 'package:chatify/constants/strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/resources/chat_methods.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-import 'package:skype_clone/screens/pageviews/friends/widgets/friend_customTile.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/resources/chat_methods.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/screens/pageviews/friends/widgets/friend_custom_tile.dart';
 
-class blockedContacts extends StatefulWidget {
+/*
+  It shows list of blocked contacts.
+*/
+class BlockedContacts extends StatefulWidget {
   @override
-  _blockedContactsState createState() => _blockedContactsState();
+  _BlockedContactsState createState() => _BlockedContactsState();
 }
 
-class _blockedContactsState extends State<blockedContacts> {
+class _BlockedContactsState extends State<BlockedContacts> {
   ChatMethods _chatMethods = ChatMethods();
- 
+
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
@@ -25,7 +29,7 @@ class _blockedContactsState extends State<blockedContacts> {
       child: Scaffold(
         appBar: AppBar(
           iconTheme: Theme.of(context).iconTheme,
-          title: Text('Blocked Contacts',
+          title: Text(Strings.blockedContacts,
               style: GoogleFonts.oswald(
                   textStyle: Theme.of(context).textTheme.displayLarge,
                   fontSize: 28.0)),
@@ -53,7 +57,8 @@ class _blockedContactsState extends State<blockedContacts> {
                   padding: EdgeInsets.all(10.0),
                   itemCount: docList.length,
                   itemBuilder: (context, i) {
-                    Contact user = Contact.fromMap(docList[i].data() as Map<String, dynamic>);
+                    Contact user = Contact.fromMap(
+                        docList[i].data() as Map<String, dynamic>);
 
                     return BlockedContactView(user);
                   },
@@ -100,7 +105,6 @@ class ViewLayout extends StatelessWidget {
   final UserData friendViewLayout;
   final ChatMethods _chatMethods = ChatMethods();
 
-
   ViewLayout({
     required this.friendViewLayout,
   });
@@ -110,8 +114,6 @@ class ViewLayout extends StatelessWidget {
     final UserProvider user = Provider.of<UserProvider>(context, listen: true);
     return FriendCustomTile(
       mini: false,
-      onLongPress: () {},
-      onTap: () {},
       title: Text(
           (friendViewLayout != null ? friendViewLayout.name : null) != null
               ? friendViewLayout.name!

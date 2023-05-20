@@ -1,12 +1,15 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/screens/App%20Settings/blocked_contacts.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/screens/appSettings/blocked_contacts.dart';
 
+
+/*
+  It contains App locker and blocked contacts settings.
+*/
 class PrivacyPage extends StatefulWidget {
   @override
   _PrivacyPageState createState() => _PrivacyPageState();
@@ -33,7 +36,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
-          
               leading: IconButton(
                   icon: Icon(Icons.arrow_back),
                   onPressed: () => Navigator.pop(context)),
@@ -91,15 +93,17 @@ class _PrivacyPageState extends State<PrivacyPage> {
                 ),
                 GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => blockedContacts())),
+                      builder: (context) => BlockedContacts())),
                   child: ListTile(
                     leading:
                         Icon(Icons.block_outlined, size: 32, color: Colors.red),
                     trailing: Icon(Icons.arrow_forward_ios),
-                    title: Text('Blocked Contacts',
+                    title: Text(
+                      'Blocked Contacts',
                       style: GoogleFonts.patuaOne(
-                        letterSpacing: 1.0,
-                        textStyle: Theme.of(context).textTheme.displayLarge),),
+                          letterSpacing: 1.0,
+                          textStyle: Theme.of(context).textTheme.displayLarge),
+                    ),
                   ),
                 )
               ],
@@ -111,8 +115,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
   Future<bool> getAppLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _appLocked =
-          prefs.getBool('isLocked') != null ? prefs.getBool('isLocked')! : false;
+      _appLocked = prefs.getBool('isLocked') != null
+          ? prefs.getBool('isLocked')!
+          : false;
     });
     return _appLocked;
   }

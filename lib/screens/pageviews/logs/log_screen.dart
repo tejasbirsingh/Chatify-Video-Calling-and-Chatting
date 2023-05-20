@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/screens/callscreens/pickup/pickup_layout.dart';
 
-import 'package:skype_clone/widgets/skype_appbar.dart';
+import 'package:chatify/widgets/skype_appbar.dart';
 
 import 'widgets/log_list_container.dart';
 

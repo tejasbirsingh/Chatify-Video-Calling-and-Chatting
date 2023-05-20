@@ -3,17 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/userData.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/userData.dart';
 
 
-import 'package:skype_clone/resources/auth_methods.dart';
+import 'package:chatify/resources/auth_methods.dart';
 
 
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 
 
-import 'package:skype_clone/screens/status_view/status_screen.dart';
+import 'package:chatify/screens/status_view/status_screen.dart';
 
 class StatusView extends StatelessWidget {
   final Contact contact;

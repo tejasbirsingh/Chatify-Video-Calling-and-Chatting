@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/utils/utilities.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/utils/utilities.dart';
 
 Future<void> downloadFile(String url, String fileName) async {
   var dir = await getExternalStorageDirectory();

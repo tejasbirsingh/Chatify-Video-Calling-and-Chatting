@@ -1,24 +1,23 @@
+import 'package:chatify/constants/navigation_routes_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/screens/pageviews/friends/widgets/friend_view.dart';
+import 'package:chatify/screens/pageviews/friends/widgets/quite_box.dart';
+import 'package:chatify/widgets/skype_appbar.dart';
+import '../../../constants/strings.dart';
 
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-
-import 'package:skype_clone/screens/pageviews/friends/widgets/friend_view.dart';
-import 'package:skype_clone/screens/pageviews/friends/widgets/quite_box.dart';
-
-import 'package:skype_clone/widgets/skype_appbar.dart';
-
-class contactsPage extends StatefulWidget {
+class ContactsPage extends StatefulWidget {
   @override
   _contactsPageState createState() => _contactsPageState();
 }
 
-class _contactsPageState extends State<contactsPage> {
+class _contactsPageState extends State<ContactsPage> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final AuthMethods _auth = AuthMethods();
 
@@ -30,7 +29,7 @@ class _contactsPageState extends State<contactsPage> {
     return Scaffold(
         appBar: SkypeAppBar(
           leading: Text(""),
-          title: 'Contacts',
+          title: Strings.contacts,
           actions: [
             IconButton(
               icon: Icon(
@@ -38,7 +37,8 @@ class _contactsPageState extends State<contactsPage> {
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () {
-                Navigator.pushNamed(context, "/setting_page");
+                Navigator.pushNamed(
+                    context, NavigationRoutesConstants.SETTINGS_PAGE_ROUTE);
               },
             ),
           ],
@@ -63,9 +63,8 @@ class _contactsPageState extends State<contactsPage> {
 
                 if (docList.isEmpty) {
                   return QuietBox(
-                    heading: "All your contacts will be shown here",
-                    subtitle:
-                        "Search your friends, add them and start chatting !",
+                    heading: Strings.allContactsShownHere,
+                    subtitle: Strings.searchFriendsHere,
                   );
                 }
                 return ListView.builder(
@@ -74,7 +73,7 @@ class _contactsPageState extends State<contactsPage> {
                   itemBuilder: (context, i) {
                     Contact user = Contact.fromMap(
                         docList[i].data() as Map<String, dynamic>);
-                    return friendView(user);
+                    return FriendView(user);
                   },
                 );
               }

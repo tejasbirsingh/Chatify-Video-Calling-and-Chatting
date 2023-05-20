@@ -1,4 +1,4 @@
-package com.example.skype_clone;
+package com.example.chatify;
 // import io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin;
 
 // import io.flutter.embedding.android.FlutterFragment;

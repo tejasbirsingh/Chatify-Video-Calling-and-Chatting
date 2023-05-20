@@ -4,21 +4,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/screens/App%20Settings/about_page.dart';
-import 'package:skype_clone/screens/App%20Settings/accountsettings_page.dart';
-import 'package:skype_clone/screens/App%20Settings/customization_page.dart';
-import 'package:skype_clone/screens/App%20Settings/privacy_page.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/screens/appSettings/about_page.dart';
+import 'package:chatify/screens/appSettings/accountsettings_page.dart';
+import 'package:chatify/screens/appSettings/customization_page.dart';
+import 'package:chatify/screens/appSettings/privacy_page.dart';
 
-class settingPage extends StatefulWidget {
+/*
+  It contains the privacy, customization, etc settings
+*/
+class SettingsPage extends StatefulWidget {
   @override
-  _settingPageState createState() => _settingPageState();
+  _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _settingPageState extends State<settingPage> {
-  bool _appLocked = false;
-
+class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
@@ -71,7 +72,7 @@ class _settingPageState extends State<settingPage> {
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                            builder: (context) => accountsSettingPage()),
+                            builder: (context) => AccountsSettingsPage()),
                       ),
                       child: ListTile(
                           leading: Icon(
@@ -141,7 +142,7 @@ class _settingPageState extends State<settingPage> {
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => aboutPage()),
+                        MaterialPageRoute(builder: (context) => AboutPage()),
                       ),
                       child: ListTile(
                           leading: Icon(
@@ -197,10 +198,4 @@ class _settingPageState extends State<settingPage> {
           }),
     );
   }
-
-  // void savebackground(String path) async {
-  //   var prefs = await SharedPreferences.getInstance();
-  //   prefs.setString('background', path);
-  // }
-
 }

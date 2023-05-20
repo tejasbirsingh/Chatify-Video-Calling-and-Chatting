@@ -5,10 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/configs/agora_configs.dart';
-import 'package:skype_clone/models/call.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/call_methods.dart';
+import 'package:chatify/configs/agora_configs.dart';
+import 'package:chatify/models/call.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/call_methods.dart';
 
 class CallScreen extends StatefulWidget {
   final Call call;

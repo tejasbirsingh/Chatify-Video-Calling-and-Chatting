@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/enum/user_state.dart';
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/utils/utilities.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/enum/user_state.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/utils/utilities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthMethods {

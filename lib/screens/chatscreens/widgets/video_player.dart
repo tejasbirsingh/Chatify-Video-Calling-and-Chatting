@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skype_clone/screens/chatscreens/video_viewer.dart';
+import 'package:chatify/screens/chatscreens/video_viewer.dart';
 
 import 'package:video_player/video_player.dart';
 

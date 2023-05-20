@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:chatify/constants/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image/image.dart' as Im;
@@ -9,25 +10,24 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:provider/provider.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/resources/update_methods.dart';
+import 'package:chatify/screens/login_screen.dart';
+import 'package:chatify/utils/utilities.dart';
 
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/userData.dart';
-
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/resources/update_methods.dart';
-import 'package:skype_clone/screens/login_screen.dart';
-
-import 'package:skype_clone/utils/utilities.dart';
-
-class accountsSettingPage extends StatefulWidget {
+/*
+  It contains account specific settings.
+*/
+class AccountsSettingsPage extends StatefulWidget {
   @override
-  _accountsSettingPageState createState() => _accountsSettingPageState();
+  _AccountsSettingsPageState createState() => _AccountsSettingsPageState();
 }
 
-class _accountsSettingPageState extends State<accountsSettingPage> {
+class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
   String newName = "";
   String newStatus = "";
   final _statusKey = GlobalKey<FormState>();
@@ -51,22 +51,22 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                 icon: Icon(Icons.arrow_back),
                 onPressed: () => Navigator.pop(context)),
             centerTitle: false,
-            title: Text('Account',
+            title: Text(Strings.account,
                 style: GoogleFonts.oswald(
                     textStyle: Theme.of(context).textTheme.displayLarge,
                     fontSize: 26.0)),
             iconTheme: Theme.of(context).iconTheme),
-        body: StreamBuilder<DocumentSnapshot>(
+        body: StreamBuilder<DocumentSnapshot?>(
             stream: FirebaseFirestore.instance
                 .collection(USERS_COLLECTION)
                 .doc(userProvider.getUser.uid)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                String? url = snapshot.data!['profile_photo'];
-                String? name = snapshot.data!['name'];
-                String? email = snapshot.data!['email'];
-                String? status = snapshot.data!['status'];
+                String? url = snapshot.data![Constants.PROFILE_PHOTO];
+                String? name = snapshot.data![Constants.NAME];
+                String? email = snapshot.data![Constants.EMAIL];
+                String? status = snapshot.data![Constants.STATUS];
                 return Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(colors: [
@@ -114,7 +114,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                 color: Colors.green.shade500,
                               ),
                               title: Text(
-                                "Name",
+                                Strings.name,
                                 style: GoogleFonts.patuaOne(
                                     letterSpacing: 1.0,
                                     fontWeight: FontWeight.bold,
@@ -168,8 +168,8 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                                 Theme.of(context).splashColor,
                                             width: 2.0),
                                       ),
-                                      hintText: "Edit Name",
-                                      labelText: "Name",
+                                      hintText: Strings.nameHintText,
+                                      labelText: Strings.nameLabel,
                                       hintStyle:
                                           Theme.of(context).textTheme.bodyLarge,
                                       labelStyle:
@@ -188,7 +188,8 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                                 .collection(USERS_COLLECTION)
                                                 .doc(userProvider.getUser.uid)
                                                 .update({
-                                              "name": _nameController.text
+                                              Constants.NAME:
+                                                  _nameController.text
                                             });
                                             _nameController.clear();
                                             setState(() {
@@ -210,7 +211,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                 color: Colors.deepOrange,
                               ),
                               title: Text(
-                                "About",
+                                Strings.about,
                                 style: GoogleFonts.patuaOne(
                                     letterSpacing: 1.0,
                                     fontWeight: FontWeight.bold,
@@ -218,7 +219,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                     textStyle:
                                         Theme.of(context).textTheme.bodyLarge),
                               ),
-                              subtitle: Text(status ?? "No Status",
+                              subtitle: Text(status ?? Strings.noStatus,
                                   style:
                                       Theme.of(context).textTheme.displayLarge),
                               trailing: IconButton(
@@ -263,8 +264,8 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                                 Theme.of(context).splashColor,
                                             width: 2.0),
                                       ),
-                                      hintText: "Edit Status",
-                                      labelText: "Status",
+                                      hintText: Strings.editStatus,
+                                      labelText: Strings.status,
                                       hintStyle:
                                           Theme.of(context).textTheme.bodyLarge,
                                       labelStyle:
@@ -283,7 +284,8 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                                                 .collection(USERS_COLLECTION)
                                                 .doc(userProvider.getUser.uid)
                                                 .update({
-                                              "status": _statusController.text
+                                              Constants.STATUS:
+                                                  _statusController.text
                                             });
                                             _statusController.clear();
                                             setState(() {
@@ -304,7 +306,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                           color: Colors.pink,
                         ),
                         title: Text(
-                          "Email",
+                          Strings.email,
                           style: GoogleFonts.patuaOne(
                               letterSpacing: 1.0,
                               fontWeight: FontWeight.bold,
@@ -318,7 +320,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
                       //   onTap: deleteAccountDialog(context),
                       //   child: ListTile(
                       //     leading: Icon(
-                      //       CupertinoIcons.delete,
+                      //       Icons.delete,
                       //       color: Colors.red,
                       //     ),
                       //     title: Text(
@@ -400,11 +402,11 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
             children: <Widget>[
               SimpleDialogOption(
                 child: Text(
-                  'Choose from Gallery',
+                  Strings.chooseFromGallery,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 onPressed: () {
-                  _pickImage('Gallery').then((selectedImage) {
+                  _pickImage(Constants.GALLERY).then((selectedImage) {
                     setState(() {
                       imageFile = selectedImage;
                     });
@@ -419,11 +421,11 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
               ),
               SimpleDialogOption(
                 child: Text(
-                  'Take Photo',
+                  Strings.takePhoto,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 onPressed: () {
-                  _pickImage('Camera').then((selectedImage) {
+                  _pickImage(Constants.CAMERA).then((selectedImage) {
                     setState(() {
                       imageFile = selectedImage;
                     });
@@ -438,7 +440,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
               ),
               SimpleDialogOption(
                 child: Text(
-                  'Cancel',
+                  Strings.cancel,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 onPressed: () {
@@ -456,7 +458,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
       _isEditing = true;
     });
 
-    action == 'Gallery'
+    action == Constants.GALLERY
         ? selectedImage = await Utils.pickImage(source: ImageSource.gallery)
         : selectedImage = await Utils.pickImage(source: ImageSource.camera);
     if (selectedImage != null) {
@@ -470,7 +472,7 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
         uiSettings: [
           AndroidUiSettings(
             toolbarColor: Colors.black54,
-            toolbarTitle: "Edit Image",
+            toolbarTitle: Strings.editImage,
             statusBarColor: Colors.black,
             backgroundColor: Colors.black,
             toolbarWidgetColor: Colors.white,
@@ -490,7 +492,6 @@ class _accountsSettingPageState extends State<accountsSettingPage> {
   }
 
   void compressImage() async {
-    print('Compression Started');
     final tempDir = await getTemporaryDirectory();
     final path = tempDir.path;
     int rand = Random().nextInt(10000);

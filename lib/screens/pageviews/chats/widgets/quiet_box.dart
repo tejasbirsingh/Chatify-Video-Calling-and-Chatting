@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+import 'package:chatify/screens/search_screen.dart';
+import 'package:chatify/utils/universal_variables.dart';
 
 class QuietBox extends StatelessWidget {
   final String heading;

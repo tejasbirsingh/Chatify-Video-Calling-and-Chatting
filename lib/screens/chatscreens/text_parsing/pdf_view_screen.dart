@@ -4,10 +4,10 @@ import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-import 'package:skype_clone/provider/file_provider.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/chat_methods.dart';
-import 'package:skype_clone/resources/storage_methods.dart';
+import 'package:chatify/provider/file_provider.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/chat_methods.dart';
+import 'package:chatify/resources/storage_methods.dart';
 
 class pdfPreviewScreen extends StatefulWidget {
   final String? path;

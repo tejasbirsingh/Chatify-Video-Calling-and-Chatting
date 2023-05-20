@@ -9,13 +9,13 @@
 // import 'package:flutter/material.dart';
 // import 'package:image_picker/image_picker.dart';
 // import 'package:provider/provider.dart';
-// import 'package:skype_clone/provider/user_provider.dart';
-// import 'package:skype_clone/screens/chatscreens/text_parsing/firebase_api_handler.dart';
-// import 'package:skype_clone/screens/chatscreens/text_parsing/pdf_view_screen.dart';
-// import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/controls_widgets.dart';
+// import 'package:chatify/provider/user_provider.dart';
+// import 'package:chatify/screens/chatscreens/text_parsing/firebase_api_handler.dart';
+// import 'package:chatify/screens/chatscreens/text_parsing/pdf_view_screen.dart';
+// import 'package:chatify/screens/chatscreens/text_parsing/widgets/controls_widgets.dart';
 
-// import 'package:skype_clone/screens/chatscreens/widgets/arc_class.dart';
-// import 'package:skype_clone/utils/utilities.dart';
+// import 'package:chatify/screens/chatscreens/widgets/arc_class.dart';
+// import 'package:chatify/utils/utilities.dart';
 
 // class TextRecognitionWidget extends StatefulWidget {
 //   final String receiverId;

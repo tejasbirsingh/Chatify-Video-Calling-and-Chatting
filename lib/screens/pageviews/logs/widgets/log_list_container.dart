@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/log.dart';
-import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-import 'package:skype_clone/screens/pageviews/chats/widgets/quiet_box.dart';
-import 'package:skype_clone/utils/utilities.dart';
-import 'package:skype_clone/widgets/custom_tile.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/log.dart';
+import 'package:chatify/resources/local_db/repository/log_repository.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/screens/pageviews/chats/widgets/quiet_box.dart';
+import 'package:chatify/utils/utilities.dart';
+import 'package:chatify/widgets/custom_tile.dart';
 
 class LogListContainer extends StatefulWidget {
   @override

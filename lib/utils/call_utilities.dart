@@ -2,15 +2,15 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/call.dart';
-import 'package:skype_clone/models/log.dart';
-import 'package:skype_clone/models/message.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/resources/call_methods.dart';
-import 'package:skype_clone/resources/chat_methods.dart';
-import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
-import 'package:skype_clone/screens/callscreens/call_screen.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/call.dart';
+import 'package:chatify/models/log.dart';
+import 'package:chatify/models/message.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/resources/call_methods.dart';
+import 'package:chatify/resources/chat_methods.dart';
+import 'package:chatify/resources/local_db/repository/log_repository.dart';
+import 'package:chatify/screens/callscreens/call_screen.dart';
 
 class CallUtils {
   static final CallMethods callMethods = CallMethods();

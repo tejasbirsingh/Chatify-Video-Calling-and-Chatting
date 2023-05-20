@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:provider/provider.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
-import 'package:skype_clone/screens/chatscreens/chat_screen.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
-import 'package:skype_clone/widgets/custom_tile.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/screens/callscreens/pickup/pickup_layout.dart';
+import 'package:chatify/screens/chatscreens/chat_screen.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/utils/universal_variables.dart';
+import 'package:chatify/widgets/custom_tile.dart';
 
 class SearchScreen extends StatefulWidget {
   @override

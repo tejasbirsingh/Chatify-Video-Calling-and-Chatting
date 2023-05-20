@@ -1,7 +1,7 @@
-import 'package:skype_clone/models/log.dart';
-import 'package:skype_clone/resources/local_db/db/hive_methods.dart';
+import 'package:chatify/models/log.dart';
+import 'package:chatify/resources/local_db/db/hive_methods.dart';
 import 'package:meta/meta.dart';
-import 'package:skype_clone/resources/local_db/db/sqlite_methods.dart';
+import 'package:chatify/resources/local_db/db/sqlite_methods.dart';
 
 class LogRepository {
   static var dbObject;

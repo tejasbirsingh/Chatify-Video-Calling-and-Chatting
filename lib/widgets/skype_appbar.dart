@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:skype_clone/widgets/appbar.dart';
+import 'package:chatify/widgets/appbar.dart';
 
 class SkypeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final title;

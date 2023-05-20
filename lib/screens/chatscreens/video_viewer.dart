@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/chewie_player.dart';
+import 'package:chatify/screens/chatscreens/widgets/chewie_player.dart';
 import 'package:video_player/video_player.dart';
 
 

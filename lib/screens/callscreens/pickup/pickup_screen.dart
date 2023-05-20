@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/call.dart';
-import 'package:skype_clone/models/log.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/call_methods.dart';
-import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
-import 'package:skype_clone/screens/callscreens/call_screen.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/call.dart';
+import 'package:chatify/models/log.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/call_methods.dart';
+import 'package:chatify/resources/local_db/repository/log_repository.dart';
+import 'package:chatify/screens/callscreens/call_screen.dart';
 
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:skype_clone/utils/permissions.dart';
+import 'package:chatify/utils/permissions.dart';
 
 class PickupScreen extends StatefulWidget {
   final Call call;

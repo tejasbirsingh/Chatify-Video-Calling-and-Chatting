@@ -1,4 +1,4 @@
-import 'package:skype_clone/models/log.dart';
+import 'package:chatify/models/log.dart';
 
 abstract class LogInterface {
   openDb(dbName);

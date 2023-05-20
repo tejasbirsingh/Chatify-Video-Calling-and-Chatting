@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/message.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/chat_methods.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/message.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/chat_methods.dart';
 
 class profilePage extends StatefulWidget {
   final UserData user;

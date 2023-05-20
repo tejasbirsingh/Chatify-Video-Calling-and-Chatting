@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/arc_class.dart';
+import 'package:chatify/screens/chatscreens/widgets/arc_class.dart';
 
 class ControlsWidget extends StatelessWidget {
   final VoidCallback onClickedCamera;

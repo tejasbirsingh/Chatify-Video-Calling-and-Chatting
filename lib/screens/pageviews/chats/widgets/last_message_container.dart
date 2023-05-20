@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:skype_clone/models/message.dart';
+import 'package:chatify/models/message.dart';
 
 class LastMessageContainer extends StatelessWidget {
   final stream;

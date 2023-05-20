@@ -1,4 +1,4 @@
-package com.example.skype_clone
+package com.example.chatify
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

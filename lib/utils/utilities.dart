@@ -4,7 +4,7 @@ import 'package:image/image.dart' as Im;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:skype_clone/enum/user_state.dart';
+import 'package:chatify/enum/user_state.dart';
 
 class Utils {
   static String getUsername(String? email) {
@@ -13,9 +13,10 @@ class Utils {
 
   static String getInitials(String? name) {
     if (name != null) {
-      List<String> nameSplit = name.split(" ");
-      String firstNameInitial = nameSplit[0][0];
-      String lastNameInitial = nameSplit.length > 1 ? nameSplit[1][0] : "";
+      final List<String> nameSplit = name.split(" ");
+      final String firstNameInitial = nameSplit[0][0];
+      final String lastNameInitial =
+          nameSplit.length > 1 ? nameSplit[1][0] : "";
       return lastNameInitial != ""
           ? firstNameInitial + lastNameInitial
           : firstNameInitial;
@@ -23,18 +24,21 @@ class Utils {
     return "";
   }
 
-  static Future<File> pickImage({required ImageSource source}) async {
-    XFile? selectedImage = await ImagePicker().pickImage(source: source);
-    File img = File(selectedImage!.path);
-    return await compressImage(img);
+  static Future<File?> pickImage({required ImageSource source}) async {
+    final XFile? selectedImage = await ImagePicker().pickImage(source: source);
+    if (selectedImage != null) {
+      File? img = File(selectedImage.path);
+      return await compressImage(img);
+    }
+    return null;
   }
 
-  static Future<File> compressImage(File? imageToCompress) async {
+  static Future<File?> compressImage(File? imageToCompress) async {
     final tempDir = await getTemporaryDirectory();
     final path = tempDir.path;
-    int rand = Random().nextInt(10000);
+    final int rand = Random().nextInt(10000);
 
-    Im.Image? image = Im.decodeImage(imageToCompress!.readAsBytesSync());
+    final Im.Image? image = Im.decodeImage(imageToCompress!.readAsBytesSync());
     Im.copyResize(image!, width: 500, height: 500);
 
     return new File('$path/img_$rand.jpg')
@@ -45,10 +49,8 @@ class Utils {
     switch (userState) {
       case UserState.Offline:
         return 0;
-
       case UserState.Online:
         return 1;
-
       default:
         return 2;
     }
@@ -58,17 +60,15 @@ class Utils {
     switch (number) {
       case 0:
         return UserState.Offline;
-
       case 1:
         return UserState.Online;
-
       default:
         return UserState.Waiting;
     }
   }
 
   static String formatDateString(String dateString) {
-    DateTime dateTime = DateTime.parse(dateString);
+    final DateTime dateTime = DateTime.parse(dateString);
     var formatter = DateFormat('dd/MM/yy');
     return formatter.format(dateTime);
   }

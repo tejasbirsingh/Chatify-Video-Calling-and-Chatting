@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:skype_clone/enum/user_state.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/utils/utilities.dart';
+import 'package:chatify/enum/user_state.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/utils/utilities.dart';
 
 class OnlineDotIndicator extends StatelessWidget {
   final String uid;

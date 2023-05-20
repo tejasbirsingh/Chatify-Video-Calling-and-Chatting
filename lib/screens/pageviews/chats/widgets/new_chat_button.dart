@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+import 'package:chatify/utils/universal_variables.dart';
 
 class NewChatButton extends StatelessWidget {
   @override

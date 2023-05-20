@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/screens/chatscreens/messageForwarding/forward_view.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/screens/chatscreens/messageForwarding/forward_view.dart';
 
-import 'package:skype_clone/widgets/skype_appbar.dart';
+import 'package:chatify/widgets/skype_appbar.dart';
 
 class forwardPage extends StatefulWidget {
   final String message;
@@ -76,7 +76,7 @@ class _forwardPageState extends State<forwardPage> {
                       itemBuilder: (context, i) {
                         Contact user = Contact.fromMap(
                             docList[i].data() as Map<String, dynamic>);
-                        return forwardView(
+                        return ForwardView(
                           contact: user,
                           forwardedMessage: widget.message,
                           imagePath: widget.imagePath,

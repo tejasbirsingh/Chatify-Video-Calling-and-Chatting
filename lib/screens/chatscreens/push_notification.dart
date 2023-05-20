@@ -1,6 +1,6 @@
  import 'dart:convert';
 
-import 'package:skype_clone/configs/firebase_config.dart';
+import 'package:chatify/configs/firebase_config.dart';
 import 'package:http/http.dart' as http;
 
 Future<http.Response> sendNotification(

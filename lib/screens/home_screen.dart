@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/BottomBar/bar_item.dart';
-import 'package:skype_clone/constants/list_data.dart';
+import 'package:chatify/BottomBar/bar_item.dart';
+import 'package:chatify/constants/list_data.dart';
 
-import 'package:skype_clone/enum/user_state.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
-import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
-import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
-import 'package:skype_clone/screens/pageviews/friends/contacts_page.dart';
-import 'package:skype_clone/screens/pageviews/logs/log_screen.dart';
-import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/screens/status_view/allStatusPage.dart';
+import 'package:chatify/enum/user_state.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/resources/local_db/repository/log_repository.dart';
+import 'package:chatify/screens/callscreens/pickup/pickup_layout.dart';
+import 'package:chatify/screens/pageviews/chats/chat_list_screen.dart';
+import 'package:chatify/screens/pageviews/friends/contacts_page.dart';
+import 'package:chatify/screens/pageviews/logs/log_screen.dart';
+import 'package:chatify/screens/search_screen.dart';
+import 'package:chatify/screens/status_view/allStatusPage.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ChatListScreen(),
               // SearchScreen(),
               AllStatusPage(),
-              Center(child: contactsPage()),
+              Center(child: ContactsPage()),
               LogScreen(),
             ],
             controller: pageController,

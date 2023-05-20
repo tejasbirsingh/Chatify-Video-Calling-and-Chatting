@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:skype_clone/enum/view_state.dart';
+import 'package:chatify/enum/view_state.dart';
 
 class VideoUploadProvider with ChangeNotifier {
   ViewState _viewState = ViewState.IDLE;

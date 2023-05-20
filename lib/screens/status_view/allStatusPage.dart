@@ -1,23 +1,23 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/widgets/skype_appbar.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/widgets/skype_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'package:skype_clone/screens/status_view/status_screen.dart';
+import 'package:chatify/screens/status_view/status_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/constants/strings.dart';
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
-import 'package:skype_clone/resources/storage_methods.dart';
-import 'package:skype_clone/screens/pageviews/chats/widgets/quiet_box.dart';
-import 'package:skype_clone/screens/status_view/status_view.dart';
-import 'package:skype_clone/utils/utilities.dart';
+import 'package:chatify/constants/strings.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/resources/storage_methods.dart';
+import 'package:chatify/screens/pageviews/chats/widgets/quiet_box.dart';
+import 'package:chatify/screens/status_view/status_view.dart';
+import 'package:chatify/utils/utilities.dart';
 
 class AllStatusPage extends StatefulWidget {
   @override
@@ -257,7 +257,7 @@ class _AllStatusPageState extends State<AllStatusPage> {
   Future pickImage({required ImageSource source, String? userId}) async {
     File? selectedImage = await Utils.pickImage(source: source);
     final cropped = (await ImageCropper().cropImage(
-        sourcePath: selectedImage.path,
+      sourcePath: selectedImage!.path,
         aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
         compressFormat: ImageCompressFormat.jpg,
         compressQuality: 80,

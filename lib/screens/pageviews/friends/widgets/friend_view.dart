@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:chatify/models/contact.dart';
+import 'package:chatify/models/userData.dart';
+import 'package:chatify/provider/user_provider.dart';
+import 'package:chatify/resources/auth_methods.dart';
+import 'package:chatify/screens/chatscreens/chat_screen.dart';
+import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
+import 'package:chatify/screens/pageviews/chats/widgets/online_dot_indicator.dart';
+import 'package:chatify/screens/pageviews/friends/widgets/friend_custom_tile.dart';
 
-import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
-
-import 'package:skype_clone/resources/auth_methods.dart';
-
-import 'package:skype_clone/screens/chatscreens/chat_screen.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
-
-import 'package:skype_clone/screens/pageviews/chats/widgets/online_dot_indicator.dart';
-import 'package:skype_clone/screens/pageviews/friends/widgets/friend_customTile.dart';
-
-class friendView extends StatelessWidget {
+class FriendView extends StatelessWidget {
   final Contact contact;
   final AuthMethods _authMethods = AuthMethods();
 
-  friendView(this.contact);
+  FriendView(this.contact);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +38,6 @@ class friendView extends StatelessWidget {
 
 class ViewLayout extends StatelessWidget {
   final UserData friendViewLayout;
-
   final AuthMethods _authMethods = AuthMethods();
 
   ViewLayout({

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:skype_clone/provider/user_provider.dart';
+import 'package:chatify/provider/user_provider.dart';
 
 class AnimatedBottomBar extends StatefulWidget {
   final List<BarItem>? barItems;

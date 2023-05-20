@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:skype_clone/models/log.dart';
-import 'package:skype_clone/resources/local_db/interface/log_interface.dart';
+import 'package:chatify/models/log.dart';
+import 'package:chatify/resources/local_db/interface/log_interface.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
