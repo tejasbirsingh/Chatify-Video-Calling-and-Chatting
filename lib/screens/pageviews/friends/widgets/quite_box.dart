@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+
 
 class QuietBox extends StatelessWidget {
   final String heading;
   final String subtitle;
 
   QuietBox({
-    @required this.heading,
-    @required this.subtitle,
+    required this.heading,
+    required this.subtitle,
   });
 
   @override
@@ -46,8 +46,8 @@ class QuietBox extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 25),
-              FlatButton(
-                color: UniversalVariables.lightBlueColor,
+              TextButton(
+                // color: UniversalVariables.lightBlueColor,
                 child: Text("Search Friends",style: TextStyle(color: Colors.white,
                 fontSize: 18.0),
                 ),

@@ -9,12 +9,12 @@ class ControlsWidget extends StatelessWidget {
   final BuildContext context;
 
   const ControlsWidget({
-    @required this.onClickedCamera,
-    @required this.onClickedGallery,
-    @required this.onClickedScanText,
-    @required this.onClickedClear,
-    @required this.context,
-    Key key,
+    required this.onClickedCamera,
+    required this.onClickedGallery,
+    required this.onClickedScanText,
+    required this.onClickedClear,
+    required this.context,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -67,7 +67,7 @@ class ControlsWidget extends StatelessWidget {
           ),
           Text(
             name,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyText1.color, fontSize: 16.0),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: 16.0),
           )
         ],
       ),

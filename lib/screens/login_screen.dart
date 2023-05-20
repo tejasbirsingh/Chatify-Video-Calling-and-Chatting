@@ -1,17 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final String token;
+  final String? token;
 
-  const LoginScreen({Key key, this.token}) : super(key: key);
+  const LoginScreen({Key? key, this.token}) : super(key: key);
 
   @override
   LoginScreenState createState() => LoginScreenState();
@@ -24,12 +22,10 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final UserProvider userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       // backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: [
-        
           Center(
             child: loginButton(),
           ),
@@ -47,18 +43,17 @@ class LoginScreenState extends State<LoginScreen> {
     return Shimmer.fromColors(
       baseColor: Colors.white,
       highlightColor: UniversalVariables.senderColor,
-      child: FlatButton(
-        padding: EdgeInsets.all(35),
+      child: TextButton(
+        //  padding: EdgeInsets.all(35),
         child: Text(
           "LOGIN",
           style: TextStyle(
-              color: Theme.of(context).textTheme.bodyText1.color,
+              color: Theme.of(context).textTheme.bodyLarge!.color,
               fontSize: 35,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.2),
         ),
         onPressed: () => performLogin(),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -68,11 +63,9 @@ class LoginScreenState extends State<LoginScreen> {
       isLoginPressed = true;
     });
 
-    UserCredential user = await _authMethods.signIn();
+    UserCredential? user = await _authMethods.signIn();
 
-    if (user != null) {
-      authenticateUser(user, widget.token);
-    }
+    authenticateUser(user!, widget.token!);
     setState(() {
       isLoginPressed = false;
     });
@@ -91,7 +84,7 @@ class LoginScreenState extends State<LoginScreen> {
 
       if (isNewUser) {
         setAppLocker();
-        _authMethods.addDataToDb(user.user, token).then((value) {
+        _authMethods.addDataToDb(user.user!, token).then((value) {
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) {
             return HomeScreen();

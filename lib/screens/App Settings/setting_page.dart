@@ -40,7 +40,7 @@ class _settingPageState extends State<settingPage> {
           centerTitle: true,
           title: Text('Settings',
               style: GoogleFonts.oswald(
-                  textStyle: Theme.of(context).textTheme.headline1,
+                  textStyle: Theme.of(context).textTheme.displayLarge,
                   fontSize: 28.0)),
           iconTheme: Theme.of(context).iconTheme),
       body: StreamBuilder<DocumentSnapshot>(
@@ -56,7 +56,7 @@ class _settingPageState extends State<settingPage> {
                     userProvider.getUser.firstColor != null
                         ? Color(userProvider.getUser.firstColor ??
                             Colors.white.value)
-                        : Theme.of(context).backgroundColor,
+                        : Theme.of(context).colorScheme.background,
                     userProvider.getUser.secondColor != null
                         ? Color(userProvider.getUser.secondColor ??
                             Colors.white.value)
@@ -84,18 +84,18 @@ class _settingPageState extends State<settingPage> {
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
-                                    Theme.of(context).textTheme.headline1),
+                                    Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
                             'Name, Profile Photo, Email, Status',
-                            style: Theme.of(context).textTheme.bodyText2,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                            builder: (context) => customizationPage()),
+                            builder: (context) => CustomizationPage()),
                       ),
                       child: ListTile(
                           leading: Icon(
@@ -108,17 +108,17 @@ class _settingPageState extends State<settingPage> {
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
-                                    Theme.of(context).textTheme.headline1),
+                                    Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
                             'Dark Mode, App Color',
-                            style: Theme.of(context).textTheme.bodyText2,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => privacyPage()),
+                        MaterialPageRoute(builder: (context) => PrivacyPage()),
                       ),
                       child: ListTile(
                           leading: Icon(
@@ -131,11 +131,11 @@ class _settingPageState extends State<settingPage> {
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
-                                    Theme.of(context).textTheme.headline1),
+                                    Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
                             'App Locker, Blocked Contacts',
-                            style: Theme.of(context).textTheme.bodyText2,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
                     ),
@@ -154,11 +154,11 @@ class _settingPageState extends State<settingPage> {
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
-                                    Theme.of(context).textTheme.headline1),
+                                    Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
                             'Developer, version',
-                            style: Theme.of(context).textTheme.bodyText2,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
                     ),

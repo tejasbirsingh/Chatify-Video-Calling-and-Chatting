@@ -17,17 +17,17 @@ class LastMessageContainer extends StatelessWidget {
       stream: stream,
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasData) {
-          var docList = snapshot.data.docs;
+          var docList = snapshot.data!.docs;
 
           if (docList.isNotEmpty) {
-            Message message = Message.fromMap(docList.last.data());
+            Message message = Message.fromMap(docList.last.data() as Map<String, dynamic>);
             return SizedBox(
               width: MediaQuery.of(context).size.width * 0.6,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                   message.message.length > 20 ?  message.message.substring(0,20) : message.message,
+                   message.message!.length > 20 ?  message.message!.substring(0,20) : message.message!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
        
@@ -38,7 +38,7 @@ class LastMessageContainer extends StatelessWidget {
                     ),)
                   ),
              
-                  Text(dateTimeFormat(message.timestamp.toDate()),
+                  Text(dateTimeFormat(message.timestamp!.toDate()),
                     style: GoogleFonts.cuprum(textStyle :TextStyle(
                       color: Colors.grey,
                       fontSize: 15.0,

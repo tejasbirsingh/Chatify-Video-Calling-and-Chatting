@@ -34,7 +34,7 @@ class _contactsPageState extends State<contactsPage> {
           actions: [
             IconButton(
               icon: Icon(
-                FontAwesomeIcons.slidersH,
+                FontAwesomeIcons.sliders,
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () {
@@ -48,7 +48,7 @@ class _contactsPageState extends State<contactsPage> {
             gradient: LinearGradient(colors: [
               userProvider.getUser.firstColor != null
                   ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-                  : Theme.of(context).backgroundColor,
+                  : Theme.of(context).colorScheme.background,
               userProvider.getUser.secondColor != null
                   ? Color(
                       userProvider.getUser.secondColor ?? Colors.white.value)
@@ -59,7 +59,7 @@ class _contactsPageState extends State<contactsPage> {
             stream: _auth.getFriends(uid: userProvider.getUser.uid),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                var docList = snapshot.data.docs;
+                var docList = snapshot.data!.docs;
 
                 if (docList.isEmpty) {
                   return QuietBox(
@@ -72,7 +72,8 @@ class _contactsPageState extends State<contactsPage> {
                   padding: EdgeInsets.all(10.0),
                   itemCount: docList.length,
                   itemBuilder: (context, i) {
-                    Contact user = Contact.fromMap(docList[i].data());
+                    Contact user = Contact.fromMap(
+                        docList[i].data() as Map<String, dynamic>);
                     return friendView(user);
                   },
                 );
@@ -86,7 +87,7 @@ class _contactsPageState extends State<contactsPage> {
   }
 
   Future<UserData> mapUserDataFromUid(String uid) async {
-    UserData user = await _auth.getUserDetailsById(uid);
-    return user;
+    UserData? user = await _auth.getUserDetailsById(uid);
+    return user!;
   }
 }

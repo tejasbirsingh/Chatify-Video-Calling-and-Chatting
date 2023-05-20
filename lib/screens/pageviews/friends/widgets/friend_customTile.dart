@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 
-class friendCustomTile extends StatelessWidget {
+class FriendCustomTile extends StatelessWidget {
   final Widget leading;
   final Widget title;
-  final Widget icon;
+  final Widget? icon;
 
-  final Widget trailing;
+  final Widget? trailing;
   final EdgeInsets margin;
   final bool mini;
-  final GestureTapCallback onTap;
-  final GestureLongPressCallback onLongPress;
+  final GestureTapCallback? onTap;
+  final GestureLongPressCallback? onLongPress;
 
-  friendCustomTile({
-    @required this.leading,
-    @required this.title,
+  FriendCustomTile({
+    required this.leading,
+    required this.title,
     this.icon,
     
     this.trailing,

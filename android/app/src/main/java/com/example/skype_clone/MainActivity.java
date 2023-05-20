@@ -1,5 +1,5 @@
 package com.example.skype_clone;
-import io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin;
+// import io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin;
 
 // import io.flutter.embedding.android.FlutterFragment;
 import  io.flutter.embedding.android.FlutterFragmentActivity;

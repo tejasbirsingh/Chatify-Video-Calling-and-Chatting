@@ -30,11 +30,11 @@ class _ContactViewState extends State<ContactView> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserData>(
+    return FutureBuilder<UserData?>(
       future: _authMethods.getUserDetailsById(widget.contact.uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          UserData user = snapshot.data;
+          UserData user = snapshot.data!;
 
           return ViewLayout(
             contact: user,
@@ -50,9 +50,9 @@ class _ContactViewState extends State<ContactView> {
 }
 
 class ViewLayout extends StatefulWidget {
-  final UserData contact;
-  final String senderId;
-  ViewLayout({@required this.contact, this.senderId});
+  final UserData? contact;
+  final String? senderId;
+  ViewLayout({required this.contact, this.senderId});
 
   @override
   _ViewLayoutState createState() => _ViewLayoutState();
@@ -75,17 +75,17 @@ class _ViewLayoutState extends State<ViewLayout> {
           context,
           MaterialPageRoute(
             builder: (context) => ChatScreen(
-              receiver: widget.contact,
+              receiver: widget.contact!,
             ),
           )),
       title: Row(
         children: [
           Text(
-              (widget.contact != null ? widget.contact.name : null) != null
-                  ? widget.contact.name
+              (widget.contact != null ? widget.contact!.name! : null) != null
+                  ? widget.contact!.name!
                   : "..",
               style: GoogleFonts.patuaOne(
-                  textStyle: Theme.of(context).textTheme.headline1,
+                  textStyle: Theme.of(context).textTheme.displayLarge,
                   letterSpacing: 1.5)),
           SizedBox(
             width: 40.0,
@@ -94,12 +94,12 @@ class _ViewLayoutState extends State<ViewLayout> {
           FutureBuilder<int>(
               initialData: 0,
               future: _chatMethods.unreadMessagesCount(
-                  senderId: widget.senderId, receiverId: widget.contact.uid),
+                  senderId: widget.senderId!, receiverId: widget.contact!.uid!),
               builder: (_, snapshot) {
                 return snapshot.data != 0
-                    ? Text(snapshot.data.toString() ?? "",
+                    ? Text(snapshot.data.toString(),
                         style: GoogleFonts.patuaOne(
-                            textStyle: Theme.of(context).textTheme.bodyText1,
+                            textStyle: Theme.of(context).textTheme.bodyLarge,
                             letterSpacing: 1.5))
                     : Text("");
               }),
@@ -107,8 +107,8 @@ class _ViewLayoutState extends State<ViewLayout> {
       ),
       subtitle: LastMessageContainer(
         stream: _chatMethods.fetchLastMessageBetween(
-          senderId: userProvider.getUser.uid,
-          receiverId: widget.contact.uid,
+          senderId: userProvider.getUser.uid!,
+          receiverId: widget.contact!.uid!,
         ),
       ),
       leading: Container(
@@ -116,18 +116,18 @@ class _ViewLayoutState extends State<ViewLayout> {
         child: Stack(
           children: <Widget>[
             OnlineDotIndicator(
-              uid: widget.contact.uid,
+              uid: widget.contact!.uid!,
             ),
             Center(
               child: CachedImage(
-                widget.contact.profilePhoto,
+                widget.contact!.profilePhoto!,
                 radius: 60,
                 isRound: true,
                 isTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => profilePage(
-                        user: widget.contact,
+                        user: widget.contact!,
                       ),
                     )),
               ),

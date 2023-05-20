@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 class ImagePage extends StatefulWidget {
   final String imageUrl;
   final List<String> imageUrlList;
-  ImagePage({@required this.imageUrl, this.imageUrlList});
+  ImagePage({required this.imageUrl, required this.imageUrlList});
   @override
   _ImagePageState createState() => _ImagePageState();
 }
@@ -22,10 +22,10 @@ class _ImagePageState extends State<ImagePage> {
   String downloadedMessage = 'Initializing...';
   bool _isDownloading = false;
   double _percentage = 0;
-  String fileName;
+  late String fileName;
   int initialPage = 0;
 
-  String imageDownloadUrl;
+  late String imageDownloadUrl;
   @override
   void initState() {
     super.initState();
@@ -47,7 +47,7 @@ class _ImagePageState extends State<ImagePage> {
     Dio dio = Dio();
 
     dio.download(
-        imageDownloadUrl ?? noImageAvailable, '${dir.path}/${fileName}.jpg',
+        imageDownloadUrl ?? noImageAvailable, '${dir!.path}/$fileName.jpg',
         onReceiveProgress: (actualBytes, totalBytes) {
       var percentage = actualBytes / totalBytes * 100;
       _percentage = percentage / 100;
@@ -66,7 +66,7 @@ class _ImagePageState extends State<ImagePage> {
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
-      child: Scaffold(     
+      child: Scaffold(
         appBar: AppBar(
           iconTheme: Theme.of(context).iconTheme,
           actions: [
@@ -93,7 +93,7 @@ class _ImagePageState extends State<ImagePage> {
                     userProvider.getUser.firstColor != null
                         ? Color(userProvider.getUser.firstColor ??
                             Colors.white.value)
-                        : Theme.of(context).backgroundColor,
+                        : Theme.of(context).colorScheme.background,
                     userProvider.getUser.secondColor != null
                         ? Color(userProvider.getUser.secondColor ??
                             Colors.white.value)
@@ -101,7 +101,7 @@ class _ImagePageState extends State<ImagePage> {
                   ]),
                 ),
                 padding: EdgeInsets.symmetric(vertical: 20.0),
-                height: MediaQuery.of(context).size.height ,
+                height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 child: CarouselSlider(
                   options: CarouselOptions(
@@ -111,7 +111,7 @@ class _ImagePageState extends State<ImagePage> {
                         });
                       },
                       enlargeCenterPage: true,
-                      height: MediaQuery.of(context).size.height,                      
+                      height: MediaQuery.of(context).size.height,
                       enableInfiniteScroll: false,
                       viewportFraction: 0.95,
                       enlargeStrategy: CenterPageEnlargeStrategy.scale,
@@ -121,6 +121,7 @@ class _ImagePageState extends State<ImagePage> {
                             child: CachedImage(
                               item,
                               fit: BoxFit.cover,
+                              isTap: () => {},
                             ),
                           ))
                       .toList(),
@@ -150,7 +151,6 @@ class _ImagePageState extends State<ImagePage> {
                 : Text(""),
           ],
         ),
-
       ),
     );
   }

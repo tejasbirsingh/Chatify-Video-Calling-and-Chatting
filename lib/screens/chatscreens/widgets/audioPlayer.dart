@@ -5,16 +5,16 @@ class audioPlayerClass extends StatefulWidget {
   final String url;
   final bool isSender;
 
-  const audioPlayerClass({Key key, this.url, this.isSender}) : super(key: key);
+  const audioPlayerClass({Key? key, required this.url, required this.isSender}) : super(key: key);
   @override
   _audioPlayerClassState createState() => _audioPlayerClassState();
 }
 
 class _audioPlayerClassState extends State<audioPlayerClass> {
   AudioPlayer audioPlayer = AudioPlayer();
-  Duration totalDuration;
-  Duration position;
-  String audioState;
+  Duration? totalDuration;
+  Duration? position;
+  String? audioState;
   @override
   void initState() {
     super.initState();
@@ -27,12 +27,12 @@ class _audioPlayerClassState extends State<audioPlayerClass> {
         totalDuration = newDuration;
       });
     });
-    audioPlayer.onAudioPositionChanged.listen((updatesPosition) {
+    audioPlayer.onPositionChanged.listen((updatesPosition) {
       setState(() {
         position = updatesPosition;
       });
     });
-    audioPlayer.onPlayerCompletion.listen((event) {
+    audioPlayer.onPlayerComplete.listen((event) {
       setState(() {
         position = Duration(milliseconds: 0);
         audioState = "stopped";
@@ -41,11 +41,11 @@ class _audioPlayerClassState extends State<audioPlayerClass> {
 
     audioPlayer.onPlayerStateChanged.listen((playerState) {
       setState(() {
-        if (playerState == AudioPlayerState.STOPPED) {
+        if (playerState == PlayerState.stopped) {
           audioState = 'stopped';
-        } else if (playerState == AudioPlayerState.PLAYING) {
+        } else if (playerState == PlayerState.playing) {
           audioState = 'playing';
-        } else if (playerState == AudioPlayerState.PAUSED) {
+        } else if (playerState == PlayerState.paused) {
           audioState = 'paused';
         }
       });
@@ -53,7 +53,7 @@ class _audioPlayerClassState extends State<audioPlayerClass> {
   }
 
   playAudio() async {
-    await audioPlayer.play(widget.url);
+    await audioPlayer.play(UrlSource(widget.url));
   }
 
   pauseAudio() async {
@@ -85,7 +85,7 @@ class _audioPlayerClassState extends State<audioPlayerClass> {
                           enabledThumbRadius: 10,
                         )),
                     child: Slider(
-                      value: position == null ? 0 : position.inMilliseconds.toDouble(),
+                      value: position == null ? 0 : position!.inMilliseconds.toDouble(),
                       activeColor: widget.isSender ? Colors.blue : Colors.green,
                       inactiveColor: Colors.white,
                       onChanged: (val) {
@@ -94,10 +94,10 @@ class _audioPlayerClassState extends State<audioPlayerClass> {
                       min: 0,
                       max: totalDuration == null
                           ? 20
-                          : totalDuration.inMilliseconds.toDouble(),
+                          : totalDuration!.inMilliseconds.toDouble(),
                     ),
                   ),
-                  Text("${curr} / ${total} "),
+                  Text("$curr / $total "),
                   IconButton(
                     color: Colors.white,
                     iconSize: 35.0,

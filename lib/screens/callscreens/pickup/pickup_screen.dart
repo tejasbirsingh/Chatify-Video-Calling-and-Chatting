@@ -20,7 +20,7 @@ class PickupScreen extends StatefulWidget {
   final Call call;
 
   PickupScreen({
-    @required this.call,
+    required this.call,
   });
 
   @override
@@ -34,7 +34,7 @@ class _PickupScreenState extends State<PickupScreen> {
 
   bool isCallMissed = true;
 
-  addToLocalStorage({@required String callStatus}) {
+  addToLocalStorage({required String callStatus}) {
     Log log = Log(
       callerName: widget.call.callerName,
       callerPic: widget.call.callerPic,
@@ -73,7 +73,7 @@ class _PickupScreenState extends State<PickupScreen> {
           gradient: LinearGradient(colors: [
             userProvider.getUser.firstColor != null
                 ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-                : Theme.of(context).backgroundColor,
+                : Theme.of(context).colorScheme.background,
             userProvider.getUser.secondColor != null
                 ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
                 : Theme.of(context).scaffoldBackgroundColor,
@@ -89,19 +89,19 @@ class _PickupScreenState extends State<PickupScreen> {
               style: GoogleFonts.patuaOne(
                   textStyle: TextStyle(
                       fontSize: 30,
-                      color: Theme.of(context).textTheme.headline1.color)),
+                      color: Theme.of(context).textTheme.displayLarge!.color)),
             ),
             SizedBox(height: 30),
             CachedImage(
-              widget.call.callerPic,
+              widget.call.callerPic!,
               isRound: false,
               radius: 200,
               height: 200.0,
               width: 200.0,
             ),
             SizedBox(height: 15),
-            Text(widget.call.callerName,
-                style: Theme.of(context).textTheme.headline1),
+            Text(widget.call.callerName!,
+                style: Theme.of(context).textTheme.displayLarge),
             SizedBox(height: 75),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -111,24 +111,7 @@ class _PickupScreenState extends State<PickupScreen> {
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(60.0),
                   ),
-                  // child: IconButton(
-                  //     icon: Icon(Icons.call),
-                  //     color: Colors.white,
-                  //     onPressed: () async {
-                  //       FlutterRingtonePlayer.stop();
-                  //       isCallMissed = false;
-                  //       addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                  //       await Permissions.cameraAndMicrophonePermissionsGranted()
-                  //           ? Navigator.push(
-                  //               context,
-                  //               MaterialPageRoute(
-                  //                 builder: (context) =>
-                  //                     CallScreen(call: widget.call),
-                  //               ),
-                  //             )
-                  //           // ignore: unnecessary_statements
-                  //           : {};
-                  //     }),
+                 
                   child: GestureDetector(
                     onTap: () async {
                       FlutterRingtonePlayer.stop();
@@ -142,8 +125,8 @@ class _PickupScreenState extends State<PickupScreen> {
                                     CallScreen(call: widget.call),
                               ),
                             )
-                          // ignore: unnecessary_statements
-                          : {};
+                       
+                          : [];
                     },
                     child: Container(
                       width: 70.0,
@@ -161,16 +144,7 @@ class _PickupScreenState extends State<PickupScreen> {
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(60.0),
                     ),
-                    // child: IconButton(
-                    //   icon: Icon(Icons.call_end),
-                    //   color: Colors.white,
-                    //   onPressed: () async {
-                    //     FlutterRingtonePlayer.stop();
-                    //     isCallMissed = false;
-                    //     addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                    //     await callMethods.endCall(call: widget.call);
-                    //   },
-                    // ),
+                
                     child: GestureDetector(
                       onTap: () async {
                         FlutterRingtonePlayer.stop();

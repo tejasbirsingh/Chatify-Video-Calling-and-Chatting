@@ -1,28 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/material.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
+
 import 'package:skype_clone/screens/pageviews/chats/widgets/quiet_box.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
 
-class statusPage extends StatefulWidget {
-  final Contact contact;
+class StatusPage extends StatefulWidget {
+  final Contact? contact;
 
-  const statusPage({Key key, this.contact}) : super(key: key);
+  const StatusPage({Key? key, this.contact}) : super(key: key);
   @override
-  _statusPageState createState() => _statusPageState();
+  _StatusPageState createState() => _StatusPageState();
 }
 
-class _statusPageState extends State<statusPage> {
+class _StatusPageState extends State<StatusPage> {
   final storyController = StoryController();
-  final AuthMethods _authMethods = AuthMethods();
+
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _userCollection =
       _firestore.collection(USERS_COLLECTION);
-  List<StoryItem> stories = List();
+  List<StoryItem> stories = [];
   @override
   void dispose() {
     storyController.dispose();
@@ -47,12 +47,12 @@ class _statusPageState extends State<statusPage> {
       child: Scaffold(
         body: StreamBuilder<QuerySnapshot>(
             stream: _userCollection
-                .doc(widget.contact.uid)
+                .doc(widget.contact!.uid)
                 .collection(STATUS)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                var docList = snapshot.data.docs;
+                var docList = snapshot.data!.docs;
 
                 if (docList.isEmpty) {
                   return QuietBox(
@@ -65,9 +65,10 @@ class _statusPageState extends State<statusPage> {
                   stories.add(StoryItem.pageImage(
                     
                     imageFit: BoxFit.scaleDown,
-                    caption: (formatTime(element.data()['timestamp'].toDate()))
+                    caption:
+                        (formatTime(element['timestamp'].toDate()))
                         .toString(),
-                    url: element.data()['url'],
+                    url: element['url'],
                     controller: storyController,
                   )); 
                 });
@@ -90,7 +91,13 @@ class _statusPageState extends State<statusPage> {
                   ],
                 );
               }
-            }),
+              return QuietBox(
+                heading: "Status will be shown here",
+                subtitle: "",
+              );
+           
+            }
+            ),
       ),
     );
   }

@@ -16,7 +16,7 @@ class UserCircle extends StatelessWidget {
       onTap: () => showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         builder: (context) => UserDetailsContainer(),
       ),
       child: Container(
@@ -30,9 +30,9 @@ class UserCircle extends StatelessWidget {
             Align(
               alignment: Alignment.center,
               child: Text(
-                Utils.getInitials(userProvider.getUser.name),
+                Utils.getInitials(userProvider.getUser.name!),
                 style: GoogleFonts.anton(
-                  textStyle: Theme.of(context).textTheme.headline1,
+                  textStyle: Theme.of(context).textTheme.displayLarge,
                 letterSpacing: 2.0),
               ),
             ),

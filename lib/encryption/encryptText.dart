@@ -47,7 +47,7 @@ String decryptAESCryptoJS(String encrypted, String passphrase) {
 Tuple2<Uint8List, Uint8List> deriveKeyAndIV(String passphrase, Uint8List salt) {
   var password = createUint8ListFromString(passphrase);
   Uint8List concatenatedHashes = Uint8List(0);
-  Uint8List currentHash = Uint8List(0);
+  List<int> currentHash = Uint8List(0);
   bool enoughBytesForKey = false;
   Uint8List preHash = Uint8List(0);
 

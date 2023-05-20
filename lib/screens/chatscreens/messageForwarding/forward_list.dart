@@ -13,7 +13,7 @@ import 'package:skype_clone/widgets/skype_appbar.dart';
 class forwardPage extends StatefulWidget {
   final String message;
   final String imagePath;
-  forwardPage({@required this.message, @required this.imagePath});
+  forwardPage({required this.message, required this.imagePath});
   @override
   _forwardPageState createState() => _forwardPageState();
 }
@@ -33,12 +33,14 @@ class _forwardPageState extends State<forwardPage> {
         onPressed: () =>
             Navigator.push(context, MaterialPageRoute(builder: (context) {
           Navigator.pop(context);
+          return Container();
         })),
       ),
       title: Text(
         'Forward Message',
         style: GoogleFonts.oswald(
-            textStyle: Theme.of(context).textTheme.headline1, fontSize: 26.0),
+            textStyle: Theme.of(context).textTheme.displayLarge,
+            fontSize: 26.0),
       ),
       actions: [],
     );
@@ -53,7 +55,7 @@ class _forwardPageState extends State<forwardPage> {
                     userProvider.getUser.firstColor != null
                         ? Color(userProvider.getUser.firstColor ??
                             Colors.white.value)
-                        : Theme.of(context).backgroundColor,
+                        : Theme.of(context).colorScheme.background,
                     userProvider.getUser.secondColor != null
                         ? Color(userProvider.getUser.secondColor ??
                             Colors.white.value)
@@ -65,14 +67,15 @@ class _forwardPageState extends State<forwardPage> {
                 stream: _auth.getFriends(uid: userProvider.getUser.uid),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    var docList = snapshot.data.docs;
+                    var docList = snapshot.data!.docs;
                     if (docList.isEmpty) return Container();
 
                     return ListView.builder(
                       padding: EdgeInsets.all(10.0),
                       itemCount: docList.length,
                       itemBuilder: (context, i) {
-                        Contact user = Contact.fromMap(docList[i].data());
+                        Contact user = Contact.fromMap(
+                            docList[i].data() as Map<String, dynamic>);
                         return forwardView(
                           contact: user,
                           forwardedMessage: widget.message,
@@ -92,7 +95,7 @@ class _forwardPageState extends State<forwardPage> {
   }
 
   Future<UserData> mapUserDataFromUid(String uid) async {
-    UserData user = await _auth.getUserDetailsById(uid);
-    return user;
+    UserData? user = await _auth.getUserDetailsById(uid);
+    return user!;
   }
 }

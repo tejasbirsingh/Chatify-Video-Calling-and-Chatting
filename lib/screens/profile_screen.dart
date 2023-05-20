@@ -13,13 +13,13 @@ import 'package:skype_clone/resources/chat_methods.dart';
 class profilePage extends StatefulWidget {
   final UserData user;
 
-  const profilePage({Key key, @required this.user}) : super(key: key);
+  const profilePage({Key? key, required this.user}) : super(key: key);
   @override
   _profilePageState createState() => _profilePageState();
 }
 
 class _profilePageState extends State<profilePage> {
-  String currUserId;
+  late String currUserId;
   bool _first = true;
   ChatMethods _chatMethods = ChatMethods();
   double _fontSize = 60;
@@ -45,10 +45,10 @@ class _profilePageState extends State<profilePage> {
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
-  currUserId  = userProvider.getUser.uid;
+    currUserId = userProvider.getUser.uid!;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: NestedScrollView(
           dragStartBehavior: DragStartBehavior.start,
           headerSliverBuilder: (BuildContext context, bool innerBox) {
@@ -71,14 +71,14 @@ class _profilePageState extends State<profilePage> {
                           fontWeight: _weight),
                     ),
                     child: Text(
-                      widget.user.name,
+                      widget.user.name!,
                     ),
                   ),
                   flexibleSpace: Stack(
                     children: [
                       Positioned.fill(
                           child: Image.network(
-                        widget.user.profilePhoto,
+                        widget.user.profilePhoto!,
                         fit: BoxFit.cover,
                       )),
                     ],
@@ -91,7 +91,7 @@ class _profilePageState extends State<profilePage> {
                 userProvider.getUser.firstColor != null
                     ? Color(
                         userProvider.getUser.firstColor ?? Colors.white.value)
-                    : Theme.of(context).backgroundColor,
+                    : Theme.of(context).colorScheme.background,
                 userProvider.getUser.secondColor != null
                     ? Color(
                         userProvider.getUser.secondColor ?? Colors.white.value)
@@ -100,113 +100,115 @@ class _profilePageState extends State<profilePage> {
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 18.0),
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.email_outlined,
-                      color: Theme.of(context).iconTheme.color,
+              child: SizedBox(
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height: 10.0,
                     ),
-                    title: Text(
-                      'Email',
-                      style: Theme.of(context).textTheme.bodyText1,
+                    ListTile(
+                      leading: Icon(
+                        Icons.email_outlined,
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                      title: Text(
+                        'Email',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      subtitle: Text(widget.user.email!,
+                          style: Theme.of(context).textTheme.displayLarge),
                     ),
-                    subtitle: Text(widget.user.email,
-                        style: Theme.of(context).textTheme.headline1),
-                  ),
-                  Divider(
-                    thickness: 1.0,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.info_outline_rounded,
-                      color: Theme.of(context).iconTheme.color,
+                    Divider(
+                      thickness: 1.0,
+                      color: Theme.of(context).dividerColor,
                     ),
-                    title: Text(
-                      'Status',
-                      style: Theme.of(context).textTheme.bodyText1,
-                    ),
-                    subtitle: Text(widget.user.status ?? "No Status",
-                        style: Theme.of(context).textTheme.headline1),
-                  ),
-                  Divider(
-                    thickness: 1.0,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                  FutureBuilder(
-                    future: _chatMethods.isBlocked(
-                        userProvider.getUser.uid, widget.user.uid),
-                    builder: (context, AsyncSnapshot<bool> snapshot) =>
-                        ListTile(
+                    ListTile(
                       leading: Icon(
                         Icons.info_outline_rounded,
                         color: Theme.of(context).iconTheme.color,
                       ),
                       title: Text(
-                        snapshot.data == true ? 'Block' : 'Unblock',
-                        style: Theme.of(context).textTheme.headline1,
+                        'Status',
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      trailing: IconButton(
-                        iconSize: 35.0,
-                        icon: snapshot.data == true
-                            ? Icon(
-                                Icons.block,
-                                color: Colors.red,
-                              )
-                            : Icon(
-                                Icons.block_flipped,
-                                color: Colors.green,
-                              ),
-                        onPressed: () {
-                          _chatMethods.addToBlockedList(
-                              senderId: userProvider.getUser.uid,
-                              receiverId: widget.user.uid);
-                        },
+                      subtitle: Text(widget.user.status ?? "No Status",
+                          style: Theme.of(context).textTheme.displayLarge),
+                    ),
+                    Divider(
+                      thickness: 1.0,
+                      color: Theme.of(context).dividerColor,
+                    ),
+                    FutureBuilder(
+                      future: _chatMethods.isBlocked(
+                          userProvider.getUser.uid, widget.user.uid),
+                      builder: (context, AsyncSnapshot<bool> snapshot) =>
+                          ListTile(
+                        leading: Icon(
+                          Icons.info_outline_rounded,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          snapshot.data == true ? 'Block' : 'Unblock',
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                        trailing: IconButton(
+                          iconSize: 35.0,
+                          icon: snapshot.data == true
+                              ? Icon(
+                                  Icons.block,
+                                  color: Colors.red,
+                                )
+                              : Icon(
+                                  Icons.block_flipped,
+                                  color: Colors.green,
+                                ),
+                          onPressed: () {
+                            _chatMethods.addToBlockedList(
+                                senderId: userProvider.getUser.uid,
+                                receiverId: widget.user.uid);
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  Divider(
-                    thickness: 1.0,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                  FutureBuilder(
-                    future: _chatMethods.isMuted(
-                        userProvider.getUser.uid, widget.user.uid),
-                    builder: (context, AsyncSnapshot<bool> snapshot) =>
-                        ListTile(
-                      leading: Icon(
-                        Icons.info_outline_rounded,
-                        color: Theme.of(context).iconTheme.color,
-                      ),
-                      title: Text(
-                        snapshot.data == false ? 'Mute' : 'Unmute',
-                        style: Theme.of(context).textTheme.headline1,
-                      ),
-                      trailing: IconButton(
-                        iconSize: 35.0,
-                        icon: snapshot.data == false
-                            ? Icon(
-                                Icons.volume_mute,
-                                color: Colors.red,
-                              )
-                            : Icon(
-                              FontAwesomeIcons.volumeUp,
-                                color: Colors.green,
-                              ),
-                        onPressed: () {
-                          _chatMethods.addToMutedList(
-                              senderId: userProvider.getUser.uid,
-                              receiverId: widget.user.uid);
-                        },
+                    Divider(
+                      thickness: 1.0,
+                      color: Theme.of(context).dividerColor,
+                    ),
+                    FutureBuilder(
+                      future: _chatMethods.isMuted(
+                          userProvider.getUser.uid!, widget.user.uid!),
+                      builder: (context, AsyncSnapshot<bool> snapshot) =>
+                          ListTile(
+                        leading: Icon(
+                          Icons.info_outline_rounded,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          snapshot.data == false ? 'Mute' : 'Unmute',
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                        trailing: IconButton(
+                          iconSize: 35.0,
+                          icon: snapshot.data == false
+                              ? Icon(
+                                  Icons.volume_mute,
+                                  color: Colors.red,
+                                )
+                              : Icon(
+                                  FontAwesomeIcons.volumeUp,
+                                  color: Colors.green,
+                                ),
+                          onPressed: () {
+                            _chatMethods.addToMutedList(
+                                senderId: userProvider.getUser.uid,
+                                receiverId: widget.user.uid);
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  messageList()
-                ],
+                    messageList()
+                  ],
+                ),
               ),
             ),
           ),
@@ -214,31 +216,35 @@ class _profilePageState extends State<profilePage> {
       ),
     );
   }
-   Widget messageList() {
+
+  Widget messageList() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection(MESSAGES_COLLECTION)
           .doc(currUserId)
-          .collection(widget.user.uid)
+          .collection(widget.user.uid!)
           .orderBy(TIMESTAMP_FIELD, descending: true)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.data == null) {
           return Center(child: CircularProgressIndicator());
         }
-        return ListView.builder(
-          padding: EdgeInsets.all(10),
-          // controller: _listScrollController,
-          reverse: true,
-          itemCount: snapshot.data.docs.length,
-          itemBuilder: (context, index) {
-            Message message = Message.fromMap(snapshot.data.docs[index].data());
-            return Container(child:Text(message.message));
-            // return chatMessageItem(snapshot.data.docs[index]);
-          },
+        return SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: ListView.builder(
+            padding: EdgeInsets.all(10),
+            // controller: _listScrollController,
+            reverse: true,
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              Message message = Message.fromMap(
+                  snapshot.data!.docs[index].data() as Map<String, dynamic>);
+              return Container(child: Text(message.message!));
+              // return chatMessageItem(snapshot.data.docs[index]);
+            },
+          ),
         );
       },
     );
   }
-
 }

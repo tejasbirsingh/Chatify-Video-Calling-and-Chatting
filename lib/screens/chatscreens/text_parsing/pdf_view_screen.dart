@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 
 import 'package:flutter/material.dart';
@@ -11,8 +10,8 @@ import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 
 class pdfPreviewScreen extends StatefulWidget {
-  final String path;
-  final String receiverId;
+  final String? path;
+  final String? receiverId;
   pdfPreviewScreen({this.path, this.receiverId});
 
   @override
@@ -21,18 +20,18 @@ class pdfPreviewScreen extends StatefulWidget {
 
 class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
   bool _isLoading = true;
-  PDFDocument document;
-  String userId;
-  FileUploadProvider _fileUploadProvider;
+  var document;
+  String? userId;
+  FileUploadProvider? _fileUploadProvider;
   final StorageMethods _storageMethods = StorageMethods();
   final ChatMethods _chatMethods = ChatMethods();
-  File file;
+  File? file;
 
   @override
   void initState() {
     super.initState();
     loadDocument();
-    file = File(widget.path);
+    file = File(widget.path!);
   }
 
   @override
@@ -41,7 +40,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
   }
 
   loadDocument() async {
-    document = await PDFDocument.fromAsset(widget.path);
+    document = await PDFDocument.fromAsset(widget.path!);
     setState(() => _isLoading = false);
   }
 
@@ -55,11 +54,11 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).backgroundColor,
+          backgroundColor: Theme.of(context).colorScheme.background,
           iconTheme: Theme.of(context).iconTheme,
           title: Text(
             'Pdf File',
-            style: Theme.of(context).textTheme.headline1,
+            style: Theme.of(context).textTheme.displayLarge,
           ),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -69,13 +68,11 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
             IconButton(
               icon: Icon(Icons.reply, color: Colors.lightBlue),
               onPressed: () {
-                if (file != null && widget.receiverId != null) {
-                  _storageMethods.uploadFile(
-                      file: file,
-                      receiverId: widget.receiverId,
-                      senderId: userId,
-                      fileUploadProvider: _fileUploadProvider);
-                }
+                _storageMethods.uploadFile(
+                    file: file!,
+                    receiverId: widget.receiverId!,
+                    senderId: userId!,
+                    fileUploadProvider: _fileUploadProvider!);
 
                 Navigator.pop(context);
                 Navigator.pop(context);
@@ -87,7 +84,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
                 color: Colors.teal,
               ),
               onPressed: () {
-                Share.shareFiles([widget.path], text: 'Share Document');
+                Share.shareFiles([widget.path!], text: 'Share Document');
               },
             )
           ],
@@ -95,7 +92,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
         body: Center(
           child: _isLoading
               ? Center(child: CircularProgressIndicator())
-              : PDFViewer(
+              :      PDFViewer(
                   document: document,
                   zoomSteps: 1,
                   lazyLoad: false,
@@ -113,7 +110,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
                         IconButton(
                           icon: Icon(Icons.arrow_back),
                           onPressed: () {
-                            animateToPage(page: page - 2);
+                            animateToPage(page: page! - 2);
                           },
                         ),
                         IconButton(
@@ -125,7 +122,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
                         IconButton(
                           icon: Icon(Icons.last_page),
                           onPressed: () {
-                            jumpToPage(page: totalPages - 1);
+                            jumpToPage(page: totalPages! - 1);
                           },
                         ),
                       ],
@@ -137,22 +134,3 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
     );
   }
 }
-
-//   final pdf = pw.Document();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//           child: PDFViewerScaffold(
-//         path: widget.path,
-// appBar: AppBar(
-//   backgroundColor: Theme.of(context).backgroundColor,
-//   iconTheme: Theme.of(context).iconTheme,
-//   leading: IconButton(
-//     icon: Icon(Icons.arrow_back),
-//     onPressed: () => Navigator.pop(context),
-//   ),
-// ),
-//       ),
-//     );
-//   }

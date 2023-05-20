@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'dart:math' as math;
 
 class MyArc extends StatelessWidget {
   final double diameter;
  final Color color;
-  const MyArc({Key key, this.diameter = 200,this.color=Colors.white}) : super(key: key);
+  const MyArc({Key? key, this.diameter = 200,this.color=Colors.white}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,7 @@ class MyArc extends StatelessWidget {
 class MyPainter extends CustomPainter {
   final Color color;
 
-  MyPainter({this.color});
+  MyPainter({required this.color});
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()..color = color;

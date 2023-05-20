@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+
+
 
 import 'package:skype_clone/models/contact.dart';
 import 'package:skype_clone/models/userData.dart';
-import 'package:skype_clone/provider/user_provider.dart';
+
 
 import 'package:skype_clone/resources/auth_methods.dart';
 
-import 'package:skype_clone/screens/chatscreens/chat_screen.dart';
+
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 
-import 'package:skype_clone/screens/pageviews/chats/widgets/online_dot_indicator.dart';
-import 'package:skype_clone/screens/pageviews/friends/widgets/friend_customTile.dart';
+
 import 'package:skype_clone/screens/status_view/status_screen.dart';
 
-class statusView extends StatelessWidget {
+class StatusView extends StatelessWidget {
   final Contact contact;
   final AuthMethods _authMethods = AuthMethods();
 
-  statusView(this.contact);
+  StatusView(this.contact);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserData>(
+    return FutureBuilder<UserData?>(
       future: _authMethods.getUserDetailsById(contact.uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          UserData user = snapshot.data;
+          UserData user = snapshot.data!;
 
           return StatusViewLayout(friendViewLayout: user, contact: contact);
         }
@@ -42,10 +41,10 @@ class statusView extends StatelessWidget {
 
 class StatusViewLayout extends StatelessWidget {
   final UserData friendViewLayout;
-  final Contact contact;
-  final AuthMethods _authMethods = AuthMethods();
+  final Contact? contact;
 
-  StatusViewLayout({@required this.friendViewLayout, this.contact});
+
+  StatusViewLayout({required this.friendViewLayout, this.contact});
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +52,8 @@ class StatusViewLayout extends StatelessWidget {
       onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => statusPage(
-                    contact: contact,
+              builder: (context) => StatusPage(
+                    contact: contact!,
                   ))),
       child: Card(
         shape:
@@ -64,17 +63,17 @@ class StatusViewLayout extends StatelessWidget {
           contentPadding: EdgeInsets.all(10.0),
 
           title: Text(
-              (friendViewLayout != null ? friendViewLayout.name : null) != null
-                  ? friendViewLayout.name
+              (friendViewLayout != null ? friendViewLayout.name! : null) != null
+                  ? friendViewLayout.name!
                   : "..",
               style: GoogleFonts.patuaOne(
-                  textStyle: Theme.of(context).textTheme.headline1,
+                  textStyle: Theme.of(context).textTheme.displayLarge,
                   letterSpacing: 1.0) // style:
 
               ),
           // subtitle: Text(),
           leading: CachedImage(
-            friendViewLayout.profilePhoto,
+            friendViewLayout.profilePhoto!,
             radius: 60,
             isRound: true,
           ),

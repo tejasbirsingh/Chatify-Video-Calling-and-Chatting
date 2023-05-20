@@ -6,13 +6,13 @@ import 'package:video_player/video_player.dart';
 class videoPlayer extends StatefulWidget {
   final String url;
 
-  const videoPlayer({Key key, this.url}) : super(key: key);
+  const videoPlayer({Key? key, required this.url}) : super(key: key);
   @override
   _videoPlayerState createState() => _videoPlayerState();
 }
 
 class _videoPlayerState extends State<videoPlayer> {
-  VideoPlayerController _videoPlayerController;
+  late VideoPlayerController _videoPlayerController;
   bool _isplaying = false;
 
   @override
@@ -39,13 +39,13 @@ class _videoPlayerState extends State<videoPlayer> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _videoPlayerController.value.initialized
+        _videoPlayerController.value.isInitialized
             ? GestureDetector(
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => videoPage(
+                          builder: (context) => VideoPage(
                                 url: widget.url,
                               )));
                 },

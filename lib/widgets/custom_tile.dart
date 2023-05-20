@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 
 class CustomTile extends StatelessWidget {
-  final Widget leading;
-  final Widget title;
-  final Widget icon;
-  final Widget subtitle;
-  final Widget trailing;
+  final Widget? leading;
+  final Widget? title;
+  final Widget? icon;
+  final Widget? subtitle;
+  final Widget? trailing;
   final EdgeInsets margin;
   final bool mini;
-  final GestureTapCallback onTap;
-  final GestureLongPressCallback onLongPress;
+  final GestureTapCallback? onTap;
+  final GestureLongPressCallback? onLongPress;
 
   CustomTile({
-    @required this.leading,
-    @required this.title,
+    this.leading,
+    this.title,
     this.icon,
     this.subtitle,
     this.trailing,
@@ -47,7 +47,7 @@ class CustomTile extends StatelessWidget {
         child: Row(
           children: <Widget>[
             SizedBox(width: 5),
-            leading,
+            leading!,
             Expanded(
               child: Container(
                 margin: EdgeInsets.only(left: mini ? 10 : 15),
@@ -63,7 +63,7 @@ class CustomTile extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        title,
+                        title!,
                         SizedBox(height: 5),
                         Row(
                           children: <Widget>[

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:js_interop';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as Im;
@@ -9,32 +10,31 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skype_clone/enum/user_state.dart';
 
 class Utils {
-  static String getUsername(String email) {
-    return "live:${email.split('@')[0]}";
+  static String getUsername(String? email) {
+    return "live:${email!.split('@')[0]}";
   }
 
-  static String getInitials(String name) {
-    List<String> nameSplit = name.split(" ");
+  static String getInitials(String? name) {
+    List<String> nameSplit = name!.split(" ");
     String firstNameInitial = nameSplit[0][0];
     String lastNameInitial = nameSplit.length > 1  ? nameSplit[1][0]  : "";
     return lastNameInitial!="" ? firstNameInitial + lastNameInitial : firstNameInitial;
   }
 
-  // this is new
 
-  static Future<File> pickImage({@required ImageSource source}) async {
-    PickedFile selectedImage = await ImagePicker().getImage(source: source);
-    File img = File(selectedImage.path);
+  static Future<File> pickImage({required ImageSource source}) async {
+    XFile? selectedImage = await ImagePicker().pickImage(source: source);
+    File img = File(selectedImage!.path);
     return await compressImage(img);
   }
 
-  static Future<File> compressImage(File imageToCompress) async {
+  static Future<File> compressImage(File? imageToCompress) async {
     final tempDir = await getTemporaryDirectory();
     final path = tempDir.path;
     int rand = Random().nextInt(10000);
 
-    Im.Image image = Im.decodeImage(imageToCompress.readAsBytesSync());
-    Im.copyResize(image, width: 500, height: 500);
+    Im.Image? image = Im.decodeImage(imageToCompress!.readAsBytesSync());
+    Im.copyResize(image!, width: 500, height: 500);
 
     return new File('$path/img_$rand.jpg')
       ..writeAsBytesSync(Im.encodeJpg(image, quality: 85));

@@ -11,7 +11,7 @@ class CachedImage extends StatelessWidget {
   final double radius;
   final double height;
   final double width;
-  final GestureTapCallback isTap ;
+  final GestureTapCallback? isTap ;
 
 
   final BoxFit fit;
@@ -24,8 +24,8 @@ class CachedImage extends StatelessWidget {
     this.imageUrl, {
     this.isRound = false,
     this.radius = 0,
-    this.height,
-    this.width,
+    this.height = 100,
+    this.width = 100,
     this.isTap,
     this.fit = BoxFit.cover,
   });

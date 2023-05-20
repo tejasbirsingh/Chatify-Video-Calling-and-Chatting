@@ -1,7 +1,7 @@
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+// import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -13,16 +13,16 @@ import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/widgets/gradient_icon.dart';
 
-class customizationPage extends StatefulWidget {
+class CustomizationPage extends StatefulWidget {
   @override
-  _customizationPageState createState() => _customizationPageState();
+  _CustomizationPageState createState() => _CustomizationPageState();
 }
 
-class _customizationPageState extends State<customizationPage>
+class _CustomizationPageState extends State<CustomizationPage>
     with SingleTickerProviderStateMixin {
-  AnimationController animationController;
+  AnimationController? animationController;
 
-  Animation<double> animation;
+  Animation<double>? animation;
 
   bool _darkTheme = true;
 
@@ -50,31 +50,32 @@ class _customizationPageState extends State<customizationPage>
     );
 
     animation = CurvedAnimation(
-      parent: animationController,
+      parent: animationController!,
       curve: Curves.easeIn,
     );
-    animationController.forward();
+    animationController!.forward();
   }
 
   colorPickerDialog(BuildContext context, String uid, String name) {
     showDialog(
         context: context,
-        child: AlertDialog(
+        builder: (BuildContext context) { 
+         return AlertDialog(
           actionsPadding: EdgeInsets.all(10.0),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
           backgroundColor: Colors.white,
           title: const Text('Pick a color'),
           content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: pickerColor,
-              onColorChanged: changeColor,
-              showLabel: true,
-              pickerAreaHeightPercent: 0.8,
-            ),
+            // child: ColorPicker(
+            //   pickerColor: pickerColor,
+            //   onColorChanged: changeColor,
+            //   showLabel: true,
+            //   pickerAreaHeightPercent: 0.8,
+            // ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(
                 'Select',
                 style: TextStyle(fontSize: 18.0),
@@ -90,7 +91,7 @@ class _customizationPageState extends State<customizationPage>
               },
             ),
           ],
-        ));
+        );});
   }
 
   @override
@@ -100,7 +101,7 @@ class _customizationPageState extends State<customizationPage>
     return SafeArea(
         child: cirAn
             ? CircularRevealAnimation(
-                animation: animation,
+                animation: animation!,
                 centerOffset: Offset(size.height / 15, size.width / 3.5),
                 child: page(context))
             : page(context));
@@ -118,7 +119,7 @@ class _customizationPageState extends State<customizationPage>
           centerTitle: false,
           title: Text('Customize',
               style: GoogleFonts.oswald(
-                  textStyle: Theme.of(context).textTheme.headline1,
+                  textStyle: Theme.of(context).textTheme.displayLarge,
                   fontSize: 26.0)),
           iconTheme: Theme.of(context).iconTheme),
       body: StreamBuilder<DocumentSnapshot>(
@@ -134,7 +135,7 @@ class _customizationPageState extends State<customizationPage>
                     userProvider.getUser.firstColor != null
                         ? Color(userProvider.getUser.firstColor ??
                             Colors.white.value)
-                        : Theme.of(context).backgroundColor,
+                        : Theme.of(context).colorScheme.background,
                     userProvider.getUser.secondColor != null
                         ? Color(userProvider.getUser.secondColor ??
                             Colors.white.value)
@@ -155,7 +156,7 @@ class _customizationPageState extends State<customizationPage>
                         'Dark Mode',
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.headline1),
+                            textStyle: Theme.of(context).textTheme.displayLarge),
                       ),
                       contentPadding: const EdgeInsets.only(left: 16.0),
                       trailing: Transform.scale(
@@ -170,14 +171,14 @@ class _customizationPageState extends State<customizationPage>
                               cirAn = true;
                             });
                             onThemeChanged(val, themeNotifier);
-                            if (animationController.status ==
+                            if (animationController!.status ==
                                     AnimationStatus.forward ||
-                                animationController.status ==
+                                animationController!.status ==
                                     AnimationStatus.completed) {
-                              animationController.reset();
-                              animationController.forward();
+                              animationController!.reset();
+                              animationController!.forward();
                             } else {
-                              animationController.forward();
+                              animationController!.forward();
                             }
                           },
                         ),
@@ -204,7 +205,7 @@ class _customizationPageState extends State<customizationPage>
                         "Pick First Color",
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.headline1),
+                            textStyle: Theme.of(context).textTheme.displayLarge),
                       ),
                       trailing: IconButton(
                           icon: Icon(
@@ -212,7 +213,7 @@ class _customizationPageState extends State<customizationPage>
                             color: Theme.of(context).iconTheme.color,
                           ),
                           onPressed: () async {
-                            colorPickerDialog(context, userProvider.getUser.uid,
+                            colorPickerDialog(context, userProvider.getUser.uid!,
                                 'first_color');
                             print(currentColor);
                           }),
@@ -234,7 +235,7 @@ class _customizationPageState extends State<customizationPage>
                         "Pick Second Color",
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.headline1),
+                            textStyle: Theme.of(context).textTheme.displayLarge),
                       ),
                       trailing: IconButton(
                           icon: Icon(
@@ -243,7 +244,7 @@ class _customizationPageState extends State<customizationPage>
                           ),
                           onPressed: () async {
                             await colorPickerDialog(context,
-                                userProvider.getUser.uid, 'second_color');
+                                userProvider.getUser.uid!, 'second_color');
                             userProvider.refreshUser();
                           }),
                     ),
@@ -256,7 +257,7 @@ class _customizationPageState extends State<customizationPage>
                         "Reset Custom Color",
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.headline1),
+                            textStyle: Theme.of(context).textTheme.displayLarge),
                       ),
                       trailing: IconButton(
                           icon: Icon(

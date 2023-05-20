@@ -9,9 +9,9 @@ class ChewieListItem extends StatefulWidget {
   final bool looping;
 
   ChewieListItem({
-    @required this.videoPlayerController,
-    this.looping,
-    Key key,
+    required this.videoPlayerController,
+    this.looping = false,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -19,7 +19,7 @@ class ChewieListItem extends StatefulWidget {
 }
 
 class _ChewieListItemState extends State<ChewieListItem> {
-  ChewieController _chewieController;
+  late ChewieController _chewieController;
 
   @override
   void initState() {

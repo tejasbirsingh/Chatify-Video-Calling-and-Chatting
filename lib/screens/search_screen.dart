@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gradient_app_bar/gradient_app_bar.dart';
+
 import 'package:provider/provider.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
@@ -20,8 +20,8 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final AuthMethods _authMethods = AuthMethods();
 
-  List<UserData> userList;
-  List<String> friendsList;
+  late List<UserData> userList;
+  late List<String> friendsList;
   String query = "";
   TextEditingController searchController = TextEditingController();
   bool _folded = true;
@@ -62,9 +62,9 @@ class _SearchScreenState extends State<SearchScreen> {
         ? []
         : userList != null
             ? userList.where((UserData user) {
-                String _getUsername = user.username.toLowerCase();
+                String _getUsername = user.username!.toLowerCase();
                 String _query = query.toLowerCase();
-                String _getName = user.name.toLowerCase();
+                String _getName = user.name!.toLowerCase();
                 bool matchesUsername = _getUsername.contains(_query);
                 bool matchesName = _getName.contains(_query);
 
@@ -89,6 +89,8 @@ class _SearchScreenState extends State<SearchScreen> {
           isFriend = false;
         }
         return CustomTile(
+          icon: Icon(Icons.abc),
+          onLongPress: () => {},
           mini: false,
           onTap: () {
             Navigator.push(
@@ -99,19 +101,20 @@ class _SearchScreenState extends State<SearchScreen> {
                         )));
           },
           leading: CachedImage(
-            searchedUser.profilePhoto,
+            searchedUser.profilePhoto!,
             radius: 60.0,
             isRound: true,
+            isTap: () => {},
           ),
           subtitle: Text(
-            searchedUser.username,
+            searchedUser.username!,
             style: GoogleFonts.patuaOne(
-                textStyle: Theme.of(context).textTheme.bodyText1),
+                textStyle: Theme.of(context).textTheme.bodyLarge),
           ),
           title: Text(
-            searchedUser.name,
+            searchedUser.name!,
             style: GoogleFonts.patuaOne(
-                textStyle: Theme.of(context).textTheme.headline1,
+                textStyle: Theme.of(context).textTheme.displayLarge,
                 letterSpacing: 1.0),
           ),
           trailing: IconButton(
@@ -132,8 +135,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 content: Text("Already a friend!"),
               );
               isFriend
-                  ? Scaffold.of(context).showSnackBar(snackbarFriend)
-                  : Scaffold.of(context).showSnackBar(snackbar);
+                  ? ScaffoldMessenger.of(context).showSnackBar(snackbarFriend)
+                  : ScaffoldMessenger.of(context).showSnackBar(snackbar);
             },
           ),
         );
@@ -157,7 +160,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     userProvider.getUser.firstColor != null
                         ? Color(userProvider.getUser.firstColor ??
                             Colors.white.value)
-                        : Theme.of(context).backgroundColor,
+                        : Theme.of(context).colorScheme.background,
                     userProvider.getUser.secondColor != null
                         ? Color(userProvider.getUser.secondColor ??
                             Colors.white.value)
@@ -201,7 +204,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: Text(
                   'Search',
                   style: GoogleFonts.oswald(
-                      textStyle: Theme.of(context).textTheme.headline1,
+                      textStyle: Theme.of(context).textTheme.displayLarge,
                       fontSize: 34.0),
                 ))),
                 top: 10.0,
@@ -273,7 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       userProvider.getUser.firstColor != null
                           ? Color(userProvider.getUser.firstColor ??
                               Colors.white.value)
-                          : Theme.of(context).backgroundColor,
+                          : Theme.of(context).colorScheme.background,
                       userProvider.getUser.secondColor != null
                           ? Color(userProvider.getUser.secondColor ??
                               Colors.white.value)

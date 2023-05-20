@@ -1,26 +1,26 @@
 import 'dart:async';
+
 import 'dart:io';
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:dio/dio.dart';
 import 'package:file/local.dart';
-import 'package:audio_recorder/audio_recorder.dart';
+// import 'package:audio_recorder/audio_recorder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:emoji_picker/emoji_picker.dart';
+// import 'package:emoji_picker/emoji_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hexcolor/hexcolor.dart';
 
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:provider/provider.dart';
-import 'package:sensors/sensors.dart';
+
 import 'package:shake/shake.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,10 +40,9 @@ import 'package:skype_clone/resources/chat_methods.dart';
 import 'package:skype_clone/resources/storage_methods.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/chatscreens/messageForwarding/forward_list.dart';
-import 'package:skype_clone/screens/chatscreens/text_parsing/firebase_api_handler.dart';
-
+import 'package:skype_clone/screens/chatscreens/sound_recorder.dart';
+import 'package:record/record.dart';
 import 'package:skype_clone/screens/chatscreens/push_notification.dart';
-import 'package:skype_clone/screens/chatscreens/text_parsing/widgets/text_recognition_widget.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/arc_class.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/audioPlayer.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
@@ -53,7 +52,6 @@ import 'package:skype_clone/screens/chatscreens/widgets/image_page.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/location_class.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/pdf_widget.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/video_player.dart';
-import 'package:skype_clone/screens/chatscreens/widgets/video_trimmer.dart';
 import 'package:skype_clone/screens/home_screen.dart';
 
 import 'package:skype_clone/screens/profile_screen.dart';
@@ -66,12 +64,11 @@ import 'package:skype_clone/widgets/gradient_icon.dart';
 import 'package:swipe_to/swipe_to.dart';
 
 import 'package:video_player/video_player.dart';
-import 'package:video_trimmer/video_trimmer.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
 
-  ChatScreen({this.receiver});
+  ChatScreen({required this.receiver});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -79,36 +76,38 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen>
     with SingleTickerProviderStateMixin {
-  String fileName;
+  String? fileName;
   bool moreMenu = false;
-  Message replyMessage;
-  AnimationController animationController;
-  Animation<double> animation;
+  Message? replyMessage;
+  AnimationController? animationController;
+  Animation<double>? animation;
   bool isCir = false;
-  ImageUploadProvider _imageUploadProvider;
-  VideoUploadProvider _videoUploadProvider;
-  AudioUploadProvider _audioUploadProvider;
-  FileUploadProvider _fileUploadProvider;
-  List<String> imageUrlList = List<String>();
+  ImageUploadProvider? _imageUploadProvider;
+  VideoUploadProvider? _videoUploadProvider;
+  AudioUploadProvider? _audioUploadProvider;
+  FileUploadProvider? _fileUploadProvider;
+  List<String> imageUrlList = [];
   final StorageMethods _storageMethods = StorageMethods();
   final ChatMethods _chatMethods = ChatMethods();
   final AuthMethods _authMethods = AuthMethods();
 
-  Recording _recording = new Recording();
+  // Recording _recording = new Recording();
   bool _isRecording = false;
   Random random = new Random();
   bool isRecordStart = false;
+  Record record = Record();
+  final recorder = SoundRecorder();
 
-  LocalFileSystem localFileSystem;
+  late LocalFileSystem localFileSystem;
   TextEditingController textFieldController = TextEditingController();
   FocusNode textFieldFocus = FocusNode();
   ScrollController _listScrollController = ScrollController();
   bool _isEditing = false;
-  UserData sender;
-  String _currentUserId;
+  late UserData sender;
+  late String _currentUserId;
   bool isWriting = false;
   bool showEmojiPicker = false;
-  VideoPlayerController videoPlayerController;
+  late VideoPlayerController videoPlayerController;
   bool _isAppBarOptions = false;
   String messageId = "";
   String forwardMessageText = "";
@@ -117,11 +116,12 @@ class _ChatScreenState extends State<ChatScreen>
   bool uploading = false;
   String ocrText = "";
   String backgroundImage = "";
-  ShakeDetector detector;
+  late ShakeDetector detector;
 
   @override
   void initState() {
     super.initState();
+    recorder.init();
     detector = ShakeDetector.autoStart(onPhoneShake: () {
       CallUtils.dial(
         from: sender,
@@ -135,8 +135,8 @@ class _ChatScreenState extends State<ChatScreen>
       setState(() {
         sender = UserData(
           uid: user.uid,
-          name: user.displayName,
-          profilePhoto: user.photoURL,
+          name: user.displayName!,
+          profilePhoto: user.photoURL!,
         );
       });
     });
@@ -145,16 +145,16 @@ class _ChatScreenState extends State<ChatScreen>
       duration: Duration(milliseconds: 250),
     );
     animation = CurvedAnimation(
-      parent: animationController,
+      parent: animationController!,
       curve: Curves.easeInCirc,
     );
-    animationController.forward();
+    animationController!.forward();
   }
 
   getbackground() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      backgroundImage = prefs.getString('background');
+      backgroundImage = prefs.getString('background') ?? "";
     });
   }
 
@@ -163,25 +163,28 @@ class _ChatScreenState extends State<ChatScreen>
       moreMenu = !moreMenu;
       isCir = true;
     });
-    if (animationController.status == AnimationStatus.forward ||
-        animationController.status == AnimationStatus.completed) {
-      animationController.reset();
-      animationController.forward();
+    if (animationController!.status == AnimationStatus.forward ||
+        animationController!.status == AnimationStatus.completed) {
+      animationController!.reset();
+      animationController!.forward();
     } else {
-      animationController.forward();
+      animationController!.forward();
     }
   }
 
   getTheme() async {
     var prefs = await SharedPreferences.getInstance();
     setState(() {
-      _darkTheme = prefs.getBool('darkTheme');
+      _darkTheme = prefs.getBool('darkTheme') ?? false;
     });
   }
 
   @override
   void dispose() {
+    recorder.dispose();
     detector.stopListening();
+    record.dispose();
+
     super.dispose();
   }
 
@@ -190,8 +193,8 @@ class _ChatScreenState extends State<ChatScreen>
     final imageFile = await picker.getImage(
         source: ImageSource.gallery, maxHeight: 970, maxWidth: 670);
 
-    final text = await FirebaseMLApi.recogniseText(File(imageFile.path));
-
+    // final text = await FirebaseMLApi.recogniseText(File(imageFile.path));
+    final text = "";
     setState(() {
       uploading = false;
 
@@ -219,7 +222,7 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
-   
+
     getTheme();
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     _videoUploadProvider = Provider.of<VideoUploadProvider>(context);
@@ -240,7 +243,7 @@ class _ChatScreenState extends State<ChatScreen>
                       userProvider.getUser.firstColor != null
                           ? Color(userProvider.getUser.firstColor ??
                               Colors.white.value)
-                          : Theme.of(context).backgroundColor,
+                          : Theme.of(context).colorScheme.background,
                       userProvider.getUser.secondColor != null
                           ? Color(userProvider.getUser.secondColor ??
                               Colors.white.value)
@@ -256,28 +259,28 @@ class _ChatScreenState extends State<ChatScreen>
                   Flexible(
                     child: messageList(),
                   ),
-                  _imageUploadProvider.getViewState == ViewState.LOADING
+                  _imageUploadProvider!.getViewState == ViewState.LOADING
                       ? Container(
                           alignment: Alignment.centerRight,
                           margin: EdgeInsets.only(right: 15),
                           child: CircularProgressIndicator(),
                         )
                       : Container(),
-                  _videoUploadProvider.getViewState == ViewState.LOADING
+                  _videoUploadProvider!.getViewState == ViewState.LOADING
                       ? Container(
                           alignment: Alignment.centerRight,
                           margin: EdgeInsets.only(right: 15.0),
                           child: CircularProgressIndicator(),
                         )
                       : Container(),
-                  _audioUploadProvider.getViewState == ViewState.LOADING
+                  _audioUploadProvider!.getViewState == ViewState.LOADING
                       ? Container(
                           alignment: Alignment.centerRight,
                           margin: EdgeInsets.only(right: 15.0),
                           child: CircularProgressIndicator(),
                         )
                       : Container(),
-                  _fileUploadProvider.getViewState == ViewState.LOADING
+                  _fileUploadProvider!.getViewState == ViewState.LOADING
                       ? Container(
                           alignment: Alignment.centerRight,
                           margin: EdgeInsets.only(right: 15.0),
@@ -286,14 +289,14 @@ class _ChatScreenState extends State<ChatScreen>
                       : Container(),
                   Container(
                       decoration: BoxDecoration(
-                          color: Theme.of(context).backgroundColor,
+                          color: Theme.of(context).colorScheme.background,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(30.0),
                               topRight: Radius.circular(30.0))),
                       child: chatControls()),
-                  showEmojiPicker
-                      ? Container(child: emojiContainer())
-                      : Container(),
+                  // showEmojiPicker
+                  //     ? Container(child: emojiContainer())
+                  //     : Container(),
                 ],
               ),
               (_isEditing)
@@ -317,7 +320,7 @@ class _ChatScreenState extends State<ChatScreen>
                                 (MediaQuery.of(context).size.width * 0.8) / 2,
                               ),
                               child: moreMenuOptions(),
-                              animation: animation),
+                              animation: animation!),
                         )
                       : Positioned(
                           child: moreMenuOptions(),
@@ -374,7 +377,7 @@ class _ChatScreenState extends State<ChatScreen>
                     widget.receiver.uid, _currentUserId);
                 if (isBlocked) {
                   toggleMenu();
-                  pickVideo();
+                  // pickVideo();
                 } else {
                   blockedDialog(context);
                 }
@@ -407,11 +410,11 @@ class _ChatScreenState extends State<ChatScreen>
                     widget.receiver.uid, _currentUserId);
                 if (isBlocked) {
                   toggleMenu();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => TextRecognitionWidget(
-                              receiverId: widget.receiver.uid)));
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => TextRecognitionWidget(
+                  //             receiverId: widget.receiver.uid)));
                 } else {
                   blockedDialog(context);
                 }
@@ -497,29 +500,29 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  emojiContainer() {
-    return EmojiPicker(
-      bgColor: UniversalVariables.separatorColor,
-      indicatorColor: UniversalVariables.blueColor,
-      rows: 3,
-      columns: 7,
-      onEmojiSelected: (emoji, category) {
-        setState(() {
-          isWriting = true;
-        });
-        textFieldController.text = textFieldController.text + emoji.emoji;
-      },
-      recommendKeywords: ["face", "happy", "party", "sad"],
-      numRecommended: 50,
-    );
-  }
+  // emojiContainer() {
+  //   return EmojiPicker(
+  //     bgColor: UniversalVariables.separatorColor,
+  //     indicatorColor: UniversalVariables.blueColor,
+  //     rows: 3,
+  //     columns: 7,
+  //     onEmojiSelected: (emoji, category) {
+  //       setState(() {
+  //         isWriting = true;
+  //       });
+  //       textFieldController.text = textFieldController.text + emoji.emoji;
+  //     },
+  //     recommendKeywords: ["face", "happy", "party", "sad"],
+  //     numRecommended: 50,
+  //   );
+  // }
 
   Widget messageList() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection(MESSAGES_COLLECTION)
           .doc(_currentUserId)
-          .collection(widget.receiver.uid)
+          .collection(widget.receiver.uid!)
           .orderBy(TIMESTAMP_FIELD, descending: true)
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -530,9 +533,9 @@ class _ChatScreenState extends State<ChatScreen>
           padding: EdgeInsets.all(10),
           controller: _listScrollController,
           reverse: true,
-          itemCount: snapshot.data.docs.length,
+          itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
-            return chatMessageItem(snapshot.data.docs[index]);
+            return chatMessageItem(snapshot.data!.docs[index]);
           },
         );
       },
@@ -541,63 +544,66 @@ class _ChatScreenState extends State<ChatScreen>
 
   _start() async {
     try {
-      if (await Permissions.recordingPermission()) {
-        var ran = Random().nextInt(50);
-        String path = Utils.generateRandomString(ran);
-        Io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
-        path = appDocDirectory.path + '/' + path;
-        await AudioRecorder.start(
-            path: path, audioOutputFormat: AudioOutputFormat.WAV);
+      bool result = await record.hasPermission();
+      // if (await Permissions.recordingPermission()) {
+      var ran = Random().nextInt(50);
+      String path = Utils.generateRandomString(ran);
+      Io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
+      path = appDocDirectory.path + '/' + path;
 
-        bool isRecording = await AudioRecorder.isRecording;
-        setState(() {
-          _recording = new Recording(duration: new Duration(), path: "");
-          _isRecording = isRecording;
-        });
-      } else {
-        print("No permissions");
-      }
+      // await record.start(
+      //   path: path,
+      //   encoder: AudioEncoder.AAC,
+      //   bitRate: 128000,
+      // );
+      await recorder.record(path);
+      bool isRecording = await record.isRecording();
+      // bool isRecording = await recorder.toggleRecording(path);
+
+      setState(() {
+        // _recording = new Recording(duration: new Duration(), path: "");
+        _isRecording = isRecording;
+      });
+      // } else {
+      //   print("No permissions");
+      // }
     } catch (e) {
       print(e);
     }
   }
 
   _stop() async {
-    var recording = await AudioRecorder.stop();
+    // var recording = await record.stop();
+    String recording = await recorder.stop();
 
-    bool isRecording = await AudioRecorder.isRecording;
-    if (recording.path != null) {
-      File file = File(recording.path);
-      if (file.path != null) {
-        _storageMethods.uploadAudio(
-            audio: file,
-            receiverId: widget.receiver.uid,
-            senderId: _currentUserId,
-            audioUploadProvider: _audioUploadProvider);
-        sendNotification("Audio", sender.name.toString(),
-            widget.receiver.firebaseToken.toString());
-      }
+    bool isRecording = await record.isRecording();
+    File file = File(recording);
+    _storageMethods.uploadAudio(
+        audio: file,
+        receiverId: widget.receiver.uid!,
+        senderId: _currentUserId,
+        audioUploadProvider: _audioUploadProvider!);
+    sendNotification("Audio", sender.name.toString(),
+        widget.receiver.firebaseToken.toString());
 
-      setState(() {
-        _recording = recording;
-        _isRecording = isRecording;
-      });
-    }
+    setState(() {
+      // _recording = recording;
+      _isRecording = isRecording;
+    });
   }
 
   Widget chatMessageItem(DocumentSnapshot snapshot) {
-    Message _message = Message.fromMap(snapshot.data());
+    Message _message = Message.fromMap(snapshot.data() as Map<String, dynamic>) ;
 
     return _message.type != "Call"
         ? GestureDetector(
             onLongPress: () {
               setState(() {
-                _message.type == MESSAGE_TYPE_IMAGE
-                    ? forwardedImage = _message.photoUrl
-                    : [];
+                if (_message.type == MESSAGE_TYPE_IMAGE)
+                  forwardedImage = _message.photoUrl!;
                 messageId = snapshot.id;
                 _isAppBarOptions = true;
-                forwardMessageText = _message.message;
+                forwardMessageText = _message.message!;
               });
             },
             child: Container(
@@ -641,7 +647,7 @@ class _ChatScreenState extends State<ChatScreen>
                 SizedBox(width: 5.0),
                 Text(
                   "Call",
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
             ),
@@ -650,7 +656,7 @@ class _ChatScreenState extends State<ChatScreen>
                 borderRadius: BorderRadius.circular(10.0)),
           ),
           SizedBox(height: 2.0),
-          (formatTime(_message.timestamp.toDate()))
+          (formatTime(_message.timestamp!.toDate()))
         ],
       ),
     );
@@ -666,24 +672,24 @@ class _ChatScreenState extends State<ChatScreen>
             backgroundColor: Theme.of(context).cardColor,
             title: Text(
               "Delete this message ?",
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             actions: [
               TextButton(
                 child:
-                    Text('Yes', style: Theme.of(context).textTheme.bodyText1),
+                    Text('Yes', style: Theme.of(context).textTheme.bodyLarge),
                 onPressed: () async {
                   await FirebaseFirestore.instance
                       .collection(MESSAGES_COLLECTION)
                       .doc(_currentUserId)
-                      .collection(widget.receiver.uid)
+                      .collection(widget.receiver.uid!)
                       .doc(id)
                       .delete();
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: Text('No', style: Theme.of(context).textTheme.bodyText1),
+                child: Text('No', style: Theme.of(context).textTheme.bodyLarge),
                 onPressed: () => Navigator.pop(context),
               )
             ],
@@ -696,7 +702,7 @@ class _ChatScreenState extends State<ChatScreen>
     final replyMessage = message.replyMessage;
     final isReplying = replyMessage != null;
     final messageWidget = Text(
-      message.message,
+      message.message!,
       style: TextStyle(color: Colors.white, fontSize: 16.0),
     );
     if (message.replyMessage == null) {
@@ -732,7 +738,7 @@ class _ChatScreenState extends State<ChatScreen>
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      widget.receiver.name,
+                                      widget.receiver.name!,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold),
@@ -744,7 +750,7 @@ class _ChatScreenState extends State<ChatScreen>
                                 ],
                               ),
                               Text(
-                                replyMessage.message,
+                                replyMessage!.message!,
                                 style: TextStyle(color: Colors.white),
                               )
                             ],
@@ -780,7 +786,7 @@ class _ChatScreenState extends State<ChatScreen>
     return Text(date,
         style: TextStyle(
           fontSize: 10.0,
-          color: Theme.of(context).textTheme.bodyText1.color,
+          color: Theme.of(context).textTheme.bodyLarge!.color,
         ));
   }
 
@@ -792,7 +798,7 @@ class _ChatScreenState extends State<ChatScreen>
             builder: (context) => showMap(
                   receiver: widget.receiver,
                   isSender: true,
-                  pos: message.position,
+                  pos: message.position!,
                 ))),
         child: Container(
             height: 60.0,
@@ -830,16 +836,16 @@ class _ChatScreenState extends State<ChatScreen>
                                 colors: [Colors.green, Colors.teal])),
                         width: MediaQuery.of(context).size.width * 0.4,
                         child: audioPlayerClass(
-                          url: message.audioUrl,
+                          url: message.audioUrl!,
                           isSender: true,
                         )),
                     SizedBox(height: 2.0),
-                    formatTime(message.timestamp.toDate()),
+                    formatTime(message.timestamp!.toDate()),
                   ],
                 ),
-                Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+                Icon(message.isRead! ? Icons.done_all_outlined : Icons.done,
                     size: 20.0,
-                    color: message.isRead
+                    color: message.isRead!
                         ? Colors.blue
                         : Theme.of(context).splashColor)
               ],
@@ -863,18 +869,18 @@ class _ChatScreenState extends State<ChatScreen>
                         maxWidth: MediaQuery.of(context).size.width * 0.50),
                     child: message.videoUrl != null
                         ? videoPlayer(
-                            url: message.videoUrl,
+                            url: message.videoUrl!,
                           )
                         : Icon(Icons.sync_problem)),
               ),
               SizedBox(height: 2.0),
-              formatTime(message.timestamp.toDate()),
+              formatTime(message.timestamp!.toDate()),
             ],
           ),
-          Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+          Icon(message.isRead!  ? Icons.done_all_outlined : Icons.done,
               size: 20.0,
               color:
-                  message.isRead ? Colors.blue : Theme.of(context).splashColor)
+                  message.isRead!  ? Colors.blue : Theme.of(context).splashColor)
         ],
       );
     }
@@ -889,15 +895,15 @@ class _ChatScreenState extends State<ChatScreen>
                         onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    fileViewPage(url: message.fileUrl))),
-                        child: pdfWidget(message.fileUrl, true)),
+                                    fileViewPage(url: message.fileUrl!))),
+                        child: pdfWidget(message.fileUrl!, true)),
                     SizedBox(height: 2.0),
-                    formatTime(message.timestamp.toDate()),
+                    formatTime(message.timestamp!.toDate()),
                   ],
                 ),
-                Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+                Icon(message.isRead!  ? Icons.done_all_outlined : Icons.done,
                     size: 20.0,
-                    color: message.isRead
+                    color: message.isRead!
                         ? Colors.blue
                         : Theme.of(context).splashColor)
               ],
@@ -924,7 +930,7 @@ class _ChatScreenState extends State<ChatScreen>
                       width: MediaQuery.of(context).size.width * 0.5,
                       child: Container(
                         margin: EdgeInsets.all(5.0),
-                        child: CachedImage(message.photoUrl,
+                        child: CachedImage(message.photoUrl!,
                             height: 250,
                             width: 250,
                             radius: 10,
@@ -932,21 +938,21 @@ class _ChatScreenState extends State<ChatScreen>
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ImagePage(
-                                          imageUrl: message.photoUrl,
+                                          imageUrl: message.photoUrl!,
                                           imageUrlList: imageUrlList,
                                         )))),
                       ),
                     ),
                     SizedBox(height: 2.0),
-                    formatTime(message.timestamp.toDate()),
+                    formatTime(message.timestamp!.toDate()),
                   ],
                 ),
                 SizedBox(
                   width: 2.0,
                 ),
-                Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+                Icon(message.isRead! ? Icons.done_all_outlined : Icons.done,
                     size: 20.0,
-                    color: message.isRead
+                    color: message.isRead!
                         ? Colors.blue
                         : Theme.of(context).splashColor)
               ],
@@ -998,16 +1004,16 @@ class _ChatScreenState extends State<ChatScreen>
               SizedBox(
                 height: 2.0,
               ),
-              formatTime(message.timestamp.toDate()),
+              formatTime(message.timestamp!.toDate()),
             ],
           ),
         ),
         SizedBox(
           width: 2.0,
         ),
-        Icon(message.isRead ? Icons.done_all_outlined : Icons.done,
+        Icon(message.isRead! ? Icons.done_all_outlined : Icons.done,
             size: 20.0,
-            color: message.isRead ? Colors.blue : Theme.of(context).splashColor)
+            color: message.isRead! ? Colors.blue : Theme.of(context).splashColor)
       ],
     );
   }
@@ -1039,7 +1045,7 @@ class _ChatScreenState extends State<ChatScreen>
             builder: (context) => showMap(
                   receiver: widget.receiver,
                   isSender: false,
-                  pos: message.position,
+                  pos: message.position!,
                 ))),
         child: Container(
             height: 60.0,
@@ -1077,11 +1083,11 @@ class _ChatScreenState extends State<ChatScreen>
                         ])),
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: audioPlayerClass(
-                      url: message.audioUrl,
+                      url: message.audioUrl!,
                       isSender: false,
                     )),
                 SizedBox(height: 2.0),
-                formatTime(message.timestamp.toDate()),
+                formatTime(message.timestamp!.toDate()),
               ],
             )
           : Icon(Icons.sync_problem);
@@ -1100,12 +1106,12 @@ class _ChatScreenState extends State<ChatScreen>
                     maxWidth: MediaQuery.of(context).size.width * 0.50),
                 child: message.videoUrl != null
                     ? videoPlayer(
-                        url: message.videoUrl,
+                        url: message.videoUrl!,
                       )
                     : Icon(Icons.sync_problem)),
           ),
           SizedBox(height: 2.0),
-          formatTime(message.timestamp.toDate()),
+          formatTime(message.timestamp!.toDate()),
         ],
       );
     }
@@ -1116,11 +1122,11 @@ class _ChatScreenState extends State<ChatScreen>
                 GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) =>
-                          fileViewPage(url: message.fileUrl))),
-                  child: pdfWidget(message.fileUrl, false),
+                          fileViewPage(url: message.fileUrl!))),
+                  child: pdfWidget(message.fileUrl!, false),
                 ),
                 SizedBox(height: 2.0),
-                formatTime(message.timestamp.toDate()),
+                formatTime(message.timestamp!.toDate()),
               ],
             )
           : Icon(Icons.sync_problem);
@@ -1144,7 +1150,7 @@ class _ChatScreenState extends State<ChatScreen>
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: Container(
                     margin: EdgeInsets.all(5.0),
-                    child: CachedImage(message.photoUrl,
+                    child: CachedImage(message.photoUrl!,
                         height: 250,
                         width: 250,
                         radius: 10,
@@ -1152,13 +1158,13 @@ class _ChatScreenState extends State<ChatScreen>
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ImagePage(
-                                      imageUrl: message.photoUrl,
+                                      imageUrl: message.photoUrl!,
                                       imageUrlList: imageUrlList,
                                     )))),
                   ),
                 ),
                 SizedBox(height: 2.0),
-                formatTime(message.timestamp.toDate()),
+                formatTime(message.timestamp!.toDate()),
               ],
             )
           : Icon(Icons.sync_problem);
@@ -1207,7 +1213,7 @@ class _ChatScreenState extends State<ChatScreen>
         SizedBox(
           height: 2.0,
         ),
-        formatTime(message.timestamp.toDate())
+        formatTime(message.timestamp!.toDate())
       ],
     );
   }
@@ -1241,7 +1247,7 @@ class _ChatScreenState extends State<ChatScreen>
       bool isBlocked =
           await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
       bool isMuted =
-          await _chatMethods.isMuted(widget.receiver.uid, _currentUserId);
+          await _chatMethods.isMuted(widget.receiver.uid!, _currentUserId);
 
       if (isBlocked) {
         _chatMethods.addMessageToDb(_message);
@@ -1309,7 +1315,7 @@ class _ChatScreenState extends State<ChatScreen>
                       },
                       decoration: InputDecoration(
                           hintText: "Type a message",
-                          hintStyle: Theme.of(context).textTheme.bodyText2,
+                          hintStyle: Theme.of(context).textTheme.bodyMedium,
                           border: OutlineInputBorder(
                               borderRadius: const BorderRadius.all(
                                 const Radius.circular(50.0),
@@ -1358,7 +1364,14 @@ class _ChatScreenState extends State<ChatScreen>
                   child: isRecordStart == true
                       ? IconButton(
                           icon: Icon(Icons.mic_off_outlined),
-                          onPressed: () {
+                          onPressed: () async {
+                            var ran = Random().nextInt(50);
+                            String path = Utils.generateRandomString(ran);
+                            Io.Directory appDocDirectory =
+                                await getApplicationDocumentsDirectory();
+                            path = appDocDirectory.path + '/' + path;
+                            _isRecording = await recorder.toggleRecording(path);
+
                             _stop();
                             setState(() {
                               isRecordStart = false;
@@ -1372,6 +1385,12 @@ class _ChatScreenState extends State<ChatScreen>
                                 widget.receiver.uid, _currentUserId);
 
                             if (isBlocked) {
+                              var ran = Random().nextInt(50);
+                              String path = Utils.generateRandomString(ran);
+                              Io.Directory appDocDirectory =
+                                  await getApplicationDocumentsDirectory();
+                              path = appDocDirectory.path + '/' + path;
+
                               _start();
                               setState(() {
                                 isRecordStart = true;
@@ -1416,22 +1435,22 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Future pickFile() async {
-    FilePickerResult path = await FilePicker.platform
+    FilePickerResult? path = await FilePicker.platform
         .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
 
     if (path != null) {
       _storageMethods.uploadFile(
-          file: File(path.paths[0]),
-          receiverId: widget.receiver.uid,
+          file: File(path.paths[0]!),
+          receiverId: widget.receiver.uid!,
           senderId: _currentUserId,
-          fileUploadProvider: _fileUploadProvider);
+          fileUploadProvider: _fileUploadProvider!);
       sendNotification("FILE", sender.name.toString(),
           widget.receiver.firebaseToken.toString());
     }
   }
 
-  Future<AlertDialog> blockedDialog(BuildContext context) {
-    showDialog<AlertDialog>(
+  Future<AlertDialog?> blockedDialog(BuildContext context) {
+    return showDialog<AlertDialog>(
         context: context,
         barrierDismissible: false,
         builder: ((context) {
@@ -1447,7 +1466,7 @@ class _ChatScreenState extends State<ChatScreen>
               InkWell(
                 child: Text(
                   'OK',
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 onTap: () => Navigator.pop(context),
               )
@@ -1456,35 +1475,35 @@ class _ChatScreenState extends State<ChatScreen>
         }));
   }
 
-  Future pickImage({@required ImageSource source}) async {
+  Future pickImage({required ImageSource source}) async {
     this.setState(() {
       _isEditing = true;
     });
-    File selectedImage = await Utils.pickImage(source: source);
+    File? selectedImage = await Utils.pickImage(source: source);
     if (selectedImage != null) {
-      File cropped = await ImageCropper.cropImage(
+      final cropped = await ImageCropper().cropImage(
           sourcePath: selectedImage.path,
           aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
           compressFormat: ImageCompressFormat.jpg,
           compressQuality: 80,
           maxHeight: 700,
           maxWidth: 700,
-          androidUiSettings: AndroidUiSettings(
-            toolbarColor: Theme.of(context).backgroundColor,
+          uiSettings: [AndroidUiSettings(
+            toolbarColor: Theme.of(context).colorScheme.background,
             toolbarTitle: "Edit Image",
             // statusBarColor: Theme.of(context).backgroundColor,
             backgroundColor: Colors.black,
             activeControlsWidgetColor: Colors.teal,
             toolbarWidgetColor: Theme.of(context).iconTheme.color,
-          ));
+          )],) as File;
       bool isBlocked =
           await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
       if (isBlocked) {
         _storageMethods.uploadImage(
           image: cropped,
-          receiverId: widget.receiver.uid,
+          receiverId: widget.receiver.uid!,
           senderId: _currentUserId,
-          imageUploadProvider: _imageUploadProvider,
+          imageUploadProvider: _imageUploadProvider!,
         );
         sendNotification("IMAGE", sender.name.toString(),
             widget.receiver.firebaseToken.toString());
@@ -1502,29 +1521,29 @@ class _ChatScreenState extends State<ChatScreen>
     }
   }
 
-  Future pickVideo() async {
-    final Trimmer _trimmer = Trimmer();
-    PickedFile video = await ImagePicker().getVideo(
-        source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
-    await _trimmer.loadVideo(videoFile: File(video.path));
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return TrimmerView(
-        trimmerFile: _trimmer,
-        receiver: widget.receiver.uid,
-        sender: _currentUserId,
-      );
-    }));
-    if (video != null) {
-      videoPlayerController = VideoPlayerController.file(File(video.path))
-        ..initialize().then((_) {
-          setState(() {
-            videoPlayerController.play();
-          });
-        });
-    }
-    sendNotification("Video", sender.name.toString(),
-        widget.receiver.firebaseToken.toString());
-  }
+  // Future pickVideo() async {
+  //   final Trimmer _trimmer = Trimmer();
+  //   PickedFile video = await ImagePicker().getVideo(
+  //       source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
+  //   await _trimmer.loadVideo(videoFile: File(video.path));
+  //   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+  //     return TrimmerView(
+  //       trimmerFile: _trimmer,
+  //       receiver: widget.receiver.uid,
+  //       sender: _currentUserId,
+  //     );
+  //   }));
+  //   if (video != null) {
+  //     videoPlayerController = VideoPlayerController.file(File(video.path))
+  //       ..initialize().then((_) {
+  //         setState(() {
+  //           videoPlayerController.play();
+  //         });
+  //       });
+  //   }
+  //   sendNotification("Video", sender.name.toString(),
+  //       widget.receiver.firebaseToken.toString());
+  // }
 
   Future<void> downloadFile(String imagePath) async {
     Dio dio = Dio();
@@ -1535,6 +1554,7 @@ class _ChatScreenState extends State<ChatScreen>
 
   CustomAppBar optionsAppBar(context) {
     return CustomAppBar(
+      onTap: () {},
       isLeadingWidth: false,
       leading: IconButton(
         icon: Icon(
@@ -1559,7 +1579,7 @@ class _ChatScreenState extends State<ChatScreen>
             var dir = await getExternalStorageDirectory();
 
             String imageFilePath = Utils.generateRandomString(15);
-            String path = '${dir.path}/${imageFilePath}.jpg';
+            String path = '${dir!.path}/$imageFilePath.jpg';
             await downloadFile(path);
             Navigator.push(
                 context,
@@ -1613,16 +1633,17 @@ class _ChatScreenState extends State<ChatScreen>
           CircleAvatar(
               radius: 20.0,
               child: CachedImage(
-                widget.receiver.profilePhoto,
+                widget.receiver.profilePhoto!,
                 radius: 35.0,
+                isTap: () => {}
               )),
           SizedBox(
             width: 6.0,
           ),
           Text(
-            widget.receiver.name,
+            widget.receiver.name!,
             style: GoogleFonts.patuaOne(
-                textStyle: Theme.of(context).textTheme.bodyText1,
+                textStyle: Theme.of(context).textTheme.bodyLarge,
                 fontSize: 20.0,
                 letterSpacing: 1.5),
           ),
@@ -1655,6 +1676,7 @@ class _ChatScreenState extends State<ChatScreen>
                   widget.receiver.uid, _currentUserId);
               if (isBlocked) {
                 await Permissions.cameraAndMicrophonePermissionsGranted()
+                    // ignore: unnecessary_statements
                     ? {
                         CallUtils.dial(
                           from: sender,
@@ -1695,7 +1717,7 @@ class _ChatScreenState extends State<ChatScreen>
                         },
                         child: Text(
                           snapshot.data == true ? 'Block' : 'Unblock',
-                          style: Theme.of(context).textTheme.bodyText1,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
                     ),
@@ -1704,7 +1726,7 @@ class _ChatScreenState extends State<ChatScreen>
                     value: 2,
                     child: FutureBuilder(
                       future: _chatMethods.isMuted(
-                          _currentUserId, widget.receiver.uid),
+                          _currentUserId, widget.receiver.uid!),
                       builder: (context, AsyncSnapshot<bool> snapshot) =>
                           GestureDetector(
                         onTap: () {
@@ -1714,7 +1736,7 @@ class _ChatScreenState extends State<ChatScreen>
                         },
                         child: Text(
                           snapshot.data == false ? 'Mute' : 'Unmute',
-                          style: Theme.of(context).textTheme.bodyText1,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
                     ),
@@ -1759,7 +1781,7 @@ class _ChatScreenState extends State<ChatScreen>
                 children: [
                   Expanded(
                     child: Text(
-                      widget.receiver.name,
+                      widget.receiver.name!,
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
@@ -1774,7 +1796,7 @@ class _ChatScreenState extends State<ChatScreen>
                 ],
               ),
               Text(
-                replyMessage.message,
+                replyMessage!.message!,
                 style: TextStyle(color: Colors.white),
               )
             ],

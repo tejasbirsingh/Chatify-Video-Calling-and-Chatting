@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -10,19 +9,16 @@ import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
-
 import 'package:skype_clone/provider/audio_upload_provider.dart';
-
 import 'package:skype_clone/provider/file_provider.dart';
-import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
+import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/provider/video_upload_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
-
+import 'package:skype_clone/screens/App%20Settings/setting_page.dart';
 import 'package:skype_clone/screens/login_screen.dart';
 import 'package:skype_clone/screens/search_screen.dart';
-import 'package:skype_clone/screens/App%20Settings/setting_page.dart';
 import 'package:skype_clone/screens/splash_screen.dart';
 
 void main() async {
@@ -60,10 +56,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final LocalAuthentication _localAuthentication = LocalAuthentication();
   final AuthMethods _authMethods = AuthMethods();
-  bool _authorizedOrNot = false, _isLocked;
+  bool _authorizedOrNot = false;
+  bool? _isLocked;
   static const platform = const MethodChannel('TokenChannel');
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  String token;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  String? token;
 
   _getdeviceToken() async {
     await _firebaseMessaging.getToken().then((deviceToken) {
@@ -76,7 +73,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _getLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isLocked = prefs.getBool('isLocked');
+      _isLocked = prefs.getBool('isLocked')!;
     });
     // print(_isLocked);
     if (_isLocked == true) {
@@ -87,11 +84,10 @@ class _MyAppState extends State<MyApp> {
   Future<void> _authenticateMe() async {
     bool authenticated = false;
     try {
-      authenticated = await _localAuthentication.authenticateWithBiometrics(
-        localizedReason: "Authenticate to use Chatify",
-        useErrorDialogs: true,
-        stickyAuth: true,
-      );
+      authenticated = await _localAuthentication.authenticate(
+          localizedReason: "Authenticate to use Chatify",
+          options: const AuthenticationOptions(
+              useErrorDialogs: false, biometricOnly: true, stickyAuth: true));
     } catch (e) {
       print(e);
     }
@@ -112,7 +108,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> sendData() async {
     String message;
     try {
-      message = await platform.invokeMethod(token);
+      message = await platform.invokeMethod(token!);
       // print(message);
     } on PlatformException catch (e) {
       message = "Failed to get data from native : '${e.message}'.";

@@ -19,24 +19,24 @@ class ChatMethods {
 
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     addToContacts(senderId: message.senderId, receiverId: message.receiverId);
 
-    return await _messageCollection
-        .doc(message.receiverId)
-        .collection(message.senderId)
+    await _messageCollection
+        .doc(message.receiverId!)
+        .collection(message.senderId!)
         .add(map);
   }
 
-  DocumentReference getContactsDocument({String of, String forContact}) =>
+  DocumentReference getContactsDocument({String? of, String? forContact}) =>
       _userCollection.doc(of).collection(CONTACTS_COLLECTION).doc(forContact);
 
-  addToContacts({String senderId, String receiverId}) async {
+  addToContacts({String? senderId, String? receiverId}) async {
     Timestamp currentTime = Timestamp.now();
 
-    await addToSenderContacts(senderId, receiverId, currentTime);
+    await addToSenderContacts(senderId!, receiverId!, currentTime);
     await addToReceiverContacts(senderId, receiverId, currentTime);
   }
 
@@ -84,22 +84,22 @@ class ChatMethods {
     }
   }
 
-  DocumentReference getBlockedDocument({String of, String forContact}) =>
+  DocumentReference getBlockedDocument({String? of, String? forContact}) =>
       _userCollection.doc(of).collection(BLOCKED_CONTACTS).doc(forContact);
 
-  addToBlockedList({String senderId, String receiverId}) async {
+  addToBlockedList({String? senderId, String? receiverId}) async {
     Timestamp currentTime = Timestamp.now();
 
     await addToSenderBlockedList(senderId, receiverId, currentTime);
   }
 
   Future<void> addToSenderBlockedList(
-    String senderId,
-    String receiverId,
+    String? senderId,
+    String? receiverId,
     currentTime,
   ) async {
     DocumentSnapshot senderSnapshot =
-        await getBlockedDocument(of: senderId, forContact: receiverId).get();
+        await getBlockedDocument(of: senderId!, forContact: receiverId!).get();
 
     if (!senderSnapshot.exists) {
       Contact receiverContact = Contact(
@@ -116,13 +116,13 @@ class ChatMethods {
     }
   }
 
-  DocumentReference getMutedDocument({String of, String forContact}) =>
+  DocumentReference getMutedDocument({String? of, String? forContact}) =>
       _userCollection.doc(of).collection(MUTED_CONTACTS).doc(forContact);
 
-  addToMutedList({String senderId, String receiverId}) async {
+  addToMutedList({String? senderId, String? receiverId}) async {
     Timestamp currentTime = Timestamp.now();
 
-    await addToSenderMutedList(senderId, receiverId, currentTime);
+    await addToSenderMutedList(senderId!, receiverId!, currentTime);
   }
 
   Future<void> addToSenderMutedList(
@@ -166,16 +166,16 @@ class ChatMethods {
     // var map = Map<String, dynamic>();
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     _messageCollection
         .doc(message.receiverId)
-        .collection(message.senderId)
+        .collection(message.senderId!)
         .add(map);
   }
 
-  void setVideoMsg(String url, String receiverId, String senderId) async {
+  void setVideoMsg(String? url, String? receiverId, String? senderId) async {
     Message message;
 
     message = Message.videoMessage(
@@ -193,16 +193,16 @@ class ChatMethods {
     // var map = Map<String, dynamic>();
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     _messageCollection
         .doc(message.receiverId)
-        .collection(message.senderId)
+        .collection(message.senderId!)
         .add(map);
   }
 
-  void setFileMsg(String url, String receiverId, String senderId) async {
+  void setFileMsg(String? url, String? receiverId, String? senderId) async {
     Message message;
 
     message = Message.fileMessage(
@@ -218,16 +218,16 @@ class ChatMethods {
 
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     _messageCollection
         .doc(message.receiverId)
-        .collection(message.senderId)
-        .add(map);
+        .collection(message.senderId!)
+        .add(map as Map<String, dynamic>);
   }
 
-  void setAudioMsg(String url, String receiverId, String senderId) async {
+  void setAudioMsg(String? url, String? receiverId, String? senderId) async {
     Message message;
 
     message = Message.audioMessage(
@@ -243,22 +243,22 @@ class ChatMethods {
 
     await _messageCollection
         .doc(message.senderId)
-        .collection(message.receiverId)
-        .add(map);
+        .collection(message.receiverId!)
+        .add(map as Map<String, dynamic>);
 
     _messageCollection
         .doc(message.receiverId)
-        .collection(message.senderId)
+        .collection(message.senderId!)
         .add(map);
   }
 
-  Stream<QuerySnapshot> fetchContacts({String userId}) =>
+  Stream<QuerySnapshot> fetchContacts({String? userId}) =>
       _userCollection.doc(userId).collection(CONTACTS_COLLECTION).snapshots();
 
-  Stream<QuerySnapshot> fetchBlockedUsers({String userId}) =>
+  Stream<QuerySnapshot> fetchBlockedUsers({String? userId}) =>
       _userCollection.doc(userId).collection(BLOCKED_CONTACTS).snapshots();
 
-  Future<bool> isBlocked(String userId, String receiverId) async {
+  Future<bool> isBlocked(String? userId, String? receiverId) async {
     DocumentSnapshot senderSnapshot =
         await getBlockedDocument(of: userId, forContact: receiverId).get();
 
@@ -281,8 +281,8 @@ class ChatMethods {
   }
 
   Stream<QuerySnapshot> fetchLastMessageBetween({
-    @required String senderId,
-    @required String receiverId,
+    required String senderId,
+    required String receiverId,
   }) =>
       _messageCollection
           .doc(senderId)
@@ -291,8 +291,8 @@ class ChatMethods {
           .snapshots();
 
   Future<int> unreadMessagesCount({
-    @required String senderId,
-    @required String receiverId,
+    required String senderId,
+    required String receiverId,
   }) async {
     var c = 0;
     await _messageCollection
@@ -307,7 +307,6 @@ class ChatMethods {
   }
 
   void addStatus(String url, String senderId) async {
- 
     await _userCollection
         .doc(senderId)
         .collection(STATUS)

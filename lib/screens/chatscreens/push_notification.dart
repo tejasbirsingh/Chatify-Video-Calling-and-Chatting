@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 
 Future<http.Response> sendNotification(
       String message, String sender, String receiver) async {
-
-    return await http.post(
-      'https://fcm.googleapis.com/fcm/send',
+Uri uri = Uri(path:  'https://fcm.googleapis.com/fcm/send');
+    return await http.post(uri
+     ,
       headers: <String, String>{
         'Authorization': 'key=$SERVER_KEY',
         'Content-Type': 'application/json; charset=UTF-8',

@@ -1,18 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skype_clone/constants/strings.dart';
+
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/screens/App%20Settings/blocked_contacts.dart';
 
-class privacyPage extends StatefulWidget {
+class PrivacyPage extends StatefulWidget {
   @override
-  _privacyPageState createState() => _privacyPageState();
+  _PrivacyPageState createState() => _PrivacyPageState();
 }
 
-class _privacyPageState extends State<privacyPage> {
+class _PrivacyPageState extends State<PrivacyPage> {
   bool _appLocked = false;
 
   @override
@@ -40,7 +40,7 @@ class _privacyPageState extends State<privacyPage> {
               centerTitle: false,
               title: Text('Privacy',
                   style: GoogleFonts.oswald(
-                      textStyle: Theme.of(context).textTheme.headline1,
+                      textStyle: Theme.of(context).textTheme.displayLarge,
                       fontSize: 26.0)),
               iconTheme: Theme.of(context).iconTheme),
           body: Container(
@@ -49,7 +49,7 @@ class _privacyPageState extends State<privacyPage> {
                 userProvider.getUser.firstColor != null
                     ? Color(
                         userProvider.getUser.firstColor ?? Colors.white.value)
-                    : Theme.of(context).backgroundColor,
+                    : Theme.of(context).colorScheme.background,
                 userProvider.getUser.secondColor != null
                     ? Color(
                         userProvider.getUser.secondColor ?? Colors.white.value)
@@ -71,7 +71,7 @@ class _privacyPageState extends State<privacyPage> {
                     'App Locker',
                     style: GoogleFonts.patuaOne(
                         letterSpacing: 1.0,
-                        textStyle: Theme.of(context).textTheme.headline1),
+                        textStyle: Theme.of(context).textTheme.displayLarge),
                   ),
                   contentPadding: const EdgeInsets.only(left: 16.0),
                   trailing: Transform.scale(
@@ -99,7 +99,7 @@ class _privacyPageState extends State<privacyPage> {
                     title: Text('Blocked Contacts',
                       style: GoogleFonts.patuaOne(
                         letterSpacing: 1.0,
-                        textStyle: Theme.of(context).textTheme.headline1),),
+                        textStyle: Theme.of(context).textTheme.displayLarge),),
                   ),
                 )
               ],
@@ -112,7 +112,7 @@ class _privacyPageState extends State<privacyPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _appLocked =
-          prefs.getBool('isLocked') != null ? prefs.getBool('isLocked') : false;
+          prefs.getBool('isLocked') != null ? prefs.getBool('isLocked')! : false;
     });
     return _appLocked;
   }

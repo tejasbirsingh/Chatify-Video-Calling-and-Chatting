@@ -29,7 +29,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           actions: <Widget>[
             IconButton(
               icon: Icon(
-                FontAwesomeIcons.slidersH,
+                FontAwesomeIcons.sliders,
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () {
@@ -62,7 +62,7 @@ class _ChatListContainerState extends State<ChatListContainer> {
         gradient: LinearGradient(colors: [
           userProvider.getUser.firstColor != null
               ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-              : Theme.of(context).backgroundColor,
+              : Theme.of(context).colorScheme.background,
           userProvider.getUser.secondColor != null
               ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
               : Theme.of(context).scaffoldBackgroundColor,
@@ -74,7 +74,7 @@ class _ChatListContainerState extends State<ChatListContainer> {
           ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var docList = snapshot.data.docs;
+              List<QueryDocumentSnapshot<Object?>> docList = snapshot.data!.docs;
 
               if (docList.isEmpty) {
                 return QuietBox(
@@ -83,13 +83,16 @@ class _ChatListContainerState extends State<ChatListContainer> {
                       "Search your friends, add them and start chatting !",
                 );
               }
-              return ListView.builder(
-                padding: EdgeInsets.all(10),
-                itemCount: docList.length,
-                itemBuilder: (context, index) {
-                  Contact contact = Contact.fromMap(docList[index].data());
-                  return ContactView(contact, userProvider.getUser.uid);
-                },
+              return SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: ListView.builder(
+                  padding: EdgeInsets.all(10),
+                  itemCount: docList.length,
+                  itemBuilder: (context, index) {
+                    Contact contact = Contact.fromMap(docList[index].data() as Map<String, dynamic>);
+                    return ContactView(contact, userProvider.getUser.uid!);
+                  },
+                ),
               );
             }
 

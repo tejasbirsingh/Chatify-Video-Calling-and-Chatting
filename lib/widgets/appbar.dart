@@ -12,13 +12,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   
 
   const CustomAppBar({
-    Key key,
-    @required this.title,
-    @required this.actions,
-     this.leading, 
-    @required this.centerTitle,
-    this.onTap,
-    this.isLeadingWidth
+    Key? key,
+    required this.title,
+    required this.actions,
+    required this.leading, 
+    required this.centerTitle,
+    required this.onTap,
+    required this.isLeadingWidth
   }) : super(key: key);
 
   @override
@@ -29,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
       decoration: BoxDecoration(
 
         
-        color: Theme.of(context).appBarTheme.color,
+        color: Theme.of(context).appBarTheme.foregroundColor,
        
         border: Border(
           
@@ -42,7 +42,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
       ),
       child: AppBar(
     
-        backgroundColor: Theme.of(context).appBarTheme.color,
+        backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
         iconTheme:Theme.of(context).appBarTheme.iconTheme,
         elevation: 0.0,
         leadingWidth : isLeadingWidth ? 20.0 : 50.0,

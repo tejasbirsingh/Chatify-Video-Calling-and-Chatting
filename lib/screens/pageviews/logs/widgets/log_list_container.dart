@@ -71,10 +71,13 @@ class _LogListContainerState extends State<LogListContainer> {
                 return Padding(
                   padding:  EdgeInsets.symmetric(vertical:4.0,horizontal: 4.0),
                   child: CustomTile(
+                    onTap: () => {},
                     leading: CachedImage(
-                      hasDialled ? _log.receiverPic : _log.callerPic,
+                    
+                      hasDialled ? _log.receiverPic! : _log.callerPic!,
                       isRound: true,
-                      radius: 45,
+                      radius: 45, isTap: () {  },
+                      
                     ),
                     mini: false,
                     onLongPress: () => showDialog(
@@ -88,10 +91,10 @@ class _LogListContainerState extends State<LogListContainer> {
                         fontSize: 20.0),),
                         content:
                             Text("Are you sure you wish to delete this log?",
-                             style: Theme.of(context).textTheme.bodyText1,
+                             style: Theme.of(context).textTheme.bodyLarge,
                             ),
                         actions: [
-                          FlatButton(
+                          TextButton(
                             child: Text("YES",style: TextStyle(
                               color: Colors.red,
                               fontSize: 20.0,
@@ -105,7 +108,7 @@ class _LogListContainerState extends State<LogListContainer> {
                               }
                             },
                           ),
-                          FlatButton(
+                          TextButton(
                             child: Text("NO",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -118,18 +121,18 @@ class _LogListContainerState extends State<LogListContainer> {
                       ),
                     ),
                     title: Text(
-                      hasDialled ? _log.receiverName : _log.callerName,
-                      style: Theme.of(context).textTheme.bodyText1
+                      hasDialled ? _log.receiverName! : _log.callerName!,
+                      style: Theme.of(context).textTheme.bodyLarge
                     ),
-                    icon: getIcon(_log.callStatus,15.0),
+                    icon: getIcon(_log.callStatus!,15.0),
                     subtitle: Text(
-                      Utils.formatDateString(_log.timestamp),
+                      Utils.formatDateString(_log.timestamp!),
                       style: TextStyle(
-                        color:Theme.of(context).textTheme.bodyText1.color ,
+                        color:Theme.of(context).textTheme.bodyLarge!.backgroundColor,
                         fontSize: 13,
                       ),
                     ),
-                    trailing: getIcon(_log.callStatus,30.0),
+                    trailing: getIcon(_log.callStatus!,30.0),
                   ),
                 );
               },

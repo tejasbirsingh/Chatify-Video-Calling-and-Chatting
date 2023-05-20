@@ -1,15 +1,15 @@
 class UserData {
-  String uid;
-  String name;
-  String email;
-  String username;
-  String status;
-  int state;
-  String profilePhoto;
-  String firebaseToken;
-  int firstColor;
-  int secondColor;
-  bool hasStatus;
+  String? uid;
+  String? name;
+  String? email;
+  String? username;
+  String? status;
+  int? state;
+  String? profilePhoto;
+  String? firebaseToken;
+  int? firstColor;
+  int? secondColor;
+  bool? hasStatus;
 
   UserData(
       {this.uid,

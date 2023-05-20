@@ -23,7 +23,7 @@ class LogScreen extends StatelessWidget {
             gradient: LinearGradient(colors: [
               userProvider.getUser.firstColor != null
                   ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-                  : Theme.of(context).backgroundColor,
+                  : Theme.of(context).colorScheme.background,
               userProvider.getUser.secondColor != null
                   ? Color(
                       userProvider.getUser.secondColor ?? Colors.white.value)

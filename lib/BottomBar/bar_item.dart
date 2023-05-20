@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 
 class AnimatedBottomBar extends StatefulWidget {
-  final List<BarItem> barItems;
+  final List<BarItem>? barItems;
   final Duration animationDuration;
-  final Function onBarTap;
-  final BarStyle barStyle;
+  final Function? onBarTap;
+  final BarStyle? barStyle;
 
   AnimatedBottomBar(
       {this.barItems,
@@ -33,7 +33,7 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
                   
                 userProvider.getUser.firstColor != null
               ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-              : Theme.of(context).backgroundColor,
+              : Theme.of(context).colorScheme.background,
           userProvider.getUser.secondColor != null
               ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
               : Theme.of(context).scaffoldBackgroundColor,
@@ -63,20 +63,20 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
   }
 
   List<Widget> _buildBarItems() {
-    List<Widget> _barItems = List();
-    for (int i = 0; i < widget.barItems.length; i++) {
-      BarItem item = widget.barItems[i];
+    List<Widget> _barItems = [];
+    for (int i = 0; i < widget.barItems!.length; i++) {
+      BarItem item = widget.barItems![i];
       bool isSelected = selectedBarIndex == i;
       _barItems.add(InkWell(
         splashColor: Colors.transparent,
         onTap: () {
           setState(() {
             selectedBarIndex = i;
-            widget.onBarTap(selectedBarIndex);
+            widget.onBarTap!(selectedBarIndex);
           });
         },
         child: AnimatedContainer(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           duration: widget.animationDuration,
           decoration: BoxDecoration(
               color: isSelected
@@ -89,7 +89,7 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
                 item.iconData,
                 color:
                     isSelected ? item.color : Theme.of(context).iconTheme.color,
-                size: widget.barStyle.iconSize,
+                size: widget.barStyle!.iconSize,
               ),
               SizedBox(
                 width: 10.0,
@@ -97,15 +97,14 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
               AnimatedSize(
                 duration: widget.animationDuration,
                 curve: Curves.easeInOut,
-                vsync: this,
                 child: Text(
                   isSelected ? item.text : "",
                   style:GoogleFonts.paytoneOne(
                     textStyle: TextStyle(
                       color: item.color,
                       
-                      fontWeight: widget.barStyle.fontWeight,
-                      fontSize: widget.barStyle.fontSize),
+                      fontWeight: widget.barStyle!.fontWeight,
+                      fontSize: widget.barStyle!.fontSize),
                   )
                 ),
               )
@@ -133,5 +132,5 @@ class BarItem {
   IconData iconData;
   Color color;
 
-  BarItem({this.text, this.iconData, this.color});
+  BarItem({required this.text, required this.iconData, required this.color});
 }

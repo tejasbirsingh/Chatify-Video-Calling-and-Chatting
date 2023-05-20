@@ -8,8 +8,8 @@ class QuietBox extends StatelessWidget {
   final String subtitle;
 
   QuietBox({
-    @required this.heading,
-    @required this.subtitle,
+    required this.heading,
+    required this.subtitle,
   });
 
   @override
@@ -46,8 +46,8 @@ class QuietBox extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 25),
-              FlatButton(
-                color: UniversalVariables.lightBlueColor,
+              TextButton(
+               style: ButtonStyle( backgroundColor: MaterialStateProperty.all<Color>(UniversalVariables.blueColor),),
                 child: Text("Search Friends",style: TextStyle(color: Colors.white,
                 fontSize: 18.0),
                 ),

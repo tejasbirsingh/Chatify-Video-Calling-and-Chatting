@@ -17,7 +17,7 @@ class blockedContacts extends StatefulWidget {
 
 class _blockedContactsState extends State<blockedContacts> {
   ChatMethods _chatMethods = ChatMethods();
-  AuthMethods _authMethods = AuthMethods();
+ 
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
@@ -27,7 +27,7 @@ class _blockedContactsState extends State<blockedContacts> {
           iconTheme: Theme.of(context).iconTheme,
           title: Text('Blocked Contacts',
               style: GoogleFonts.oswald(
-                  textStyle: Theme.of(context).textTheme.headline1,
+                  textStyle: Theme.of(context).textTheme.displayLarge,
                   fontSize: 28.0)),
         ),
         body: Container(
@@ -35,7 +35,7 @@ class _blockedContactsState extends State<blockedContacts> {
             gradient: LinearGradient(colors: [
               userProvider.getUser.firstColor != null
                   ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-                  : Theme.of(context).backgroundColor,
+                  : Theme.of(context).colorScheme.background,
               userProvider.getUser.secondColor != null
                   ? Color(
                       userProvider.getUser.secondColor ?? Colors.white.value)
@@ -47,15 +47,15 @@ class _blockedContactsState extends State<blockedContacts> {
                 userId: userProvider.getUser.uid),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                var docList = snapshot.data.docs;
+                var docList = snapshot.data!.docs;
 
                 return ListView.builder(
                   padding: EdgeInsets.all(10.0),
                   itemCount: docList.length,
                   itemBuilder: (context, i) {
-                    Contact user = Contact.fromMap(docList[i].data());
+                    Contact user = Contact.fromMap(docList[i].data() as Map<String, dynamic>);
 
-                    return blockedContactView(user);
+                    return BlockedContactView(user);
                   },
                 );
               }
@@ -70,19 +70,19 @@ class _blockedContactsState extends State<blockedContacts> {
   }
 }
 
-class blockedContactView extends StatelessWidget {
+class BlockedContactView extends StatelessWidget {
   final Contact contact;
   final AuthMethods _authMethods = AuthMethods();
 
-  blockedContactView(this.contact);
+  BlockedContactView(this.contact);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserData>(
+    return FutureBuilder<UserData?>(
       future: _authMethods.getUserDetailsById(contact.uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          UserData user = snapshot.data;
+          UserData user = snapshot.data!;
 
           return ViewLayout(
             friendViewLayout: user,
@@ -99,25 +99,25 @@ class blockedContactView extends StatelessWidget {
 class ViewLayout extends StatelessWidget {
   final UserData friendViewLayout;
   final ChatMethods _chatMethods = ChatMethods();
-  final AuthMethods _authMethods = AuthMethods();
+
 
   ViewLayout({
-    @required this.friendViewLayout,
+    required this.friendViewLayout,
   });
 
   @override
   Widget build(BuildContext context) {
     final UserProvider user = Provider.of<UserProvider>(context, listen: true);
-    return friendCustomTile(
+    return FriendCustomTile(
       mini: false,
       onLongPress: () {},
       onTap: () {},
       title: Text(
           (friendViewLayout != null ? friendViewLayout.name : null) != null
-              ? friendViewLayout.name
+              ? friendViewLayout.name!
               : "..",
           style: GoogleFonts.patuaOne(
-            textStyle: Theme.of(context).textTheme.headline1,
+            textStyle: Theme.of(context).textTheme.displayLarge,
           ) // style:
 
           ),
@@ -137,7 +137,7 @@ class ViewLayout extends StatelessWidget {
           children: <Widget>[
             Center(
               child: CachedImage(
-                friendViewLayout.profilePhoto,
+                friendViewLayout.profilePhoto!,
                 radius: 60,
                 isRound: true,
               ),

@@ -6,14 +6,14 @@ import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 class fileViewPage extends StatefulWidget {
   final String url;
 
-  const fileViewPage({Key key, this.url}) : super(key: key);
+  const fileViewPage({Key? key, required this.url}) : super(key: key);
   @override
   _fileViewPageState createState() => _fileViewPageState();
 }
 
 class _fileViewPageState extends State<fileViewPage> {
   bool _isLoading = true;
-  PDFDocument document;
+  late PDFDocument document;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _fileViewPageState extends State<fileViewPage> {
           child: Scaffold(
         
            appBar: AppBar(
-            backgroundColor: Theme.of(context).appBarTheme.color,
+            backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
             iconTheme: Theme.of(context).iconTheme,
             title: Text('Pdf Document'),
             leading: IconButton(
@@ -66,7 +66,7 @@ class _fileViewPageState extends State<fileViewPage> {
                           IconButton(
                             icon: Icon(Icons.arrow_back),
                             onPressed: () {
-                              animateToPage(page: page - 2);
+                              animateToPage(page: page! - 2);
                             },
                           ),
                           IconButton(
@@ -78,7 +78,7 @@ class _fileViewPageState extends State<fileViewPage> {
                           IconButton(
                             icon: Icon(Icons.last_page),
                             onPressed: () {
-                              jumpToPage(page: totalPages - 1);
+                              jumpToPage(page: totalPages! - 1);
                             },
                           ),
                         ],

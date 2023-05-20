@@ -24,7 +24,7 @@ class UserDetailsContainer extends StatelessWidget {
       final bool isLoggedOut = await AuthMethods().signOut();
       if (isLoggedOut) {
         authMethods.setUserState(
-          userId: userProvider.getUser.uid,
+          userId: userProvider.getUser.uid!,
           userState: UserState.Offline,
         );
 
@@ -47,7 +47,7 @@ class UserDetailsContainer extends StatelessWidget {
             // Theme.of(context).scaffoldBackgroundColor
             userProvider.getUser.firstColor != null
                 ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
-                : Theme.of(context).backgroundColor,
+                : Theme.of(context).colorScheme.background,
             userProvider.getUser.secondColor != null
                 ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
                 : Theme.of(context).scaffoldBackgroundColor,
@@ -65,11 +65,11 @@ class UserDetailsContainer extends StatelessWidget {
               // centerTitle: true,
               title: ShimmeringLogo(),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () => signOut(),
                   child: Text("Sign Out",
                       style: GoogleFonts.cuprum(
-                          textStyle: Theme.of(context).textTheme.bodyText1)),
+                          textStyle: Theme.of(context).textTheme.bodyLarge)),
                 )
               ],
             ),
@@ -92,7 +92,7 @@ class UserDetailsBody extends StatelessWidget {
       child: Row(
         children: [
           CachedImage(
-            user.profilePhoto,
+            user.profilePhoto!,
             isRound: true,
             radius: 65.0,
           ),
@@ -100,15 +100,15 @@ class UserDetailsBody extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(user.name,
+              Text(user.name!,
                   style: GoogleFonts.patuaOne(
-                      textStyle: Theme.of(context).textTheme.bodyText1,
+                      textStyle: Theme.of(context).textTheme.bodyLarge,
                       fontSize: 25.0,
                       letterSpacing: 1.5)),
               SizedBox(height: 10),
-              Text(user.email,
+              Text(user.email!,
                   style: GoogleFonts.cuprum(
-                      textStyle: Theme.of(context).textTheme.bodyText1)),
+                      textStyle: Theme.of(context).textTheme.bodyLarge)),
             ],
           ),
         ],

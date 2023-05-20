@@ -10,11 +10,12 @@
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
-
-<!-- The Agora SDK requires Bluetooth permissions in case users are using Bluetooth devices.-->
 <uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -61,9 +62,9 @@
             <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-            <meta-data
+            <!-- <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-                android:value="ocr" />
+                android:value="ocr" /> -->
        
 
     </application>

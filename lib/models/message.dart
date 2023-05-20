@@ -3,19 +3,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skype_clone/encryption/encryptText.dart';
 
 class Message {
-  String senderId;
-  String receiverId;
-  String type;
-  String message;
-  bool isRead;
-  bool isLocation;
-  GeoPoint position;
-  Timestamp timestamp;
-  String photoUrl;
-  String videoUrl;
-  String audioUrl;
-  String fileUrl;
-  Message replyMessage;
+  String? senderId;
+  String? receiverId;
+  String? type;
+  String? message;
+  bool? isRead;
+  bool? isLocation;
+  GeoPoint? position;
+  Timestamp? timestamp;
+  String? photoUrl;
+  String? videoUrl;
+  String? audioUrl;
+  String? fileUrl;
+  Message? replyMessage;
 
   Message({
     this.senderId,
@@ -69,7 +69,7 @@ class Message {
   });
 
   Map toMap() {
-    var encryptedText = encryptAESCryptoJS(this.message, "password");
+    var encryptedText = encryptAESCryptoJS(this.message!, "password");
     // print(encryptedText);
     // var decrypted = decryptAESCryptoJS("U2FsdGVkX18kywp91Ikacgub10Cw94ZytfYUrsevhYQ=","password");
     // print(decrypted);
@@ -82,7 +82,8 @@ class Message {
     map['isRead'] = this.isRead;
     map["isLocation"] = this.isLocation;
     map["position"] = this.position;
-    map["reply"] = this.replyMessage ==null ? null : this.replyMessage.toMap();
+    map["reply"] =
+        this.replyMessage == null ? null : this.replyMessage!.toMap();
     return map;
   }
 

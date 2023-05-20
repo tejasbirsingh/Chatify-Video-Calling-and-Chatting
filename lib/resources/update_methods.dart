@@ -8,9 +8,9 @@ import 'package:skype_clone/constants/strings.dart';
 
 
 class UpdateMethods {
-  final String uid;
+  final String? uid;
   UpdateMethods({this.uid});
-  StorageReference _storageReference;
+  var _storageReference;
      
 
  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -29,12 +29,12 @@ class UpdateMethods {
         _storageReference = FirebaseStorage.instance
             .ref()
             .child('${DateTime.now().millisecondsSinceEpoch}');
-        StorageUploadTask storageUploadTask = _storageReference.putFile(imageFile);
+        var storageUploadTask = _storageReference.putFile(imageFile);
         var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
         return url;
     }
     catch(e){
-       return null;
+       return "error";
     }
 
   }

@@ -13,7 +13,7 @@ final List<BarItem> barItems = [
     BarItem
     (
       text: "Contacts",
-      iconData: FontAwesomeIcons.userFriends, 
+      iconData: FontAwesomeIcons.userGroup, 
       color: Colors.pinkAccent,
     ),
     BarItem(

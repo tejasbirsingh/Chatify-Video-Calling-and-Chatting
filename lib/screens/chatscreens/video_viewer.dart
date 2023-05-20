@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/chewie_player.dart';
 import 'package:video_player/video_player.dart';
-import 'package:velocity_x/velocity_x.dart';
 
-class videoPage extends StatefulWidget {
+
+class VideoPage extends StatefulWidget {
   final String url;
 
-  const videoPage({Key key, this.url}) : super(key: key);
+  const VideoPage({Key? key, required this.url}) : super(key: key);
 
   @override
-  _videoPageState createState() => _videoPageState();
+  _VideoPageState createState() => _VideoPageState();
 }
 
-class _videoPageState extends State<videoPage> {
+class _VideoPageState extends State<VideoPage> {
   String downloadedMessage = 'Initializing...';
 
   bool _isDownloading = false;
@@ -40,7 +40,7 @@ class _videoPageState extends State<videoPage> {
     var dir = await getExternalStorageDirectory();
     Dio dio = Dio();
 
-    dio.download(widget.url, '${dir.path}/${fileName}.mp4',
+    dio.download(widget.url, '${dir!.path}/${fileName}.mp4',
         onReceiveProgress: (actualBytes, totalBytes) {
       var percentage = actualBytes / totalBytes * 100;
       _percentage = percentage / 100;
@@ -59,7 +59,7 @@ class _videoPageState extends State<videoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: "Video".text.white.extraBold.makeCentered(),
+          title: Text("Video", style: Theme.of(context).textTheme.headline1),
           actions: [
             IconButton(
               icon: Icon(Icons.download_sharp),

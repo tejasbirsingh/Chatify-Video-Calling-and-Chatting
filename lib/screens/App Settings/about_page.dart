@@ -22,7 +22,7 @@ class _aboutPageState extends State<aboutPage> {
             centerTitle: false,
             title: Text('About',
                 style: GoogleFonts.oswald(
-                    textStyle: Theme.of(context).textTheme.headline1,
+                    textStyle: Theme.of(context).textTheme.displayLarge,
                     fontSize: 26.0)),
             iconTheme: Theme.of(context).iconTheme),
         body: Stack(
@@ -33,7 +33,7 @@ class _aboutPageState extends State<aboutPage> {
                   userProvider.getUser.firstColor != null
                       ? Color(
                           userProvider.getUser.firstColor ?? Colors.white.value)
-                      : Theme.of(context).backgroundColor,
+                      : Theme.of(context).colorScheme.background,
                   userProvider.getUser.secondColor != null
                       ? Color(userProvider.getUser.secondColor ??
                           Colors.white.value)
@@ -55,10 +55,10 @@ class _aboutPageState extends State<aboutPage> {
                       'Developer',
                       style: GoogleFonts.patuaOne(
                           letterSpacing: 1.0,
-                          textStyle: Theme.of(context).textTheme.headline1),
+                          textStyle: Theme.of(context).textTheme.displayLarge),
                     ),
                     subtitle: Text('Tejas Bir Singh',
-                        style: Theme.of(context).textTheme.bodyText1),
+                        style: Theme.of(context).textTheme.bodyLarge),
                     contentPadding: const EdgeInsets.only(left: 16.0),
                   ),
                   ListTile(
@@ -71,10 +71,10 @@ class _aboutPageState extends State<aboutPage> {
                       'App Version',
                       style: GoogleFonts.patuaOne(
                           letterSpacing: 1.0,
-                          textStyle: Theme.of(context).textTheme.headline1),
+                          textStyle: Theme.of(context).textTheme.displayLarge),
                     ),
                     subtitle: Text('v 0.2.0',
-                        style: Theme.of(context).textTheme.bodyText1),
+                        style: Theme.of(context).textTheme.bodyLarge),
                     contentPadding: const EdgeInsets.only(left: 16.0),
                   ),
                 ],

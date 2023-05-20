@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/scheduler.dart';
@@ -23,9 +22,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  PageController pageController;
+  PageController? pageController;
   int _page = 0;
-  UserProvider userProvider;
+  UserProvider? userProvider;
 
   final AuthMethods _authMethods = AuthMethods();
   // final LogRepository _logRepository = LogRepository(isHive: true);
@@ -37,16 +36,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.refreshUser();
+      await userProvider!.refreshUser();
 
       _authMethods.setUserState(
-        userId: userProvider.getUser.uid,
+        userId: userProvider!.getUser.uid!,
         userState: UserState.Online,
       );
 
       LogRepository.init(
         isHive: true,
-        dbName: userProvider.getUser.uid,
+        dbName: userProvider!.getUser.uid!,
       );
     });
 
@@ -64,8 +63,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     String currentUserId =
-        (userProvider != null && userProvider.getUser != null)
-            ? userProvider.getUser.uid
+        (userProvider != null)
+            ? userProvider!.getUser.uid!
             : "";
 
     super.didChangeAppLifecycleState(state);
@@ -105,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void navigationTapped(int page) {
-    pageController.jumpToPage(page);
+    pageController!.jumpToPage(page);
   }
 
   @override
@@ -130,12 +129,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   MaterialPageRoute(builder: (context) => SearchScreen())),
             ),
           ),
-          backgroundColor: Theme.of(context).backgroundColor,
+          backgroundColor: Theme.of(context).colorScheme.background,
           body: PageView(
             children: <Widget>[
               ChatListScreen(),
               // SearchScreen(),
-              allStatusPage(),
+              AllStatusPage(),
               Center(child: contactsPage()),
               LogScreen(),
             ],

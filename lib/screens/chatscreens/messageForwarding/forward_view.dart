@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:skype_clone/models/contact.dart';
-import 'package:skype_clone/models/message.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/image_upload_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
@@ -22,25 +20,25 @@ import 'package:skype_clone/screens/pageviews/chats/widgets/online_dot_indicator
 import 'package:skype_clone/screens/pageviews/friends/widgets/friend_customTile.dart';
 
 class forwardView extends StatelessWidget {
-  final Contact contact;
+  final Contact? contact;
   final forwardedMessage;
   final AuthMethods _authMethods = AuthMethods();
-  final imagePath;
+  final String? imagePath;
 
-  forwardView({this.contact, @required this.forwardedMessage, this.imagePath});
+  forwardView({this.contact, required this.forwardedMessage, this.imagePath});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserData>(
-      future: _authMethods.getUserDetailsById(contact.uid),
+    return FutureBuilder<UserData?>(
+      future: _authMethods.getUserDetailsById(contact!.uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          UserData user = snapshot.data;
+          UserData user = snapshot.data!;
 
           return ViewLayout(
             friendViewLayout: user,
             forwardedMessage: forwardedMessage,
-            imagePath: imagePath,
+            imagePath: imagePath!,
           );
         }
         return Center(
@@ -54,14 +52,14 @@ class forwardView extends StatelessWidget {
 class ViewLayout extends StatelessWidget {
   final UserData friendViewLayout;
   final String forwardedMessage;
-  final String imagePath;
-  ChatMethods _chatMethods = ChatMethods();
+  final String? imagePath;
+  final ChatMethods _chatMethods = ChatMethods();
   final AuthMethods _authMethods = AuthMethods();
-  StorageMethods _storageMethods=StorageMethods();
+  final StorageMethods _storageMethods = StorageMethods();
 
   ViewLayout(
-      {@required this.friendViewLayout,
-      @required this.forwardedMessage,
+      {required this.friendViewLayout,
+      required this.forwardedMessage,
       this.imagePath});
 
   @override
@@ -75,17 +73,17 @@ class ViewLayout extends StatelessWidget {
     //   timestamp: Timestamp.now(),
     //   type: 'text',
     // );
-    File img = File(imagePath);
-    return friendCustomTile(
+    File img = File(imagePath!);
+    return FriendCustomTile(
       mini: false,
       onTap: () {
 
-      if(img!="") {
+        if (img != File("")) {
         
         _storageMethods.uploadImage(
           image: img,
-          receiverId: friendViewLayout.uid,
-          senderId: user.getUser.uid,
+              receiverId: friendViewLayout.uid!,
+              senderId: user.getUser.uid!,
           imageUploadProvider: _imageUploadProvider);  
         // imagePath == ""
         //     ? _chatMethods.addMessageToDb(_message)
@@ -102,10 +100,10 @@ class ViewLayout extends StatelessWidget {
             ));}
       },
       title: Text(
-          (friendViewLayout != null ? friendViewLayout.name : null) != null
-              ? friendViewLayout.name
+          (friendViewLayout != null ? friendViewLayout.name! : null) != null
+              ? friendViewLayout.name!
               : "..",
-          style: Theme.of(context).textTheme.bodyText1
+          style: Theme.of(context).textTheme.bodyLarge
         
           ),
       trailing: Icon(Icons.reply, color: Colors.green,),
@@ -114,11 +112,11 @@ class ViewLayout extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             OnlineDotIndicator(
-              uid: friendViewLayout.uid,
+              uid: friendViewLayout.uid!,
             ),
             Center(
               child: CachedImage(
-                friendViewLayout.profilePhoto,
+                friendViewLayout.profilePhoto!,
                 radius: 60,
                 isRound: true,
               ),

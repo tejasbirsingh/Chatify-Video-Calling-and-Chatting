@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class SqliteMethods implements LogInterface {
-  Database _db;
+  Database? _db;
 
   String databaseName = "";
 
@@ -23,12 +23,9 @@ class SqliteMethods implements LogInterface {
   String timestamp = 'timestamp';
 
   Future<Database> get db async {
-    if (_db != null) {
-      return _db;
-    }
     print("db was null, now awaiting it");
     _db = await init();
-    return _db;
+    return _db!;
   }
 
   @override
@@ -98,7 +95,7 @@ class SqliteMethods implements LogInterface {
       return logList;
     } catch (e) {
       print(e);
-      return null;
+      return [];
     }
   }
 

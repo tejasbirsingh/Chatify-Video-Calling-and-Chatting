@@ -15,13 +15,13 @@ import 'package:skype_clone/screens/callscreens/call_screen.dart';
 class CallUtils {
   static final CallMethods callMethods = CallMethods();
 
-  static dial({UserData from, UserData to, context}) async {
+  static dial({UserData? from, UserData? to, context}) async {
     ChatMethods _chatMethods = ChatMethods();
     Call call = Call(
-      callerId: from.uid,
+      callerId: from!.uid,
       callerName: from.name,
       callerPic: from.profilePhoto,
-      receiverId: to.uid,
+      receiverId: to!.uid,
       receiverName: to.name,
       receiverPic: to.profilePhoto,
       channelId: Random().nextInt(1000).toString(),

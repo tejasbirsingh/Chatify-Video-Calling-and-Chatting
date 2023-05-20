@@ -10,7 +10,7 @@ class OnlineDotIndicator extends StatelessWidget {
   final AuthMethods _authMethods = AuthMethods();
 
   OnlineDotIndicator({
-    @required this.uid,
+    required this.uid,
   });
 
   @override
@@ -33,14 +33,18 @@ class OnlineDotIndicator extends StatelessWidget {
           uid: uid,
         ),
         builder: (context, snapshot) {
-          UserData user;
+          UserData? user;
 
-          if (snapshot.hasData && snapshot.data.data != null) {
-            user = UserData.fromMap(snapshot.data.data());
+          if (snapshot.hasData) {
+            user = UserData.fromMap(snapshot.data!.data() as Map<String, dynamic>);
+             return CircleAvatar(
+              radius: 300.0,
+              backgroundColor: getColor(user.state!),
+            );
           }
             return CircleAvatar(
               radius: 300.0,
-              backgroundColor: getColor(user?.state),
+              backgroundColor: getColor(0),
             );
           // return Container(
           //   height: 10,

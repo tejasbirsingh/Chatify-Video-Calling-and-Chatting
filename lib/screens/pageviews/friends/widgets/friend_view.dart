@@ -22,11 +22,11 @@ class friendView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserData>(
+    return FutureBuilder<UserData?>(
       future: _authMethods.getUserDetailsById(contact.uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          UserData user = snapshot.data;
+          UserData user = snapshot.data!;
 
           return ViewLayout(
             friendViewLayout: user,
@@ -46,13 +46,13 @@ class ViewLayout extends StatelessWidget {
   final AuthMethods _authMethods = AuthMethods();
 
   ViewLayout({
-    @required this.friendViewLayout,
+    required this.friendViewLayout,
   });
 
   @override
   Widget build(BuildContext context) {
     final UserProvider user = Provider.of<UserProvider>(context, listen: true);
-    return friendCustomTile(
+    return FriendCustomTile(
       mini: false,
       onLongPress: () {
         _authMethods.removeFriend(user.getUser.uid, friendViewLayout.uid);
@@ -65,11 +65,11 @@ class ViewLayout extends StatelessWidget {
             ),
           )),
       title: Text(
-          (friendViewLayout != null ? friendViewLayout.name : null) != null
-              ? friendViewLayout.name
+          (friendViewLayout != null ? friendViewLayout.name! : null) != null
+              ? friendViewLayout.name!
               : "..",
           style: GoogleFonts.patuaOne(
-            textStyle: Theme.of(context).textTheme.headline1,
+            textStyle: Theme.of(context).textTheme.displayLarge,
           ) // style:
 
           ),
@@ -87,11 +87,11 @@ class ViewLayout extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             OnlineDotIndicator(
-              uid: friendViewLayout.uid,
+              uid: friendViewLayout.uid!,
             ),
             Center(
               child: CachedImage(
-                friendViewLayout.profilePhoto,
+                friendViewLayout.profilePhoto!,
                 radius: 60,
                 isRound: true,
               ),
