@@ -1,18 +1,22 @@
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/Theme/theme_colors.dart';
+import 'package:skype_clone/constants/constants.dart';
 import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/provider/theme_provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/widgets/gradient_icon.dart';
 
+/* 
+Class responsible for showing customization page to
+change the theme and colors.
+*/
 class CustomizationPage extends StatefulWidget {
   @override
   _CustomizationPageState createState() => _CustomizationPageState();
@@ -21,18 +25,11 @@ class CustomizationPage extends StatefulWidget {
 class _CustomizationPageState extends State<CustomizationPage>
     with SingleTickerProviderStateMixin {
   AnimationController? animationController;
-
   Animation<double>? animation;
-
   bool _darkTheme = true;
-
-  AuthMethods authUser = AuthMethods();
-  bool isNameEdit = false;
-  bool isStatusEdit = false;
   var dayColor = Color(0xFFd56352);
   var nightColor = Color(0xFF1e2230);
   bool cirAn = false;
-
   Color pickerColor = Color(0xff443a49);
   Color currentColor = Color(0xff443a49);
 
@@ -59,45 +56,44 @@ class _CustomizationPageState extends State<CustomizationPage>
   colorPickerDialog(BuildContext context, String uid, String name) {
     showDialog(
         context: context,
-        builder: (BuildContext context) { 
-         return AlertDialog(
-          actionsPadding: EdgeInsets.all(10.0),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-          backgroundColor: Colors.white,
-          title: const Text('Pick a color'),
-          content: SingleChildScrollView(
-            // child: ColorPicker(
-            //   pickerColor: pickerColor,
-            //   onColorChanged: changeColor,
-            //   showLabel: true,
-            //   pickerAreaHeightPercent: 0.8,
-            // ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Select',
-                style: TextStyle(fontSize: 18.0),
+        builder: (BuildContext context) {
+          return AlertDialog(
+            actionsPadding: EdgeInsets.all(10.0),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0)),
+            backgroundColor: Colors.white,
+            title: const Text(Strings.pickaColor),
+            content: SingleChildScrollView(
+              child: ColorPicker(
+                pickerColor: pickerColor,
+                onColorChanged: changeColor,
+                pickerAreaHeightPercent: 0.8,
               ),
-              onPressed: () {
-                setState(() => currentColor = pickerColor);
-                FirebaseFirestore.instance
-                    .collection(USERS_COLLECTION)
-                    .doc(uid)
-                    .update({name: currentColor.value});
-
-                Navigator.of(context).pop();
-              },
             ),
-          ],
-        );});
+            actions: <Widget>[
+              TextButton(
+                child: Text(
+                  Strings.select,
+                  style: TextStyle(fontSize: 18.0),
+                ),
+                onPressed: () {
+                  setState(() => currentColor = pickerColor);
+                  FirebaseFirestore.instance
+                      .collection(USERS_COLLECTION)
+                      .doc(uid)
+                      .update({name: currentColor.value});
+
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-
+    final Size size = MediaQuery.of(context).size;
     return SafeArea(
         child: cirAn
             ? CircularRevealAnimation(
@@ -117,7 +113,7 @@ class _CustomizationPageState extends State<CustomizationPage>
               icon: Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context)),
           centerTitle: false,
-          title: Text('Customize',
+          title: Text(Strings.customize,
               style: GoogleFonts.oswald(
                   textStyle: Theme.of(context).textTheme.displayLarge,
                   fontSize: 26.0)),
@@ -153,10 +149,11 @@ class _CustomizationPageState extends State<CustomizationPage>
                         color: Theme.of(context).iconTheme.color,
                       ),
                       title: Text(
-                        'Dark Mode',
+                        Strings.darkMode,
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.displayLarge),
+                            textStyle:
+                                Theme.of(context).textTheme.displayLarge),
                       ),
                       contentPadding: const EdgeInsets.only(left: 16.0),
                       trailing: Transform.scale(
@@ -186,7 +183,7 @@ class _CustomizationPageState extends State<CustomizationPage>
                     ),
                     ListTile(
                       leading: GradientIcon(
-                        FontAwesomeIcons.tint,
+                        FontAwesomeIcons.droplet,
                         32.0,
                         LinearGradient(
                           colors: <Color>[
@@ -197,15 +194,12 @@ class _CustomizationPageState extends State<CustomizationPage>
                           end: Alignment.bottomRight,
                         ),
                       ),
-                      // leading: Icon(
-                      //   FontAwesomeIcons.tint,
-                      //   color: Theme.of(context).iconTheme.color,
-                      // ),
                       title: Text(
-                        "Pick First Color",
+                        Strings.pickSecondColor,
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.displayLarge),
+                            textStyle:
+                                Theme.of(context).textTheme.displayLarge),
                       ),
                       trailing: IconButton(
                           icon: Icon(
@@ -213,14 +207,15 @@ class _CustomizationPageState extends State<CustomizationPage>
                             color: Theme.of(context).iconTheme.color,
                           ),
                           onPressed: () async {
-                            colorPickerDialog(context, userProvider.getUser.uid!,
-                                'first_color');
-                            print(currentColor);
+                            colorPickerDialog(
+                                context,
+                                userProvider.getUser.uid!,
+                                Constants.FIRST_COLOR);
                           }),
                     ),
                     ListTile(
                       leading: GradientIcon(
-                        FontAwesomeIcons.tint,
+                        FontAwesomeIcons.droplet,
                         32.0,
                         LinearGradient(
                           colors: <Color>[
@@ -232,10 +227,11 @@ class _CustomizationPageState extends State<CustomizationPage>
                         ),
                       ),
                       title: Text(
-                        "Pick Second Color",
+                        Strings.pickSecondColor,
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.displayLarge),
+                            textStyle:
+                                Theme.of(context).textTheme.displayLarge),
                       ),
                       trailing: IconButton(
                           icon: Icon(
@@ -243,8 +239,10 @@ class _CustomizationPageState extends State<CustomizationPage>
                             color: Theme.of(context).iconTheme.color,
                           ),
                           onPressed: () async {
-                            await colorPickerDialog(context,
-                                userProvider.getUser.uid!, 'second_color');
+                            await colorPickerDialog(
+                                context,
+                                userProvider.getUser.uid!,
+                                Constants.SECOND_COLOR);
                             userProvider.refreshUser();
                           }),
                     ),
@@ -254,10 +252,11 @@ class _CustomizationPageState extends State<CustomizationPage>
                         color: Theme.of(context).iconTheme.color,
                       ),
                       title: Text(
-                        "Reset Custom Color",
+                        Strings.resetCustomColor,
                         style: GoogleFonts.patuaOne(
                             letterSpacing: 1.0,
-                            textStyle: Theme.of(context).textTheme.displayLarge),
+                            textStyle:
+                                Theme.of(context).textTheme.displayLarge),
                       ),
                       trailing: IconButton(
                           icon: Icon(
@@ -268,13 +267,12 @@ class _CustomizationPageState extends State<CustomizationPage>
                             FirebaseFirestore.instance
                                 .collection(USERS_COLLECTION)
                                 .doc(userProvider.getUser.uid)
-                                .update({'first_color': null});
+                                .update({Constants.FIRST_COLOR: null});
                             FirebaseFirestore.instance
                                 .collection(USERS_COLLECTION)
                                 .doc(userProvider.getUser.uid)
-                                .update({'second_color': null});
+                                .update({Constants.SECOND_COLOR: null});
                             userProvider.refreshUser();
-                            // backgroundColor("secondcolor", secondColor);
                           }),
                     ),
                   ],
@@ -298,6 +296,6 @@ class _CustomizationPageState extends State<CustomizationPage>
         ? themeNotifier.setTheme(darkTheme)
         : themeNotifier.setTheme(lightTheme);
     var prefs = await SharedPreferences.getInstance();
-    prefs.setBool('darkTheme', value);
+    prefs.setBool(Constants.DARK_THEME, value);
   }
 }

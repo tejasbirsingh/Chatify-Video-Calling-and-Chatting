@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
-
 import 'package:skype_clone/utils/utilities.dart';
-
 import 'user_details_container.dart';
 
+/*
+Displays user circle with user initials
+*/
 class UserCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -30,10 +31,10 @@ class UserCircle extends StatelessWidget {
             Align(
               alignment: Alignment.center,
               child: Text(
-                Utils.getInitials(userProvider.getUser.name!),
+                Utils.getInitials(userProvider.getUser.name),
                 style: GoogleFonts.anton(
-                  textStyle: Theme.of(context).textTheme.displayLarge,
-                letterSpacing: 2.0),
+                    textStyle: Theme.of(context).textTheme.displayLarge,
+                    letterSpacing: 2.0),
               ),
             ),
           ],
