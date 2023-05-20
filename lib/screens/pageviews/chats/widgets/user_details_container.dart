@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skype_clone/constants/constants.dart';
+import 'package:skype_clone/constants/strings.dart';
 import 'package:skype_clone/enum/user_state.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/login_screen.dart';
-
 import 'package:skype_clone/widgets/skype_appbar.dart';
-
 import 'shimmering_logo.dart';
 
+/*
+User Details Container can be opened from user circle
+*/
 class UserDetailsContainer extends StatelessWidget {
   final AuthMethods authMethods = AuthMethods();
 
@@ -29,7 +32,7 @@ class UserDetailsContainer extends StatelessWidget {
         );
 
         var prefs = await SharedPreferences.getInstance();
-        prefs.setBool('darkTheme', false);
+        prefs.setBool(Constants.DARK_THEME, false);
 
         Navigator.pushAndRemoveUntil(
           context,
@@ -43,8 +46,6 @@ class UserDetailsContainer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
-            // Theme.of(context).backgroundColor,
-            // Theme.of(context).scaffoldBackgroundColor
             userProvider.getUser.firstColor != null
                 ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
                 : Theme.of(context).colorScheme.background,
@@ -62,12 +63,11 @@ class UserDetailsContainer extends StatelessWidget {
                     color: Theme.of(context).iconTheme.color),
                 onPressed: () => Navigator.maybePop(context),
               ),
-              // centerTitle: true,
               title: ShimmeringLogo(),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => signOut(),
-                  child: Text("Sign Out",
+                  child: Text(Strings.signOut,
                       style: GoogleFonts.cuprum(
                           textStyle: Theme.of(context).textTheme.bodyLarge)),
                 )

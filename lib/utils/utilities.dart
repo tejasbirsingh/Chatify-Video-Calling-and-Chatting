@@ -12,12 +12,16 @@ class Utils {
   }
 
   static String getInitials(String? name) {
-    List<String> nameSplit = name!.split(" ");
-    String firstNameInitial = nameSplit[0][0];
-    String lastNameInitial = nameSplit.length > 1  ? nameSplit[1][0]  : "";
-    return lastNameInitial!="" ? firstNameInitial + lastNameInitial : firstNameInitial;
+    if (name != null) {
+      List<String> nameSplit = name.split(" ");
+      String firstNameInitial = nameSplit[0][0];
+      String lastNameInitial = nameSplit.length > 1 ? nameSplit[1][0] : "";
+      return lastNameInitial != ""
+          ? firstNameInitial + lastNameInitial
+          : firstNameInitial;
+    }
+    return "";
   }
-
 
   static Future<File> pickImage({required ImageSource source}) async {
     XFile? selectedImage = await ImagePicker().pickImage(source: source);
@@ -69,15 +73,11 @@ class Utils {
     return formatter.format(dateTime);
   }
 
-  
- static String generateRandomString(int len) {
+  static String generateRandomString(int len) {
     var r = Random();
     const _chars =
         'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
         .join();
   }
-
-  
-
 }
