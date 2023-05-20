@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skype_clone/provider/user_provider.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+
 import 'package:skype_clone/utils/utilities.dart';
 
 import 'user_details_container.dart';
@@ -15,42 +16,26 @@ class UserCircle extends StatelessWidget {
       onTap: () => showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-        backgroundColor: UniversalVariables.blackColor,
+        backgroundColor: Theme.of(context).colorScheme.background,
         builder: (context) => UserDetailsContainer(),
       ),
       child: Container(
         height: 40,
         width: 40,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50),
-          color: UniversalVariables.separatorColor,
-        ),
+            borderRadius: BorderRadius.circular(50.0),
+            gradient: LinearGradient(colors: [Colors.green, Colors.teal])),
         child: Stack(
           children: <Widget>[
             Align(
               alignment: Alignment.center,
               child: Text(
-                Utils.getInitials(userProvider.getUser.name),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: UniversalVariables.lightBlueColor,
-                  fontSize: 13,
-                ),
+                Utils.getInitials(userProvider.getUser.name!),
+                style: GoogleFonts.anton(
+                  textStyle: Theme.of(context).textTheme.displayLarge,
+                letterSpacing: 2.0),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                height: 12,
-                width: 12,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: UniversalVariables.blackColor, width: 2),
-                  color: UniversalVariables.onlineDotColor,
-                ),
-              ),
-            )
           ],
         ),
       ),

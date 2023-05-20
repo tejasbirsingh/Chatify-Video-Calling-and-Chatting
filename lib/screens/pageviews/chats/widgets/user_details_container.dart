@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skype_clone/enum/user_state.dart';
 import 'package:skype_clone/models/userData.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/screens/chatscreens/widgets/cached_image.dart';
 import 'package:skype_clone/screens/login_screen.dart';
-import 'package:skype_clone/widgets/appbar.dart';
+
+import 'package:skype_clone/widgets/skype_appbar.dart';
 
 import 'shimmering_logo.dart';
 
@@ -20,13 +23,14 @@ class UserDetailsContainer extends StatelessWidget {
     signOut() async {
       final bool isLoggedOut = await AuthMethods().signOut();
       if (isLoggedOut) {
-        // set userState to offline as the user logs out'
         authMethods.setUserState(
-          userId: userProvider.getUser.uid,
+          userId: userProvider.getUser.uid!,
           userState: UserState.Offline,
         );
 
-        // move the user to login screen
+        var prefs = await SharedPreferences.getInstance();
+        prefs.setBool('darkTheme', false);
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -35,32 +39,43 @@ class UserDetailsContainer extends StatelessWidget {
       }
     }
 
-    return Container(
-      margin: EdgeInsets.only(top: 25),
-      child: Column(
-        children: <Widget>[
-          CustomAppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [
+            // Theme.of(context).backgroundColor,
+            // Theme.of(context).scaffoldBackgroundColor
+            userProvider.getUser.firstColor != null
+                ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
+                : Theme.of(context).colorScheme.background,
+            userProvider.getUser.secondColor != null
+                ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
+                : Theme.of(context).scaffoldBackgroundColor,
+          ]),
+        ),
+        margin: EdgeInsets.only(top: 25),
+        child: Column(
+          children: <Widget>[
+            SkypeAppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back,
+                    color: Theme.of(context).iconTheme.color),
+                onPressed: () => Navigator.maybePop(context),
               ),
-              onPressed: () => Navigator.maybePop(context),
+              // centerTitle: true,
+              title: ShimmeringLogo(),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => signOut(),
+                  child: Text("Sign Out",
+                      style: GoogleFonts.cuprum(
+                          textStyle: Theme.of(context).textTheme.bodyLarge)),
+                )
+              ],
             ),
-            centerTitle: true,
-            title: ShimmeringLogo(),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => signOut(),
-                child: Text(
-                  "Sign Out",
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              )
-            ],
-          ),
-          UserDetailsBody(),
-        ],
+            UserDetailsBody(),
+          ],
+        ),
       ),
     );
   }
@@ -77,27 +92,23 @@ class UserDetailsBody extends StatelessWidget {
       child: Row(
         children: [
           CachedImage(
-            user.profilePhoto,
+            user.profilePhoto!,
             isRound: true,
-            radius: 50,
+            radius: 65.0,
           ),
           SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                user.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
+              Text(user.name!,
+                  style: GoogleFonts.patuaOne(
+                      textStyle: Theme.of(context).textTheme.bodyLarge,
+                      fontSize: 25.0,
+                      letterSpacing: 1.5)),
               SizedBox(height: 10),
-              Text(
-                user.email,
-                style: TextStyle(fontSize: 14, color: Colors.white),
-              ),
+              Text(user.email!,
+                  style: GoogleFonts.cuprum(
+                      textStyle: Theme.of(context).textTheme.bodyLarge)),
             ],
           ),
         ],

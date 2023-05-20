@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skype_clone/models/message.dart';
 
 class LastMessageContainer extends StatelessWidget {
@@ -7,6 +8,7 @@ class LastMessageContainer extends StatelessWidget {
 
   LastMessageContainer({
     @required this.stream,
+  
   });
 
   @override
@@ -15,30 +17,33 @@ class LastMessageContainer extends StatelessWidget {
       stream: stream,
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasData) {
-          var docList = snapshot.data.docs;
+          var docList = snapshot.data!.docs;
 
           if (docList.isNotEmpty) {
-            Message message = Message.fromMap(docList.last.data());
+            Message message = Message.fromMap(docList.last.data() as Map<String, dynamic>);
             return SizedBox(
               width: MediaQuery.of(context).size.width * 0.6,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    message.message,
+                   message.message!.length > 20 ?  message.message!.substring(0,20) : message.message!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+       
+                    style: GoogleFonts.cuprum(textStyle :TextStyle(
                       color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                  ),
-                  
-                  Text(DateTimeFormat(message.timestamp.toDate()),
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold
                     ),)
+                  ),
+             
+                  Text(dateTimeFormat(message.timestamp!.toDate()),
+                    style: GoogleFonts.cuprum(textStyle :TextStyle(
+                      color: Colors.grey,
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold
+                    ),))
                 ],
               ),
             );
@@ -62,7 +67,7 @@ class LastMessageContainer extends StatelessWidget {
     );
   }
 
-  String DateTimeFormat(DateTime time){
+  String dateTimeFormat(DateTime time){
    return  time.day.toString() +"/" +time.month.toString() + "/" + time.year.toString();
   }
 }

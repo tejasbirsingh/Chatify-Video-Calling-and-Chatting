@@ -1,27 +1,30 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:skype_clone/BottomBar/bar_item.dart';
+import 'package:skype_clone/constants/list_data.dart';
+
 import 'package:skype_clone/enum/user_state.dart';
 import 'package:skype_clone/provider/user_provider.dart';
 import 'package:skype_clone/resources/auth_methods.dart';
 import 'package:skype_clone/resources/local_db/repository/log_repository.dart';
 import 'package:skype_clone/screens/callscreens/pickup/pickup_layout.dart';
 import 'package:skype_clone/screens/pageviews/chats/chat_list_screen.dart';
+import 'package:skype_clone/screens/pageviews/friends/contacts_page.dart';
 import 'package:skype_clone/screens/pageviews/logs/log_screen.dart';
-import 'package:skype_clone/utils/universal_variables.dart';
+import 'package:skype_clone/screens/search_screen.dart';
+import 'package:skype_clone/screens/status_view/allStatusPage.dart';
 
-class  HomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  PageController pageController;
+  PageController? pageController;
   int _page = 0;
-  UserProvider userProvider;
+  UserProvider? userProvider;
 
   final AuthMethods _authMethods = AuthMethods();
   // final LogRepository _logRepository = LogRepository(isHive: true);
@@ -32,18 +35,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      
       userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.refreshUser();
+      await userProvider!.refreshUser();
 
       _authMethods.setUserState(
-        userId: userProvider.getUser.uid,
+        userId: userProvider!.getUser.uid!,
         userState: UserState.Online,
       );
 
       LogRepository.init(
         isHive: true,
-        dbName: userProvider.getUser.uid,
+        dbName: userProvider!.getUser.uid!,
       );
     });
 
@@ -61,8 +63,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     String currentUserId =
-        (userProvider != null && userProvider.getUser != null)
-            ? userProvider.getUser.uid
+        (userProvider != null)
+            ? userProvider!.getUser.uid!
             : "";
 
     super.didChangeAppLifecycleState(state);
@@ -102,84 +104,54 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void navigationTapped(int page) {
-    pageController.jumpToPage(page);
+    pageController!.jumpToPage(page);
   }
 
   @override
   Widget build(BuildContext context) {
-    double _labelFontSize = 10;
-
     return PickupLayout(
-      scaffold: Scaffold(
-        backgroundColor: UniversalVariables.blackColor,
-        body: PageView(
-
-          children: <Widget>[
-            ChatListScreen(),
-            LogScreen(),
-            Center(
-                child: Text(
-              "Contact Screen",
-              style: TextStyle(color: Colors.white),
-            )),
-          ],
-          controller: pageController,
-          onPageChanged: onPageChanged,
-          physics: PageScrollPhysics(),
-        ),
-        bottomNavigationBar: Container(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: CupertinoTabBar(
-              backgroundColor: UniversalVariables.blackColor,
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.chat,
-                      color: (_page == 0)
-                          ? UniversalVariables.lightBlueColor
-                          : UniversalVariables.greyColor),
-                  title: Text(
-                    "Chats",
-                    style: TextStyle(
-                        fontSize: _labelFontSize,
-                        color: (_page == 0)
-                            ? UniversalVariables.lightBlueColor
-                            : Colors.grey),
-                  ),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.call,
-                      color: (_page == 1)
-                          ? UniversalVariables.lightBlueColor
-                          : UniversalVariables.greyColor),
-                  title: Text(
-                    "Calls",
-                    style: TextStyle(
-                        fontSize: _labelFontSize,
-                        color: (_page == 1)
-                            ? UniversalVariables.lightBlueColor
-                            : Colors.grey),
-                  ),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.contact_phone,
-                      color: (_page == 2)
-                          ? UniversalVariables.lightBlueColor
-                          : UniversalVariables.greyColor),
-                  title: Text(
-                    "Contacts",
-                    style: TextStyle(
-                        fontSize: _labelFontSize,
-                        color: (_page == 2)
-                            ? UniversalVariables.lightBlueColor
-                            : Colors.grey),
-                  ),
-                ),
-              ],
-              onTap: navigationTapped,
-              currentIndex: _page,
+      scaffold: SafeArea(
+        child: Scaffold(
+          floatingActionButton: Container(
+            height: 60.0,
+            width: 60.0,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(60.0),
+                gradient: LinearGradient(
+                    colors: [Colors.green.shade400, Colors.teal.shade700])),
+            child: IconButton(
+              icon: Icon(
+                Icons.search,
+                size: 30.0,
+                color: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SearchScreen())),
             ),
           ),
+          backgroundColor: Theme.of(context).colorScheme.background,
+          body: PageView(
+            children: <Widget>[
+              ChatListScreen(),
+              // SearchScreen(),
+              AllStatusPage(),
+              Center(child: contactsPage()),
+              LogScreen(),
+            ],
+            controller: pageController,
+            onPageChanged: onPageChanged,
+            physics: NeverScrollableScrollPhysics(),
+          ),
+          bottomNavigationBar: AnimatedBottomBar(
+              barItems: barItems,
+              animationDuration: const Duration(milliseconds: 150),
+              barStyle: BarStyle(fontSize: 20.0, iconSize: 30.0),
+              onBarTap: (index) {
+                setState(() {
+                  _page = index;
+                });
+                navigationTapped(_page);
+              }),
         ),
       ),
     );

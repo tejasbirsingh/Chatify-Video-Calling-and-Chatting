@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:skype_clone/screens/search_screen.dart';
 import 'package:skype_clone/utils/universal_variables.dart';
 
@@ -7,8 +8,8 @@ class QuietBox extends StatelessWidget {
   final String subtitle;
 
   QuietBox({
-    @required this.heading,
-    @required this.subtitle,
+    required this.heading,
+    required this.subtitle,
   });
 
   @override
@@ -17,7 +18,10 @@ class QuietBox extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Container(
-          color: UniversalVariables.separatorColor,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0),  
+            gradient: LinearGradient(colors: [HexColor('a3bded'),HexColor('6991c7')]
+          ),),
+         
           padding: EdgeInsets.symmetric(vertical: 35, horizontal: 25),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -42,9 +46,11 @@ class QuietBox extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 25),
-              FlatButton(
-                color: UniversalVariables.lightBlueColor,
-                child: Text("START SEARCHING"),
+              TextButton(
+               style: ButtonStyle( backgroundColor: MaterialStateProperty.all<Color>(UniversalVariables.blueColor),),
+                child: Text("Search Friends",style: TextStyle(color: Colors.white,
+                fontSize: 18.0),
+                ),
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
