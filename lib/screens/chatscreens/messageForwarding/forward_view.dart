@@ -70,22 +70,14 @@ class ViewLayout extends StatelessWidget {
     final ImageUploadProvider _imageUploadProvider =
         Provider.of<ImageUploadProvider>(context);
 
-    final Message _message = Message(
-      receiverId: friendViewLayout.uid,
-      senderId: user.getUser.uid,
-      message: forwardedMessage,
-      timestamp: Timestamp.now(),
-      type: Constants.MESSAGE_TYPE,
-    );
-
     File? img;
     if (imagePath != null && imagePath != "") {
       img = File(imagePath!);
     }
+
     return FriendCustomTile(
       mini: false,
-      onTap: () =>
-          _forwardMessage(img, user, _imageUploadProvider, _message, context),
+      onTap: () => _forwardMessage(img, user, _imageUploadProvider, context),
       title: Text(friendViewLayout.name ?? "..",
           style: Theme.of(context).textTheme.bodyLarge),
       trailing: Icon(
@@ -116,9 +108,16 @@ class ViewLayout extends StatelessWidget {
       final File? img,
       final UserProvider user,
       final ImageUploadProvider _imageUploadProvider,
-      final Message _message,
       final BuildContext context) {
+    final Message _message = Message(
+      receiverId: friendViewLayout.uid,
+      senderId: user.getUser.uid,
+      message: forwardedMessage,
+      timestamp: Timestamp.now(),
+      type: Constants.MESSAGE_TYPE_IMAGE,
+    );
     if (img != null) {
+      print("Image condition triggered -" + img.path);
       _storageMethods.uploadImage(
           image: img,
           receiverId: friendViewLayout.uid!,
@@ -127,6 +126,7 @@ class ViewLayout extends StatelessWidget {
       _chatMethods.setImageMsg(
           imagePath!, friendViewLayout.uid!, user.getUser.uid!);
     } else {
+      print("Message condition triggered -" + _message.toString());
       _chatMethods.addMessageToDb(_message);
     }
     sendNotification(forwardedMessage, user.getUser.name.toString(),

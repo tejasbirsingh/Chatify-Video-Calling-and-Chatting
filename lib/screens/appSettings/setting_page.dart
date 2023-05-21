@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context)),
           centerTitle: true,
-          title: Text('Settings',
+          title: Text(Strings.settings,
               style: GoogleFonts.oswald(
                   textStyle: Theme.of(context).textTheme.displayLarge,
                   fontSize: 28.0)),
@@ -81,14 +80,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             size: 30.0,
                           ),
                           title: Text(
-                            'Account',
+                            Strings.account,
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
                                     Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
-                            'Name, Profile Photo, Email, Status',
+                            Strings.accountOptions,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
@@ -105,14 +104,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             size: 30.0,
                           ),
                           title: Text(
-                            'Customize',
+                            Strings.customize,
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
                                     Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
-                            'Dark Mode, App Color',
+                            Strings.customizationSettings,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
@@ -128,14 +127,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             size: 30.0,
                           ),
                           title: Text(
-                            'Privacy',
+                            Strings.privacy,
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
                                     Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
-                            'App Locker, Blocked Contacts',
+                            Strings.privacySettings,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
@@ -151,14 +150,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             size: 30.0,
                           ),
                           title: Text(
-                            'About',
+                            Strings.about,
                             style: GoogleFonts.patuaOne(
                                 letterSpacing: 1.0,
                                 textStyle:
                                     Theme.of(context).textTheme.displayLarge),
                           ),
                           subtitle: Text(
-                            'Developer, version',
+                            Strings.aboutAppDetails,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           trailing: Icon(Icons.arrow_forward_ios)),
@@ -166,7 +165,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     // ListTile(
                     //   leading: Icon(
-                    //     FontAwesomeIcons.image,
+                    //     Icons.image,
                     //     color: Theme.of(context).iconTheme.color,
                     //   ),
                     //   title: Text(
@@ -176,14 +175,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     //   ),
                     //   trailing: IconButton(
                     //       icon: Icon(
-                    //         FontAwesomeIcons.solidEdit,
+                    //         Icons.edit,
                     //         color: Theme.of(context).iconTheme.color,
                     //       ),
                     //       onPressed: () async {
 
-                    //         PickedFile selectedImage = await ImagePicker()
-                    //             .getImage(source: ImageSource.gallery);
-                    //         File img = File(selectedImage.path);
+                    //         XFile? selectedImage = await ImagePicker()
+                    //             .pickImage(source: ImageSource.gallery);
+                    //         File img = new File(selectedImage.path);
 
                     //         savebackground(img.path);
                     //       }),

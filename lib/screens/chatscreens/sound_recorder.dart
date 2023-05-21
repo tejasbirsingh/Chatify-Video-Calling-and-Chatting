@@ -23,7 +23,7 @@ class SoundRecorder {
     _isRecorderInitialized = false;
   }
 
-  Future record(String path) async {
+  Future record(final String path) async {
     if (!_isRecorderInitialized) return;
     await _audioRecorder!.startRecorder(toFile: path);
   }
@@ -33,7 +33,7 @@ class SoundRecorder {
     await _audioRecorder!.stopRecorder();
   }
 
-  Future toggleRecording(String path) async {
+  Future toggleRecording(final String path) async {
     if (_audioRecorder!.isStopped) {
       await record(path);
     } else {

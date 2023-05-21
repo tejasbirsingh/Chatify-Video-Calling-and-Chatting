@@ -1,3 +1,4 @@
+import 'package:chatify/constants/strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,18 +8,17 @@ import 'package:chatify/models/userData.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/auth_methods.dart';
 import 'package:chatify/screens/chatscreens/messageForwarding/forward_view.dart';
+import 'package:chatify/widgets/chatify_app_bar.dart';
 
-import 'package:chatify/widgets/skype_appbar.dart';
-
-class forwardPage extends StatefulWidget {
+class ForwardPage extends StatefulWidget {
   final String message;
   final String imagePath;
-  forwardPage({required this.message, required this.imagePath});
+  ForwardPage({required this.message, required this.imagePath});
   @override
   _forwardPageState createState() => _forwardPageState();
 }
 
-class _forwardPageState extends State<forwardPage> {
+class _forwardPageState extends State<ForwardPage> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final AuthMethods _auth = AuthMethods();
 
@@ -27,7 +27,7 @@ class _forwardPageState extends State<forwardPage> {
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: true);
 
-    var skypeAppBar = SkypeAppBar(
+    var chatifyAppBar = ChatifyAppBar(
       leading: IconButton(
         icon: Icon(Icons.arrow_back),
         onPressed: () =>
@@ -37,7 +37,7 @@ class _forwardPageState extends State<forwardPage> {
         })),
       ),
       title: Text(
-        'Forward Message',
+        Strings.forwardMessage,
         style: GoogleFonts.oswald(
             textStyle: Theme.of(context).textTheme.displayLarge,
             fontSize: 26.0),
@@ -46,7 +46,7 @@ class _forwardPageState extends State<forwardPage> {
     );
     return SafeArea(
       child: Scaffold(
-          appBar: skypeAppBar,
+          appBar: chatifyAppBar,
           body: Stack(
             children: [
               Container(
@@ -74,7 +74,7 @@ class _forwardPageState extends State<forwardPage> {
                       padding: EdgeInsets.all(10.0),
                       itemCount: docList.length,
                       itemBuilder: (context, i) {
-                        Contact user = Contact.fromMap(
+                        final Contact user = Contact.fromMap(
                             docList[i].data() as Map<String, dynamic>);
                         return ForwardView(
                           contact: user,

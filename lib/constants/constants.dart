@@ -12,5 +12,9 @@ class Constants {
   static const String STATUS = "status";
   static const String GALLERY = "Gallery";
   static const String CAMERA = "Camera";
-  static const String MESSAGE_TYPE = "text";
+  static const String MESSAGE_TYPE_TEXT = "text";
+  static const String MESSAGE_TYPE_IMAGE = "image";
+  static const String TOKEN_CHANNEL = "TokenChannel";
+  static const String IS_LOCKED = "isLocked";
+  static const String IMAGE = "IMAGE";
 }

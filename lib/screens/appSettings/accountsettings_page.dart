@@ -390,7 +390,7 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
         });
   }
 
-  Future<AlertDialog?> _showImageDialog(BuildContext context, UserData user) {
+  Future<AlertDialog?> _showImageDialog(final BuildContext context, final UserData user) {
     return showDialog<AlertDialog>(
         context: context,
         barrierDismissible: false,
@@ -432,7 +432,6 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
                     compressImage();
                     _updateMethods.uploadImageToStorage(imageFile!).then((url) {
                       _updateMethods.updatePhoto(url, user.uid!).then((v) {
-                        //Navigator.pop(context);
                       });
                     });
                   });
@@ -494,14 +493,12 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
   void compressImage() async {
     final tempDir = await getTemporaryDirectory();
     final path = tempDir.path;
-    int rand = Random().nextInt(10000);
-
+    final int rand = Random().nextInt(10000);
     Im.Image image = Im.decodeImage(imageFile!.readAsBytesSync())!;
     Im.copyResize(image, width: 500, height: 500);
 
     var newim2 = new File('$path/img_$rand.jpg')
       ..writeAsBytesSync(Im.encodeJpg(image, quality: 85));
-
     setState(() {
       imageFile = newim2;
     });

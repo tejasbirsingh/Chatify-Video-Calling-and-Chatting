@@ -9,7 +9,7 @@ import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/auth_methods.dart';
 import 'package:chatify/screens/pageviews/friends/widgets/friend_view.dart';
 import 'package:chatify/screens/pageviews/friends/widgets/quite_box.dart';
-import 'package:chatify/widgets/skype_appbar.dart';
+import 'package:chatify/widgets/chatify_app_bar.dart';
 import '../../../constants/strings.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -27,7 +27,7 @@ class _contactsPageState extends State<ContactsPage> {
         Provider.of<UserProvider>(context, listen: true);
 
     return Scaffold(
-        appBar: SkypeAppBar(
+        appBar: ChatifyAppBar(
           leading: Text(""),
           title: Strings.contacts,
           actions: [

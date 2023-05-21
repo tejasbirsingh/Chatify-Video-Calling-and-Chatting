@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/screens/callscreens/pickup/pickup_layout.dart';
 
-import 'package:chatify/widgets/skype_appbar.dart';
+import 'package:chatify/widgets/chatify_app_bar.dart';
 
 import 'widgets/log_list_container.dart';
 
@@ -13,7 +13,7 @@ class LogScreen extends StatelessWidget {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
     return PickupLayout(
       scaffold: Scaffold(
-        appBar: SkypeAppBar(
+        appBar: ChatifyAppBar(
           leading: Text(""),
           title: "Calls",
           actions: <Widget>[],

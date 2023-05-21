@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:chatify/BottomBar/bar_item.dart';
 import 'package:chatify/constants/list_data.dart';
-
 import 'package:chatify/enum/user_state.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/auth_methods.dart';
@@ -27,8 +25,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   UserProvider? userProvider;
 
   final AuthMethods _authMethods = AuthMethods();
-  // final LogRepository _logRepository = LogRepository(isHive: true);
-  // final LogRepository _logRepository = LogRepository(isHive: false);
 
   @override
   void initState() {
@@ -37,20 +33,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       userProvider = Provider.of<UserProvider>(context, listen: false);
       await userProvider!.refreshUser();
-
       _authMethods.setUserState(
         userId: userProvider!.getUser.uid!,
         userState: UserState.Online,
       );
-
       LogRepository.init(
         isHive: true,
         dbName: userProvider!.getUser.uid!,
       );
     });
-
     WidgetsBinding.instance.addObserver(this);
-
     pageController = PageController();
   }
 
@@ -63,9 +55,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     String currentUserId =
-        (userProvider != null)
-            ? userProvider!.getUser.uid!
-            : "";
+        (userProvider != null) ? userProvider!.getUser.uid! : "";
 
     super.didChangeAppLifecycleState(state);
 
@@ -133,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           body: PageView(
             children: <Widget>[
               ChatListScreen(),
-              // SearchScreen(),
               AllStatusPage(),
               Center(child: ContactsPage()),
               LogScreen(),

@@ -1,30 +1,28 @@
 import 'dart:io';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
-
+import 'package:chatify/constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:chatify/provider/file_provider.dart';
 import 'package:chatify/provider/user_provider.dart';
-import 'package:chatify/resources/chat_methods.dart';
 import 'package:chatify/resources/storage_methods.dart';
 
-class pdfPreviewScreen extends StatefulWidget {
+class PdfPreviewScreen extends StatefulWidget {
   final String? path;
   final String? receiverId;
-  pdfPreviewScreen({this.path, this.receiverId});
+  PdfPreviewScreen({this.path, this.receiverId});
 
   @override
   _pdfPreviewScreenState createState() => _pdfPreviewScreenState();
 }
 
-class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
+class _pdfPreviewScreenState extends State<PdfPreviewScreen> {
   bool _isLoading = true;
   var document;
   String? userId;
   FileUploadProvider? _fileUploadProvider;
   final StorageMethods _storageMethods = StorageMethods();
-  final ChatMethods _chatMethods = ChatMethods();
   File? file;
 
   @override
@@ -47,7 +45,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     _fileUploadProvider = Provider.of<FileUploadProvider>(context);
-    UserProvider user = Provider.of<UserProvider>(context);
+    final UserProvider user = Provider.of<UserProvider>(context);
     setState(() {
       userId = user.getUser.uid;
     });
@@ -57,7 +55,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
           backgroundColor: Theme.of(context).colorScheme.background,
           iconTheme: Theme.of(context).iconTheme,
           title: Text(
-            'Pdf File',
+            Strings.pdfFile,
             style: Theme.of(context).textTheme.displayLarge,
           ),
           leading: IconButton(
@@ -73,7 +71,6 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
                     receiverId: widget.receiverId!,
                     senderId: userId!,
                     fileUploadProvider: _fileUploadProvider!);
-
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
@@ -84,7 +81,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
                 color: Colors.teal,
               ),
               onPressed: () {
-                Share.shareFiles([widget.path!], text: 'Share Document');
+                Share.shareFiles([widget.path!], text: Strings.shareDocument);
               },
             )
           ],
@@ -92,7 +89,7 @@ class _pdfPreviewScreenState extends State<pdfPreviewScreen> {
         body: Center(
           child: _isLoading
               ? Center(child: CircularProgressIndicator())
-              :      PDFViewer(
+              : PDFViewer(
                   document: document,
                   zoomSteps: 1,
                   lazyLoad: false,

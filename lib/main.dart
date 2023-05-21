@@ -1,10 +1,9 @@
+import 'package:chatify/constants/navigation_routes_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,24 +19,19 @@ import 'package:chatify/screens/appSettings/setting_page.dart';
 import 'package:chatify/screens/login_screen.dart';
 import 'package:chatify/screens/search_screen.dart';
 import 'package:chatify/screens/splash_screen.dart';
+import 'constants/constants.dart';
+import 'constants/strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  //hides the status bar of the app
-  // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]).then((_) {
-
-  // });
-
   //transparent status bar
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
-//  show statusbar
-// SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
 
   SharedPreferences.getInstance().then((prefs) {
-    var darkModeOn = prefs.getBool('darkTheme') ?? true;
+    var darkModeOn = prefs.getBool(Constants.DARK_THEME) ?? true;
     runApp(
       ChangeNotifierProvider<ThemeNotifier>(
         create: (_) =>
@@ -58,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   final AuthMethods _authMethods = AuthMethods();
   bool _authorizedOrNot = false;
   bool? _isLocked;
-  static const platform = const MethodChannel('TokenChannel');
+  static const platform = const MethodChannel(Constants.TOKEN_CHANNEL);
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   String? token;
 
@@ -73,9 +67,8 @@ class _MyAppState extends State<MyApp> {
   Future<void> _getLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isLocked = prefs.getBool('isLocked')!;
+      _isLocked = prefs.getBool(Constants.IS_LOCKED)!;
     });
-    // print(_isLocked);
     if (_isLocked == true) {
       _authenticateMe();
     }
@@ -85,7 +78,7 @@ class _MyAppState extends State<MyApp> {
     bool authenticated = false;
     try {
       authenticated = await _localAuthentication.authenticate(
-          localizedReason: "Authenticate to use Chatify",
+          localizedReason: Strings.authenticateToUse,
           options: const AuthenticationOptions(
               useErrorDialogs: false, biometricOnly: true, stickyAuth: true));
     } catch (e) {
@@ -102,10 +95,10 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _getLocker();
     _getdeviceToken();
-    sendData();
+    _sendData();
   }
 
-  Future<void> sendData() async {
+  Future<void> _sendData() async {
     String message;
     try {
       message = await platform.invokeMethod(token!);
@@ -118,7 +111,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-// print("token is {$token}");
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => ImageUploadProvider()),
@@ -132,12 +124,14 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: MaterialApp(
-            title: "Chatify",
+            title: Strings.chatify,
             debugShowCheckedModeBanner: false,
-            initialRoute: '/',
+            initialRoute: NavigationRoutesConstants.INTIAIL_ROUTE,
             routes: {
-              '/search_screen': (context) => SearchScreen(),
-              '/setting_page': (context) => SettingsPage(),
+              NavigationRoutesConstants.SEARCH_SCREEN: (context) =>
+                  SearchScreen(),
+              NavigationRoutesConstants.SETTINGS_PAGE_ROUTE: (context) =>
+                  SettingsPage(),
             },
             theme: themeNotifier.getTheme(),
             home: _authorizedOrNot == true || _isLocked == false
@@ -151,8 +145,6 @@ class _MyAppState extends State<MyApp> {
                       }
                     },
                   )
-                :
-                // Container(child: Center(child: CircularProgressIndicator(),),)
-                LoginScreen(token: token)));
+                : LoginScreen(token: token)));
   }
 }

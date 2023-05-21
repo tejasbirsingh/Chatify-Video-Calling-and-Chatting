@@ -10,21 +10,21 @@ import 'package:chatify/models/userData.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/chat_methods.dart';
 
-class profilePage extends StatefulWidget {
+class ProfilePage extends StatefulWidget {
   final UserData user;
-
-  const profilePage({Key? key, required this.user}) : super(key: key);
+  const ProfilePage({Key? key, required this.user}) : super(key: key);
   @override
   _profilePageState createState() => _profilePageState();
 }
 
-class _profilePageState extends State<profilePage> {
+class _profilePageState extends State<ProfilePage> {
   late String currUserId;
   bool _first = true;
-  ChatMethods _chatMethods = ChatMethods();
+  final ChatMethods _chatMethods = ChatMethods();
   double _fontSize = 60;
   Color _color = Colors.green;
   FontWeight _weight = FontWeight.normal;
+
   @override
   void initState() {
     super.initState();
@@ -112,7 +112,7 @@ class _profilePageState extends State<profilePage> {
                         color: Theme.of(context).iconTheme.color,
                       ),
                       title: Text(
-                        'Email',
+                        Strings.email,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       subtitle: Text(widget.user.email!,
@@ -128,10 +128,10 @@ class _profilePageState extends State<profilePage> {
                         color: Theme.of(context).iconTheme.color,
                       ),
                       title: Text(
-                        'Status',
+                        Strings.status,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      subtitle: Text(widget.user.status ?? "No Status",
+                      subtitle: Text(widget.user.status ?? Strings.noStatus,
                           style: Theme.of(context).textTheme.displayLarge),
                     ),
                     Divider(
@@ -148,7 +148,9 @@ class _profilePageState extends State<profilePage> {
                           color: Theme.of(context).iconTheme.color,
                         ),
                         title: Text(
-                          snapshot.data == true ? 'Block' : 'Unblock',
+                          snapshot.data == true
+                              ? Strings.block
+                              : Strings.unblock,
                           style: Theme.of(context).textTheme.displayLarge,
                         ),
                         trailing: IconButton(
@@ -184,7 +186,9 @@ class _profilePageState extends State<profilePage> {
                           color: Theme.of(context).iconTheme.color,
                         ),
                         title: Text(
-                          snapshot.data == false ? 'Mute' : 'Unmute',
+                          snapshot.data == false
+                              ? Strings.mute
+                              : Strings.unMute,
                           style: Theme.of(context).textTheme.displayLarge,
                         ),
                         trailing: IconButton(
@@ -195,7 +199,7 @@ class _profilePageState extends State<profilePage> {
                                   color: Colors.red,
                                 )
                               : Icon(
-                                  FontAwesomeIcons.volumeUp,
+                                  FontAwesomeIcons.volumeHigh,
                                   color: Colors.green,
                                 ),
                           onPressed: () {
@@ -233,14 +237,12 @@ class _profilePageState extends State<profilePage> {
           height: MediaQuery.of(context).size.height,
           child: ListView.builder(
             padding: EdgeInsets.all(10),
-            // controller: _listScrollController,
             reverse: true,
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               Message message = Message.fromMap(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
               return Container(child: Text(message.message!));
-              // return chatMessageItem(snapshot.data.docs[index]);
             },
           ),
         );

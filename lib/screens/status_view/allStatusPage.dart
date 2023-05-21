@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:chatify/models/userData.dart';
-import 'package:chatify/widgets/skype_appbar.dart';
+import 'package:chatify/widgets/chatify_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +37,7 @@ class _AllStatusPageState extends State<AllStatusPage> {
     userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
       child: Scaffold(
-        appBar: SkypeAppBar(
+        appBar: ChatifyAppBar(
           leading: Text(""),
           title: 'Status',
           actions: [

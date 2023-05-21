@@ -1,3 +1,4 @@
+import 'package:chatify/constants/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:chatify/screens/chatscreens/widgets/arc_class.dart';
 
@@ -25,21 +26,22 @@ class ControlsWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          moreMenuItem(Icons.photo_album_outlined, 'Gallery', onClickedGallery,
-              Colors.pink),
-          moreMenuItem(Icons.camera_enhance_outlined, 'Camera', onClickedCamera,
-              Colors.blue),
-          moreMenuItem(Icons.scanner, 'Scan', onClickedScanText, Colors.orange),
-          moreMenuItem(Icons.clear, 'Clear', onClickedClear, Colors.red),
+          moreMenuItem(Icons.photo_album_outlined, Strings.gallery,
+              onClickedGallery, Colors.pink),
+          moreMenuItem(Icons.camera_enhance_outlined, Strings.camera,
+              onClickedCamera, Colors.blue),
+          moreMenuItem(
+              Icons.scanner, Strings.scan, onClickedScanText, Colors.orange),
+          moreMenuItem(Icons.clear, Strings.clear, onClickedClear, Colors.red),
         ],
       ),
     );
   }
 
   GestureDetector moreMenuItem(
-      IconData icon, String name, GestureTapCallback fun, Color color) {
+      IconData icon, String name, GestureTapCallback func, Color color) {
     return GestureDetector(
-      onTap: fun,
+      onTap: func,
       child: Column(
         children: [
           Container(
@@ -67,7 +69,9 @@ class ControlsWidget extends StatelessWidget {
           ),
           Text(
             name,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: 16.0),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge!.color,
+                fontSize: 16.0),
           )
         ],
       ),

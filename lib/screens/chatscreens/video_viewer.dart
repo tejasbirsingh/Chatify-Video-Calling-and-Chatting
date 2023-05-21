@@ -1,11 +1,10 @@
 import 'dart:math';
-
+import 'package:chatify/constants/strings.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:chatify/screens/chatscreens/widgets/chewie_player.dart';
 import 'package:video_player/video_player.dart';
-
 
 class VideoPage extends StatefulWidget {
   final String url;
@@ -18,11 +17,10 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
   String downloadedMessage = 'Initializing...';
-
   bool _isDownloading = false;
-
   double _percentage = 0;
   String fileName = "";
+
   @override
   initState() {
     super.initState();
@@ -59,7 +57,8 @@ class _VideoPageState extends State<VideoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Video", style: Theme.of(context).textTheme.headline1),
+          title: Text(Strings.video,
+              style: Theme.of(context).textTheme.displayLarge),
           actions: [
             IconButton(
               icon: Icon(Icons.download_sharp),
@@ -81,7 +80,7 @@ class _VideoPageState extends State<VideoPage> {
                     child: Column(
                     children: [
                       Text(
-                        downloadedMessage ?? '',
+                        downloadedMessage,
                         style: TextStyle(color: Colors.white, fontSize: 20.0),
                       ),
                       SizedBox(
@@ -99,9 +98,9 @@ class _VideoPageState extends State<VideoPage> {
                     ],
                   ))
                 : Text(""),
-                  SizedBox(
-                        height: 20,
-                      ),
+            SizedBox(
+              height: 20,
+            ),
             ChewieListItem(
                 videoPlayerController:
                     VideoPlayerController.network(widget.url)),

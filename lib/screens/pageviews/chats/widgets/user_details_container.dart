@@ -1,3 +1,4 @@
+import 'package:chatify/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,6 @@ import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/auth_methods.dart';
 import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 import 'package:chatify/screens/login_screen.dart';
-import 'package:chatify/widgets/skype_appbar.dart';
 import 'shimmering_logo.dart';
 
 /*
@@ -57,7 +57,8 @@ class UserDetailsContainer extends StatelessWidget {
         margin: EdgeInsets.only(top: 25),
         child: Column(
           children: <Widget>[
-            SkypeAppBar(
+            CustomAppBar(
+              centerTitle: true,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back,
                     color: Theme.of(context).iconTheme.color),

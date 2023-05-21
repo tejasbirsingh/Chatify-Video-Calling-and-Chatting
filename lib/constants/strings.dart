@@ -27,6 +27,7 @@ const String noImageAvailable =
 */
 class Strings {
   Strings._();
+  static const String chatify = "Chatify";
   static const String pickaColor = "Pick a Color";
   static const String select = "Select";
   static const String customize = "Customize";
@@ -53,6 +54,7 @@ class Strings {
   static const String editStatus = "Edit Status";
   static const String email = "Email";
   static const String status = "Status";
+  static const String calls = "Calls";
   static const String chooseFromGallery = "Choose from Gallery";
   static const String takePhoto = "Take Photo";
   static const String editImage = "Edit Image";
@@ -64,4 +66,24 @@ class Strings {
   static const String searchFriendsHere =
       "Search your friends, add them and start chatting !";
   static const String searchFriends = "Search Friends";
+  static const String authenticateToUse = "Authenticate to use Chatify";
+  static const String video = "Video";
+  static const String forwardMessage = "Forward Message";
+  static const String pdfFile = "Pdf File";
+  static const String shareDocument = "Share Document";
+  static const String gallery = "Gallery";
+  static const String camera = "Camera";
+  static const String scan = "Scan";
+  static const String clear = "Clear";
+  static const String login = "LOGIN";
+  static const String block = "Block";
+  static const String unblock = "Unblock";
+  static const String mute = "Mute";
+  static const String unMute = "Unmute";
+  static const String settings = "Settings";
+  static const String accountOptions = "Name, Profile Photo, Email, Status";
+  static const String customizationSettings = "Dark Mode, App Color";
+  static const String privacy = "privacy";
+  static const String privacySettings = "App Locker, Blocked Contacts";
+  static const String aboutAppDetails = "Developer, version";
 }

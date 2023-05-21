@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:chatify/utils/universal_variables.dart';
 
+/*
+  Custom App bar with customizable size.
+*/
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
   final List<Widget> actions;
   final Widget leading;
   final bool centerTitle;
-  final GestureTapCallback onTap;
+  final GestureTapCallback? onTap;
   final bool isLeadingWidth;
 
   const CustomAppBar(
@@ -15,8 +18,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       required this.actions,
       required this.leading,
       required this.centerTitle,
-      required this.onTap,
-      required this.isLeadingWidth})
+      this.onTap,
+      this.isLeadingWidth = false})
       : super(key: key);
 
   @override
@@ -24,7 +27,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).appBarTheme.foregroundColor,
         border: Border(
           bottom: BorderSide(
             color: UniversalVariables.separatorColor,
@@ -34,7 +36,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       child: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.foregroundColor,
         iconTheme: Theme.of(context).appBarTheme.iconTheme,
         elevation: 0.0,
         leadingWidth: isLeadingWidth ? 20.0 : 50.0,

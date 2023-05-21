@@ -39,7 +39,7 @@ import 'package:chatify/resources/auth_methods.dart';
 import 'package:chatify/resources/chat_methods.dart';
 import 'package:chatify/resources/storage_methods.dart';
 import 'package:chatify/screens/callscreens/pickup/pickup_layout.dart';
-import 'package:chatify/screens/chatscreens/messageForwarding/forward_list.dart';
+import 'package:chatify/screens/chatscreens/messageForwarding/forward_list_page.dart';
 import 'package:chatify/screens/chatscreens/sound_recorder.dart';
 import 'package:record/record.dart';
 import 'package:chatify/screens/chatscreens/push_notification.dart';
@@ -59,7 +59,7 @@ import 'package:chatify/utils/call_utilities.dart';
 import 'package:chatify/utils/permissions.dart';
 import 'package:chatify/utils/universal_variables.dart';
 import 'package:chatify/utils/utilities.dart';
-import 'package:chatify/widgets/appbar.dart';
+import 'package:chatify/widgets/custom_app_bar.dart';
 import 'package:chatify/widgets/gradient_icon.dart';
 import 'package:swipe_to/swipe_to.dart';
 
@@ -1584,7 +1584,7 @@ class _ChatScreenState extends State<ChatScreen>
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => forwardPage(
+                    builder: (context) => ForwardPage(
                           message: forwardMessageText,
                           imagePath: path,
                         )));
@@ -1607,11 +1607,11 @@ class _ChatScreenState extends State<ChatScreen>
     return CustomAppBar(
       isLeadingWidth: true,
       onTap: () =>
-          // Get.to(profilePage(
+          // Get.to(ProfilePage(
           //   user: widget.receiver,
           // )),
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return profilePage(
+        return ProfilePage(
           user: widget.receiver,
         );
       })),

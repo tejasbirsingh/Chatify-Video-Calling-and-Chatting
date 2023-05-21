@@ -1,3 +1,5 @@
+import 'package:chatify/constants/constants.dart';
+import 'package:chatify/constants/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,9 +10,7 @@ import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? token;
-
   const LoginScreen({Key? key, this.token}) : super(key: key);
-
   @override
   LoginScreenState createState() => LoginScreenState();
 }
@@ -44,9 +44,8 @@ class LoginScreenState extends State<LoginScreen> {
       baseColor: Colors.white,
       highlightColor: UniversalVariables.senderColor,
       child: TextButton(
-        //  padding: EdgeInsets.all(35),
         child: Text(
-          "LOGIN",
+          Strings.login,
           style: TextStyle(
               color: Theme.of(context).textTheme.bodyLarge!.color,
               fontSize: 35,
@@ -73,7 +72,7 @@ class LoginScreenState extends State<LoginScreen> {
 
   setAppLocker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLocked', false);
+    await prefs.setBool(Constants.IS_LOCKED, false);
   }
 
   void authenticateUser(UserCredential user, String token) {

@@ -126,7 +126,7 @@ class _ViewLayoutState extends State<ViewLayout> {
                 isTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => profilePage(
+                      builder: (context) => ProfilePage(
                         user: widget.contact!,
                       ),
                     )),

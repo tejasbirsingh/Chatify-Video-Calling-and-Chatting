@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# push_notifcations
-=======
 # Chatify - Chat and Video Call App
 
 
@@ -105,9 +102,6 @@ Contributions are welcome! If you'd like
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-
->>>>>>> fixColorPicker
 
 A new Flutter project.
 

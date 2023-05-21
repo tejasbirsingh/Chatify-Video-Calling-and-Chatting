@@ -116,7 +116,7 @@
 //                     String documentPath = documentDirectory.path;
 //                     String path = "$documentPath/$fileName.pdf";
 //                     Navigator.of(context).push(MaterialPageRoute(
-//                         builder: (context) => pdfPreviewScreen(
+//                         builder: (context) => PdfPreviewScreen(
 //                               path: path,
 //                               receiverId: widget.receiverId,
 //                             )));
