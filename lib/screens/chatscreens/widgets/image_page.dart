@@ -17,7 +17,7 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
-  final String noImageAvailable =
+  final String NO_IMAGE_AVAILABLE_URL =
       "https://www.esm.rochester.edu/uploads/NoPhotoAvailable.jpg";
   String downloadedMessage = 'Initializing...';
   bool _isDownloading = false;
@@ -47,7 +47,8 @@ class _ImagePageState extends State<ImagePage> {
     Dio dio = Dio();
 
     dio.download(
-        imageDownloadUrl ?? noImageAvailable, '${dir!.path}/$fileName.jpg',
+        imageDownloadUrl ?? NO_IMAGE_AVAILABLE_URL,
+        '${dir!.path}/$fileName.jpg',
         onReceiveProgress: (actualBytes, totalBytes) {
       var percentage = actualBytes / totalBytes * 100;
       _percentage = percentage / 100;

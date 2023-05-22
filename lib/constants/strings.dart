@@ -19,7 +19,7 @@ const String CALL_STATUS_DIALLED = "dialled";
 const String CALL_STATUS_RECEIVED = "received";
 const String CALL_STATUS_MISSED = "missed";
 
-const String noImageAvailable =
+const String NO_IMAGE_AVAILABLE_URL =
     "https://www.esm.rochester.edu/uploads/NoPhotoAvailable.jpg";
 
 /*
@@ -86,4 +86,15 @@ class Strings {
   static const String privacy = "privacy";
   static const String privacySettings = "App Locker, Blocked Contacts";
   static const String aboutAppDetails = "Developer, version";
+  static const String image = "Image";
+  static const String file = "File";
+  static const String scanText = "Scan Text";
+  static const String textToPdf = "Text to Pdf";
+  static const String location = "Location";
+  static const String call = "Call";
+  static const String deleteMessage = "Delete this message ?";
+  static const String yes = "Yes";
+  static const String no = "No";
+  static const String typeMessageHint = "Type a message";
+  static const String areBlocked = "You have been blocked!";
 }

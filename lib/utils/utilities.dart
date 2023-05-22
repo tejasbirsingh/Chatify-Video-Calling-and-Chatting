@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:chatify/constants/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:image/image.dart' as Im;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -79,5 +81,27 @@ class Utils {
         'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
         .join();
+  }
+
+  static formatTime(final DateTime time, BuildContext context) {
+    String date = time.day.toString() +
+        Constants.SLASH +
+        time.month.toString() +
+        Constants.SLASH +
+        time.year.toString() +
+        "  " +
+        (time.hour > 12 ? time.hour - 12 : time.hour).toString() +
+        ":" +
+        (time.minute.toString().length == 1
+            ? "0" + time.minute.toString()
+            : time.minute.toString()) +
+        " " +
+        (time.hour < 12 ? "am" : "pm").toString();
+
+    return Text(date,
+        style: TextStyle(
+          fontSize: 10.0,
+          color: Theme.of(context).textTheme.bodyLarge!.color,
+        ));
   }
 }

@@ -9,7 +9,7 @@ Future<void> downloadFile(String url, String fileName) async {
   var dir = await getExternalStorageDirectory();
   Dio dio = Dio();
 
-  dio.download(url ?? noImageAvailable, '${dir!.path}/$fileName.pdf',
+  dio.download(url ?? NO_IMAGE_AVAILABLE_URL, '${dir!.path}/$fileName.pdf',
       onReceiveProgress: (actualBytes, totalBytes) {
 
   });

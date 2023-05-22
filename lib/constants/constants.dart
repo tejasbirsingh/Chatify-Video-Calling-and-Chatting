@@ -17,4 +17,12 @@ class Constants {
   static const String TOKEN_CHANNEL = "TokenChannel";
   static const String IS_LOCKED = "isLocked";
   static const String IMAGE = "IMAGE";
+  static const String BACKGROUND = "background";
+  static const String LOCATION = "location";
+  static const String AUDIO = "Audio";
+  static const String MESSAGE_TYPE_CALL = "Call";
+  static const String SLASH = "/";
+  static const String IS_READ = "isRead";
+  static const String FILE = "FILE";
+
 }

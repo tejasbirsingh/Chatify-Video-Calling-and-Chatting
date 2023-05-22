@@ -78,7 +78,7 @@ class _profilePageState extends State<ProfilePage> {
                     children: [
                       Positioned.fill(
                           child: Image.network(
-                        widget.user.profilePhoto!,
+                        widget.user.profilePhoto ?? NO_IMAGE_AVAILABLE_URL,
                         fit: BoxFit.cover,
                       )),
                     ],

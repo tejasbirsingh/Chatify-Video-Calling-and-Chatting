@@ -17,7 +17,7 @@ class CachedImage extends StatelessWidget {
   final BoxFit fit;
 
 
-  final String noImageAvailable =
+  final String NO_IMAGE_AVAILABLE_URL =
       "https://www.esm.rochester.edu/uploads/NoPhotoAvailable.jpg";
 
   CachedImage(
@@ -50,7 +50,7 @@ class CachedImage extends StatelessWidget {
                 placeholder: (context, url) =>
                       Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => Image.network(
-                    noImageAvailable,
+                    NO_IMAGE_AVAILABLE_URL,
                     height: 25,
                     width: 25,
                     fit: BoxFit.cover,
@@ -62,7 +62,7 @@ class CachedImage extends StatelessWidget {
     } catch (e) {
       print(e);
       return Image.network(
-        noImageAvailable,
+        NO_IMAGE_AVAILABLE_URL,
         height: 25,
         width: 25,
         fit: BoxFit.cover,

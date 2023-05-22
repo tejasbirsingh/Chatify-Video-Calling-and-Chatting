@@ -96,7 +96,7 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
                             radius: 100.0,
                             backgroundImage: url != null
                                 ? NetworkImage(url)
-                                : NetworkImage(noImageAvailable),
+                                : NetworkImage(NO_IMAGE_AVAILABLE_URL),
                             child: Align(
                               alignment: Alignment.bottomRight,
                               child: Icon(

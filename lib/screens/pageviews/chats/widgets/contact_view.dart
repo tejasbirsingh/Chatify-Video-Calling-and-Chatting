@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:chatify/models/contact.dart';
-
 import 'package:chatify/models/userData.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/auth_methods.dart';
@@ -11,10 +10,12 @@ import 'package:chatify/screens/chatscreens/chat_screen.dart';
 import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 import 'package:chatify/screens/profile_screen.dart';
 import 'package:chatify/widgets/custom_tile.dart';
-
 import 'last_message_container.dart';
 import 'online_dot_indicator.dart';
 
+/*
+  It provides contact view which is used at various places.
+ */
 class ContactView extends StatefulWidget {
   final Contact contact;
   final String senderId;
@@ -34,7 +35,7 @@ class _ContactViewState extends State<ContactView> {
       future: _authMethods.getUserDetailsById(widget.contact.uid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          UserData user = snapshot.data!;
+          final UserData user = snapshot.data!;
 
           return ViewLayout(
             contact: user,
@@ -90,7 +91,6 @@ class _ViewLayoutState extends State<ViewLayout> {
           SizedBox(
             width: 40.0,
           ),
-
           FutureBuilder<int>(
               initialData: 0,
               future: _chatMethods.unreadMessagesCount(
