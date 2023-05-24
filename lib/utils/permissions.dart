@@ -2,9 +2,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 
 class Permissions {
-
   static Future<bool> cameraAndMicrophonePermissionsGranted() async {
-
     PermissionStatus? cameraPermissionStatus = await _getCameraPermission();
     PermissionStatus? microphonePermissionStatus =
         await _getMicrophonePermission();
@@ -14,10 +12,9 @@ class Permissions {
       return true;
     } else {
       _handleInvalidPermissions(
-          cameraPermissionStatus, microphonePermissionStatus!);
+          cameraPermissionStatus, microphonePermissionStatus);
       return false;
     }
-    
   }
 
   static Future<bool> recordingPermission() async {
@@ -34,7 +31,7 @@ class Permissions {
 
   static Future<PermissionStatus?> _getCameraPermission() async {
     if (await Permission.camera.request().isGranted) {}
- 
+
 // You can request multiple permissions at once.
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
@@ -57,20 +54,20 @@ class Permissions {
   }
 
   static Future<PermissionStatus?> _getMicrophonePermission() async {
-    bool permission = await Permission.microphone.isGranted;
-    Map<Permission, PermissionStatus>? permissionStatus;
+    final bool permission = await Permission.microphone.isGranted;
+    final Map<Permission, PermissionStatus>? permissionStatus;
     if (!permission) {
       permissionStatus = await [
         Permission.microphone,
       ].request();
-      return permissionStatus![Permission.microphone] ??
-        PermissionStatus.restricted;
+      return permissionStatus[Permission.microphone] ??
+          PermissionStatus.restricted;
     }
     return null;
   }
 
   static void _handleRecordInvalidPermission(
-    PermissionStatus microphonePermissionStatus,
+    final PermissionStatus microphonePermissionStatus,
   ) {
     if (microphonePermissionStatus == PermissionStatus.denied) {
       throw new PlatformException(
@@ -87,19 +84,13 @@ class Permissions {
 
   static void _handleInvalidPermissions(
     PermissionStatus? cameraPermissionStatus,
-    PermissionStatus microphonePermissionStatus,
+    PermissionStatus? microphonePermissionStatus,
   ) {
     if (cameraPermissionStatus == PermissionStatus.denied &&
         microphonePermissionStatus == PermissionStatus.denied) {
       throw new PlatformException(
           code: "PERMISSION_DENIED",
           message: "Access to camera and microphone denied",
-          details: null);
-    } else if (cameraPermissionStatus == PermissionStatus.denied &&
-        microphonePermissionStatus == PermissionStatus.denied) {
-      throw new PlatformException(
-          code: "PERMISSION_DISABLED",
-          message: "Location data is not available on device",
           details: null);
     }
   }

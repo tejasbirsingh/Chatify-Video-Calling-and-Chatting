@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/widgets.dart';
 import 'package:chatify/models/userData.dart';
 import 'package:chatify/provider/audio_upload_provider.dart';
 import 'package:chatify/provider/file_provider.dart';

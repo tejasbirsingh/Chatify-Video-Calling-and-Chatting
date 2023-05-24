@@ -97,4 +97,7 @@ class Strings {
   static const String no = "No";
   static const String typeMessageHint = "Type a message";
   static const String areBlocked = "You have been blocked!";
+  static const String dialled = "DIALLED";
+  static const String ok = "OK";
+  static const String noRecents = "No Recents";
 }

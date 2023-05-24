@@ -220,7 +220,7 @@ class ChatMethods {
     _messageCollection
         .doc(message.receiverId)
         .collection(message.senderId!)
-        .add(map as Map<String, dynamic>);
+        .add(map);
   }
 
   void setAudioMsg(final String? url, final String? receiverId,
@@ -256,7 +256,6 @@ class ChatMethods {
   Future<bool> isBlocked(final String? userId, final String? receiverId) async {
     final DocumentSnapshot senderSnapshot =
         await getBlockedDocument(of: userId, forContact: receiverId).get();
-
     if (!senderSnapshot.exists) {
       return true;
     } else {

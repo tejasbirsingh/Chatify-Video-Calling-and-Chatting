@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:chatify/constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chatify/constants/strings.dart';
@@ -16,8 +16,8 @@ class CallUtils {
   static final CallMethods callMethods = CallMethods();
 
   static dial({UserData? from, UserData? to, context}) async {
-    ChatMethods _chatMethods = ChatMethods();
-    Call call = Call(
+    final ChatMethods _chatMethods = ChatMethods();
+    final Call call = Call(
       callerId: from!.uid,
       callerName: from.name,
       callerPic: from.profilePhoto,
@@ -26,16 +26,16 @@ class CallUtils {
       receiverPic: to.profilePhoto,
       channelId: Random().nextInt(1000).toString(),
     );
-    
-    Message _message = Message(
+
+    final Message _message = Message(
       receiverId: to.uid,
       senderId: from.uid,
-      message: "DIALLED",
+      message: Strings.dialled,
       timestamp: Timestamp.now(),
-      type: 'Call',
+      type: Constants.MESSAGE_TYPE_CALL,
     );
 
-    Log log = Log(
+    final Log log = Log(
       callerName: from.name,
       callerPic: from.profilePhoto,
       callStatus: CALL_STATUS_DIALLED,
@@ -44,7 +44,7 @@ class CallUtils {
       timestamp: DateTime.now().toString(),
     );
 
-    bool callMade = await callMethods.makeCall(call: call);
+    final bool callMade = await callMethods.makeCall(call: call);
 
     call.hasDialled = true;
 

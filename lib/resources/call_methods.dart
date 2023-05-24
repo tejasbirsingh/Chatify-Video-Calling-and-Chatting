@@ -29,7 +29,7 @@ class CallMethods {
   Future<bool> endCall({Call? call}) async {
     try {
       await callCollection.doc(call!.callerId).delete();
-      await callCollection.doc(call!.receiverId).delete();
+      await callCollection.doc(call.receiverId).delete();
       return true;
     } catch (e) {
       print(e);

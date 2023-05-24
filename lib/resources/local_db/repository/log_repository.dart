@@ -1,6 +1,5 @@
 import 'package:chatify/models/log.dart';
 import 'package:chatify/resources/local_db/db/hive_methods.dart';
-import 'package:meta/meta.dart';
 import 'package:chatify/resources/local_db/db/sqlite_methods.dart';
 
 class LogRepository {

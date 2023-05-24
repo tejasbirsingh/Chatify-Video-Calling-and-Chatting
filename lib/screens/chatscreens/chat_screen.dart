@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:chatify/constants/constants.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
 import 'package:dio/dio.dart';
 import 'package:file/local.dart';
-// import 'package:audio_recorder/audio_recorder.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:emoji_picker/emoji_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,6 +27,7 @@ import 'package:chatify/provider/file_provider.dart';
 import 'package:chatify/provider/image_upload_provider.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'dart:io' as Io;
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:chatify/provider/video_upload_provider.dart';
 import 'package:chatify/resources/auth_methods.dart';
 import 'package:chatify/resources/chat_methods.dart';
@@ -139,7 +139,7 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   getbackground() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       backgroundImage = prefs.getString(Constants.BACKGROUND) ?? "";
     });
@@ -242,6 +242,8 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Flexible(
                     child: messageList(),
@@ -275,15 +277,14 @@ class _ChatScreenState extends State<ChatScreen>
                         )
                       : Container(),
                   Container(
+                      // height: 100.0,
                       decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.background,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(30.0),
                               topRight: Radius.circular(30.0))),
                       child: chatControls()),
-                  // showEmojiPicker
-                  //     ? Container(child: emojiContainer())
-                  //     : Container(),
+                  showEmojiPicker ? emojiContainer() : Container(),
                 ],
               ),
               (_isEditing)
@@ -449,8 +450,8 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  GestureDetector moreMenuItem(
-      IconData icon, String name, GestureTapCallback fun, Color color) {
+  GestureDetector moreMenuItem(final IconData icon, final String name,
+      final GestureTapCallback fun, final Color color) {
     return GestureDetector(
       onTap: fun,
       child: Column(
@@ -487,22 +488,50 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  // emojiContainer() {
-  //   return EmojiPicker(
-  //     bgColor: UniversalVariables.separatorColor,
-  //     indicatorColor: UniversalVariables.blueColor,
-  //     rows: 3,
-  //     columns: 7,
-  //     onEmojiSelected: (emoji, category) {
-  //       setState(() {
-  //         isWriting = true;
-  //       });
-  //       textFieldController.text = textFieldController.text + emoji.emoji;
-  //     },
-  //     recommendKeywords: ["face", "happy", "party", "sad"],
-  //     numRecommended: 50,
-  //   );
-  // }
+  emojiContainer() {
+    return SizedBox(
+      height: 300.0,
+      child: EmojiPicker(
+        onEmojiSelected: (Category? category, Emoji emoji) {
+          setState(() {
+            isWriting = true;
+          });
+        },
+        onBackspacePressed: null,
+        textEditingController: textFieldController,
+        config: Config(
+          columns: 7,
+          emojiSizeMax: 32 *
+              (foundation.defaultTargetPlatform == TargetPlatform.iOS
+                  ? 1.30
+                  : 1.0),
+          verticalSpacing: 0,
+          horizontalSpacing: 0,
+          gridPadding: EdgeInsets.zero,
+          initCategory: Category.RECENT,
+          bgColor: Color(0xFFF2F2F2),
+          indicatorColor: Colors.blue,
+          iconColor: Colors.grey,
+          iconColorSelected: Colors.blue,
+          backspaceColor: Colors.blue,
+          skinToneDialogBgColor: Colors.white,
+          skinToneIndicatorColor: Colors.grey,
+          enableSkinTones: true,
+          showRecentsTab: true,
+          recentsLimit: 28,
+          noRecents: const Text(
+            Strings.noRecents,
+            style: TextStyle(fontSize: 20, color: Colors.black26),
+            textAlign: TextAlign.center,
+          ),
+          loadingIndicator: const SizedBox.shrink(),
+          tabIndicatorAnimDuration: kTabScrollDuration,
+          categoryIcons: const CategoryIcons(),
+          buttonMode: ButtonMode.MATERIAL,
+        ),
+      ),
+    );
+  }
 
   Widget messageList() {
     return StreamBuilder(
@@ -531,12 +560,12 @@ class _ChatScreenState extends State<ChatScreen>
 
   _start() async {
     try {
-      bool result = await record.hasPermission();
+      final bool result = await record.hasPermission();
       // if (await Permissions.recordingPermission()) {
       var ran = Random().nextInt(50);
       String path = Utils.generateRandomString(ran);
       Io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
-      path = appDocDirectory.path + '/' + path;
+      path = appDocDirectory.path + Constants.SLASH + path;
 
       // await record.start(
       //   path: path,
@@ -579,8 +608,9 @@ class _ChatScreenState extends State<ChatScreen>
     });
   }
 
-  Widget chatMessageItem(DocumentSnapshot snapshot) {
-    Message _message = Message.fromMap(snapshot.data() as Map<String, dynamic>);
+  Widget chatMessageItem(final DocumentSnapshot snapshot) {
+    final Message _message =
+        Message.fromMap(snapshot.data() as Map<String, dynamic>);
 
     return _message.type != Constants.MESSAGE_TYPE_CALL
         ? GestureDetector(
@@ -616,7 +646,7 @@ class _ChatScreenState extends State<ChatScreen>
           );
   }
 
-  Widget callLayout(Message _message) {
+  Widget callLayout(final Message _message) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width * 0.3, vertical: 10.0),
@@ -686,7 +716,7 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   getMessage(final Message message) {
-    bool lineColor = message.senderId == _currentUserId;
+    final bool lineColor = message.senderId == _currentUserId;
     final replyMessage = message.replyMessage;
     final isReplying = replyMessage != null;
     final messageWidget = Text(
@@ -756,8 +786,8 @@ class _ChatScreenState extends State<ChatScreen>
     }
   }
 
-  Widget senderLayout(Message message) {
-    Radius messageRadius = Radius.circular(35.0);
+  Widget senderLayout(final Message message) {
+    final Radius messageRadius = Radius.circular(35.0);
     if (message.isLocation = true && message.type == MESSAGE_TYPE_LOCATION) {
       return GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -985,7 +1015,7 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  updateStatus(String uid) async {
+  updateStatus(final String uid) async {
     await FirebaseFirestore.instance
         .collection(MESSAGES_COLLECTION)
         .doc(widget.receiver.uid)
@@ -1001,9 +1031,9 @@ class _ChatScreenState extends State<ChatScreen>
     });
   }
 
-  Widget receiverLayout(Message message, String uid) {
+  Widget receiverLayout(final Message message, final String uid) {
     updateStatus(uid);
-    Radius messageRadius = Radius.circular(35);
+    final Radius messageRadius = Radius.circular(35);
     if (message.isLocation = true && message.type == Constants.LOCATION) {
       return GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -1194,7 +1224,7 @@ class _ChatScreenState extends State<ChatScreen>
       var text = textFieldController.text;
       textFieldFocus.unfocus();
 
-      Message _message = Message(
+      final Message _message = Message(
           receiverId: widget.receiver.uid,
           senderId: sender!.uid,
           message: text,
@@ -1209,9 +1239,9 @@ class _ChatScreenState extends State<ChatScreen>
 
       textFieldController.text = "";
 
-      bool isBlocked =
+      final bool isBlocked =
           await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
-      bool isMuted =
+      final bool isMuted =
           await _chatMethods.isMuted(widget.receiver.uid!, _currentUserId!);
 
       if (isBlocked) {
@@ -1234,13 +1264,13 @@ class _ChatScreenState extends State<ChatScreen>
           GestureDetector(
             onTap: () async {
               toggleMenu();
-              // bool isBlocked = await _chatMethods.isBlocked(
-              //     widget.receiver.uid, _currentUserId);
-              // if (isBlocked) {
-              //   toggleMenu();
-              // } else {
-              //   blockedDialog(context);
-              // }
+              final bool isBlocked = await _chatMethods.isBlocked(
+                  widget.receiver.uid, _currentUserId);
+              if (isBlocked) {
+                toggleMenu();
+              } else {
+                blockedDialog(context);
+              }
             },
             child: Container(
               padding: EdgeInsets.all(5),
@@ -1402,7 +1432,7 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Future pickFile() async {
-    FilePickerResult? path = await FilePicker.platform
+    final FilePickerResult? path = await FilePicker.platform
         .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
 
     if (path != null) {
@@ -1432,7 +1462,7 @@ class _ChatScreenState extends State<ChatScreen>
             actions: [
               InkWell(
                 child: Text(
-                  'OK',
+                  Strings.ok,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 onTap: () => Navigator.pop(context),
@@ -1446,7 +1476,7 @@ class _ChatScreenState extends State<ChatScreen>
     this.setState(() {
       _isEditing = true;
     });
-    File? selectedImage = await Utils.pickImage(source: source);
+    final File? selectedImage = await Utils.pickImage(source: source);
     if (selectedImage != null) {
       final cropped = await ImageCropper().cropImage(
         sourcePath: selectedImage.path,
@@ -1466,7 +1496,7 @@ class _ChatScreenState extends State<ChatScreen>
           )
         ],
       ) as File;
-      bool isBlocked =
+      final bool isBlocked =
           await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
       if (isBlocked) {
         _storageMethods.uploadImage(
@@ -1515,8 +1545,8 @@ class _ChatScreenState extends State<ChatScreen>
   //       widget.receiver.firebaseToken.toString());
   // }
 
-  Future<void> downloadFile(String imagePath) async {
-    Dio dio = Dio();
+  Future<void> downloadFile(final String imagePath) async {
+    final Dio dio = Dio();
 
     dio.download(forwardedImage ?? NO_IMAGE_AVAILABLE_URL, imagePath,
         onReceiveProgress: (actualBytes, totalBytes) {});
@@ -1632,27 +1662,23 @@ class _ChatScreenState extends State<ChatScreen>
               ),
             ),
             onPressed: () async {
-              // Message _message = Message(
-              //   receiverId: widget.receiver.uid,
-              //   senderId: sender.uid,
-              //   message: "Call",
-              //   timestamp: Timestamp.now(),
-              //   type: 'Call',
-              // );
-              bool isBlocked = await _chatMethods.isBlocked(
+              final Message _message = Message(
+                receiverId: widget.receiver.uid,
+                senderId: sender!.uid,
+                message: Constants.MESSAGE_TYPE_CALL,
+                timestamp: Timestamp.now(),
+                type: Constants.MESSAGE_TYPE_CALL,
+              );
+              final bool isBlocked = await _chatMethods.isBlocked(
                   widget.receiver.uid, _currentUserId);
-              if (isBlocked) {
-                await Permissions.cameraAndMicrophonePermissionsGranted()
-                    // ignore: unnecessary_statements
-                    ? {
-                        CallUtils.dial(
-                          from: sender,
-                          to: widget.receiver,
-                          context: context,
-                        ),
-                        // _chatMethods.addMessageToDb(_message)
-                      }
-                    : [];
+              if (isBlocked &&
+                  await Permissions.cameraAndMicrophonePermissionsGranted()) {
+                CallUtils.dial(
+                  from: sender,
+                  to: widget.receiver,
+                  context: context,
+                );
+                _chatMethods.addMessageToDb(_message);
               } else {
                 blockedDialog(context);
               }
@@ -1668,7 +1694,6 @@ class _ChatScreenState extends State<ChatScreen>
               color: Theme.of(context).iconTheme.color,
               size: 30.0,
             ),
-            // child: Icon(Icons.menu),
             itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 1,
@@ -1717,7 +1742,7 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  void replyToMessage(Message message) {
+  void replyToMessage(final Message message) {
     setState(() {
       replyMessage = message;
     });

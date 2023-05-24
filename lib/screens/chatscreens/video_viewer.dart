@@ -38,7 +38,7 @@ class _VideoPageState extends State<VideoPage> {
     var dir = await getExternalStorageDirectory();
     Dio dio = Dio();
 
-    dio.download(widget.url, '${dir!.path}/${fileName}.mp4',
+    dio.download(widget.url, '${dir!.path}/$fileName.mp4',
         onReceiveProgress: (actualBytes, totalBytes) {
       var percentage = actualBytes / totalBytes * 100;
       _percentage = percentage / 100;

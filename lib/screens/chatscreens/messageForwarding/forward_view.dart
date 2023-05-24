@@ -117,7 +117,6 @@ class ViewLayout extends StatelessWidget {
       type: Constants.MESSAGE_TYPE_IMAGE,
     );
     if (img != null) {
-      print("Image condition triggered -" + img.path);
       _storageMethods.uploadImage(
           image: img,
           receiverId: friendViewLayout.uid!,
@@ -126,7 +125,6 @@ class ViewLayout extends StatelessWidget {
       _chatMethods.setImageMsg(
           imagePath!, friendViewLayout.uid!, user.getUser.uid!);
     } else {
-      print("Message condition triggered -" + _message.toString());
       _chatMethods.addMessageToDb(_message);
     }
     sendNotification(forwardedMessage, user.getUser.name.toString(),
