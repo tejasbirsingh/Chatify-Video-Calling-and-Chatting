@@ -58,6 +58,7 @@ import 'package:video_player/video_player.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
+  final bool isBlocked = false;
   ChatScreen({required this.receiver});
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -324,7 +325,19 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
+  Future<bool> getIsContactBlocked() async {
+    return await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
+  }
+
   Widget moreMenuOptions() {
+    bool isContactBlocked = false;
+    getIsContactBlocked().then((value) => {
+          if (value) {blockedDialog(context)},
+          isContactBlocked = value
+        });
+    if (isContactBlocked) {
+      return Container();
+    }
     return Visibility(
       visible: moreMenu,
       child: Container(
@@ -340,7 +353,6 @@ class _ChatScreenState extends State<ChatScreen>
                 offset: Offset(1.0, 1.0),
               )
             ]),
-        // height: MediaQuery.of(context).size.height * 0.3,
         height: 220.0,
         width: MediaQuery.of(context).size.width * 0.8,
         child: Padding(
@@ -351,97 +363,62 @@ class _ChatScreenState extends State<ChatScreen>
             crossAxisCount: 3,
             children: [
               moreMenuItem(Icons.camera_enhance, Strings.image, () async {
-                bool isBlocked = await _chatMethods.isBlocked(
-                    widget.receiver.uid, _currentUserId);
-                if (isBlocked) {
-                  toggleMenu();
-                  pickImage(source: ImageSource.gallery);
-                } else {
-                  blockedDialog(context);
-                }
+                toggleMenu();
+                pickImage(source: ImageSource.gallery);
               }, Colors.green),
               moreMenuItem(Icons.video_label, Strings.video, () async {
-                bool isBlocked = await _chatMethods.isBlocked(
-                    widget.receiver.uid, _currentUserId);
-                if (isBlocked) {
-                  toggleMenu();
-                  // pickVideo();
-                } else {
-                  blockedDialog(context);
-                }
+                toggleMenu();
+                // pickVideo();
               }, Colors.pink),
               moreMenuItem(Icons.file_copy, Strings.file, () async {
-                bool isBlocked = await _chatMethods.isBlocked(
-                    widget.receiver.uid, _currentUserId);
-                if (isBlocked) {
-                  toggleMenu();
-                  pickFile();
-                } else {
-                  blockedDialog(context);
-                }
+                toggleMenu();
+                pickFile();
               }, Colors.orange),
               moreMenuItem(Icons.scanner, Strings.scanText, () async {
-                bool isBlocked = await _chatMethods.isBlocked(
-                    widget.receiver.uid, _currentUserId);
-                if (isBlocked) {
-                  setState(() {
-                    isWriting = true;
-                  });
-                  toggleMenu();
-                  parseText();
-                } else {
-                  blockedDialog(context);
-                }
+                setState(() {
+                  isWriting = true;
+                });
+                toggleMenu();
+                parseText();
               }, Colors.purple),
               moreMenuItem(Icons.picture_as_pdf, Strings.textToPdf, () async {
-                bool isBlocked = await _chatMethods.isBlocked(
-                    widget.receiver.uid, _currentUserId);
-                if (isBlocked) {
-                  toggleMenu();
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => TextRecognitionWidget(
-                  //             receiverId: widget.receiver.uid)));
-                } else {
-                  blockedDialog(context);
-                }
+                toggleMenu();
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => TextRecognitionWidget(
+                //             receiverId: widget.receiver.uid)));
               }, Colors.red),
               moreMenuItem(Icons.location_on, Strings.location, () async {
-                bool isBlocked = await _chatMethods.isBlocked(
-                    widget.receiver.uid, _currentUserId);
-                if (isBlocked) {
-                  setState(() {
-                    isWriting = true;
-                  });
-                  toggleMenu();
-                  Position position = await Geolocator.getCurrentPosition(
-                      desiredAccuracy: LocationAccuracy.high);
+                setState(() {
+                  isWriting = true;
+                });
+                toggleMenu();
+                final Position position = await Geolocator.getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.high);
 
-                  GeoPoint x = GeoPoint(position.latitude, position.longitude);
-                  Message _message = Message(
-                    receiverId: widget.receiver.uid,
-                    senderId: sender!.uid,
-                    message: Strings.location,
-                    position: x,
-                    timestamp: Timestamp.now(),
-                    type: Strings.location,
-                    isRead: false,
-                    isLocation: true,
-                  );
+                final GeoPoint x =
+                    GeoPoint(position.latitude, position.longitude);
+                final Message _message = Message(
+                  receiverId: widget.receiver.uid,
+                  senderId: sender!.uid,
+                  message: Strings.location,
+                  position: x,
+                  timestamp: Timestamp.now(),
+                  type: Strings.location,
+                  isRead: false,
+                  isLocation: true,
+                );
 
-                  setState(() {
-                    isWriting = false;
-                  });
+                setState(() {
+                  isWriting = false;
+                });
 
-                  _chatMethods.addMessageToDb(_message);
-                  sendNotification(
-                      _message.message.toString(),
-                      sender!.name.toString(),
-                      widget.receiver.firebaseToken.toString());
-                } else {
-                  blockedDialog(context);
-                }
+                _chatMethods.addMessageToDb(_message);
+                sendNotification(
+                    _message.message.toString(),
+                    sender!.name.toString(),
+                    widget.receiver.firebaseToken.toString());
               }, Colors.blue),
             ],
           ),
@@ -1229,7 +1206,7 @@ class _ChatScreenState extends State<ChatScreen>
           senderId: sender!.uid,
           message: text,
           timestamp: Timestamp.now(),
-          type: Constants.MESSAGE_TYPE_TEXT,
+          type: Constants.TEXT,
           isRead: false,
           replyMessage: replyMessage);
 
@@ -1703,7 +1680,7 @@ class _ChatScreenState extends State<ChatScreen>
                       builder: (context, AsyncSnapshot<bool> snapshot) =>
                           GestureDetector(
                         onTap: () {
-                          _chatMethods.addToBlockedList(
+                          _chatMethods.addOrDeleteUserFromBlockedList(
                               senderId: _currentUserId,
                               receiverId: widget.receiver.uid);
                         },

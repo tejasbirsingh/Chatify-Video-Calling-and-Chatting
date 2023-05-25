@@ -19,7 +19,7 @@ class ChatMethods {
     await _messageCollection
         .doc(message.senderId)
         .collection(message.receiverId!)
-        .add(map as Map<String, dynamic>);
+        .add(map);
     addToContacts(senderId: message.senderId, receiverId: message.receiverId);
     await _messageCollection
         .doc(message.receiverId!)
@@ -33,7 +33,6 @@ class ChatMethods {
 
   addToContacts({String? senderId, String? receiverId}) async {
     final Timestamp currentTime = Timestamp.now();
-
     await addToSenderContacts(senderId!, receiverId!, currentTime);
     await addToReceiverContacts(senderId, receiverId, currentTime);
   }
@@ -45,16 +44,13 @@ class ChatMethods {
   ) async {
     final DocumentSnapshot senderSnapshot =
         await getContactsDocument(of: senderId, forContact: receiverId).get();
-
     if (!senderSnapshot.exists) {
       //does not exists
-      Contact receiverContact = Contact(
+      final Contact receiverContact = Contact(
         uid: receiverId,
         addedOn: currentTime,
       );
-
       var receiverMap = receiverContact.toMap(receiverContact);
-
       await getContactsDocument(of: senderId, forContact: receiverId)
           .set(receiverMap);
     }
@@ -86,31 +82,22 @@ class ChatMethods {
           {final String? of, final String? forContact}) =>
       _userCollection.doc(of).collection(BLOCKED_CONTACTS).doc(forContact);
 
-  addToBlockedList({String? senderId, String? receiverId}) async {
+  addOrDeleteUserFromBlockedList({String? senderId, String? receiverId}) async {
     final Timestamp currentTime = Timestamp.now();
-
-    await addToSenderBlockedList(senderId, receiverId, currentTime);
-  }
-
-  Future<void> addToSenderBlockedList(
-    final String? senderId,
-    final String? receiverId,
-    final currentTime,
-  ) async {
     final DocumentSnapshot senderSnapshot =
         await getBlockedDocument(of: senderId!, forContact: receiverId!).get();
 
     if (!senderSnapshot.exists) {
-      Contact receiverContact = Contact(
+      final Contact receiverContact = Contact(
         uid: receiverId,
         addedOn: currentTime,
       );
 
       var receiverMap = receiverContact.toMap(receiverContact);
-
       await getBlockedDocument(of: senderId, forContact: receiverId)
           .set(receiverMap);
     } else {
+      // Delete the document if the user was already blocked
       await getBlockedDocument(of: senderId, forContact: receiverId).delete();
     }
   }
@@ -254,13 +241,14 @@ class ChatMethods {
       _userCollection.doc(userId).collection(BLOCKED_CONTACTS).snapshots();
 
   Future<bool> isBlocked(final String? userId, final String? receiverId) async {
-    final DocumentSnapshot senderSnapshot =
-        await getBlockedDocument(of: userId, forContact: receiverId).get();
-    if (!senderSnapshot.exists) {
-      return true;
-    } else {
-      return false;
-    }
+    // final DocumentSnapshot senderSnapshot =
+    //     await getBlockedDocument(of: userId, forContact: receiverId).get();
+    // if (!senderSnapshot.exists) {
+    //   return false;
+    // } else {
+    //   return true;
+    // }
+    return false;
   }
 
   Future<bool> isMuted(final String userId, final String receiverId) async {
@@ -281,7 +269,7 @@ class ChatMethods {
       _messageCollection
           .doc(senderId)
           .collection(receiverId)
-          .orderBy("timestamp")
+          .orderBy(Constants.TIMESTAMP)
           .snapshots();
 
   Future<int> unreadMessagesCount({
@@ -292,7 +280,7 @@ class ChatMethods {
     await _messageCollection
         .doc(receiverId)
         .collection(senderId)
-        .where('isRead', isEqualTo: false)
+        .where(Constants.IS_READ, isEqualTo: false)
         .get()
         .then((documentSnapshot) {
       c = documentSnapshot.docs.length;
@@ -304,6 +292,6 @@ class ChatMethods {
     await _userCollection
         .doc(senderId)
         .collection(STATUS)
-        .add({'url': url, 'timestamp': Timestamp.now()});
+        .add({Constants.URL: url, Constants.TIMESTAMP: Timestamp.now()});
   }
 }

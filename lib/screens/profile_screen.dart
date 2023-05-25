@@ -149,23 +149,22 @@ class _profilePageState extends State<ProfilePage> {
                         ),
                         title: Text(
                           snapshot.data == true
-                              ? Strings.block
-                              : Strings.unblock,
+                              ? Strings.unblock
+                              : Strings.block,
                           style: Theme.of(context).textTheme.displayLarge,
                         ),
                         trailing: IconButton(
                           iconSize: 35.0,
                           icon: snapshot.data == true
                               ? Icon(
-                                  Icons.block,
-                                  color: Colors.red,
-                                )
-                              : Icon(
                                   Icons.block_flipped,
                                   color: Colors.green,
+                                ) : Icon(
+                                  Icons.block,
+                                  color: Colors.red,
                                 ),
                           onPressed: () {
-                            _chatMethods.addToBlockedList(
+                            _chatMethods.addOrDeleteUserFromBlockedList(
                                 senderId: userProvider.getUser.uid,
                                 receiverId: widget.user.uid);
                           },
@@ -210,7 +209,7 @@ class _profilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    messageList()
+                    // messageList()
                   ],
                 ),
               ),

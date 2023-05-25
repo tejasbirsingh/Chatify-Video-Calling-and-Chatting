@@ -9,13 +9,13 @@ class CallMethods {
   Stream<DocumentSnapshot> callStream({String? uid}) =>
       callCollection.doc(uid).snapshots();
 
-  Future<bool> makeCall({Call? call}) async {
+  Future<bool> makeCall({final Call? call}) async {
     try {
       call!.hasDialled = true;
-      Map<String, dynamic> hasDialledMap = call.toMap(call);
+      final Map<String, dynamic> hasDialledMap = call.toMap(call);
 
       call.hasDialled = false;
-      Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+      final Map<String, dynamic> hasNotDialledMap = call.toMap(call);
 
       await callCollection.doc(call.callerId).set(hasDialledMap);
       await callCollection.doc(call.receiverId).set(hasNotDialledMap);
@@ -26,7 +26,7 @@ class CallMethods {
     }
   }
 
-  Future<bool> endCall({Call? call}) async {
+  Future<bool> endCall({final Call? call}) async {
     try {
       await callCollection.doc(call!.callerId).delete();
       await callCollection.doc(call.receiverId).delete();

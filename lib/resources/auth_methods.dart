@@ -23,9 +23,9 @@ class AuthMethods {
   }
 
   Future<UserData> getUserDetails() async {
-    User currentUser = await getCurrentUser();
+    final User currentUser = await getCurrentUser();
 
-    DocumentSnapshot documentSnapshot =
+    final DocumentSnapshot documentSnapshot =
         await _userCollection.doc(currentUser.uid).get();
     return UserData.fromMap(documentSnapshot.data() as Map<String, dynamic>);
   }
@@ -33,7 +33,8 @@ class AuthMethods {
   Future<UserData?> getUserDetailsById(id) async {
     UserData? userData;
     try {
-      DocumentSnapshot documentSnapshot = await _userCollection.doc(id).get();
+      final DocumentSnapshot documentSnapshot =
+          await _userCollection.doc(id).get();
       userData =
           UserData.fromMap(documentSnapshot.data() as Map<String, dynamic>);
     } catch (e) {
@@ -44,15 +45,15 @@ class AuthMethods {
 
   Future<UserCredential?> signIn() async {
     try {
-      GoogleSignInAccount? _signInAccount = await _googleSignIn.signIn();
-      GoogleSignInAuthentication _signInAuthentication =
+      final GoogleSignInAccount? _signInAccount = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication _signInAuthentication =
           await _signInAccount!.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: _signInAuthentication.accessToken,
           idToken: _signInAuthentication.idToken);
 
-      UserCredential user = await _auth.signInWithCredential(credential);
+      final UserCredential user = await _auth.signInWithCredential(credential);
       return user;
     } catch (e) {
       print("Auth methods error");
@@ -61,8 +62,8 @@ class AuthMethods {
     }
   }
 
-  Future<bool> authenticateUser(UserCredential user) async {
-    QuerySnapshot result = await firestore
+  Future<bool> authenticateUser(final UserCredential user) async {
+    final QuerySnapshot result = await firestore
         .collection(USERS_COLLECTION)
         .where(EMAIL_FIELD, isEqualTo: user.user!.email)
         .get();
@@ -73,10 +74,10 @@ class AuthMethods {
     return docs.length == 0 ? true : false;
   }
 
-  Future<void> addDataToDb(User currentUser, String token) async {
-    String? username = Utils.getUsername(currentUser.email);
+  Future<void> addDataToDb(final User currentUser, final String token) async {
+    final String? username = Utils.getUsername(currentUser.email);
 
-    UserData user = UserData(
+    final UserData user = UserData(
       uid: currentUser.uid,
       email: currentUser.email,
       name: currentUser.displayName,
@@ -93,10 +94,10 @@ class AuthMethods {
         .set(user.toMap(user) as Map<String, String>);
   }
 
-  Future<List<UserData>> fetchAllUsers(User currentUser) async {
-    List<UserData> userList = [];
+  Future<List<UserData>> fetchAllUsers(final User currentUser) async {
+    final List<UserData> userList = [];
 
-    QuerySnapshot querySnapshot =
+    final QuerySnapshot querySnapshot =
         await firestore.collection(USERS_COLLECTION).get();
     for (var i = 0; i < querySnapshot.docs.length; i++) {
       if (querySnapshot.docs[i].id != currentUser.uid) {
@@ -107,9 +108,9 @@ class AuthMethods {
     return userList;
   }
 
-  Future<List<String>> fetchAllFriends(User curruser) async {
-    List<String> userList = [];
-    QuerySnapshot querySnapshot =
+  Future<List<String>> fetchAllFriends(final User curruser) async {
+    final List<String> userList = [];
+    final QuerySnapshot querySnapshot =
         await _userCollection.doc(curruser.uid).collection("following").get();
 
     for (var i = 0; i < querySnapshot.docs.length; i++) {
@@ -130,15 +131,16 @@ class AuthMethods {
     }
   }
 
-  void setUserState({required String userId, required UserState userState}) {
-    int stateNum = Utils.stateToNum(userState);
+  void setUserState(
+      {required final String userId, required final UserState userState}) {
+    final int stateNum = Utils.stateToNum(userState);
 
     _userCollection.doc(userId).update({
       "state": stateNum,
     });
   }
 
-  Stream<DocumentSnapshot> getUserStream({required String uid}) =>
+  Stream<DocumentSnapshot> getUserStream({required final String uid}) =>
       _userCollection.doc(uid).snapshots();
 
   Stream<QuerySnapshot> getFriends({String? uid}) =>
@@ -147,8 +149,10 @@ class AuthMethods {
   Stream<QuerySnapshot> getFriendsStatus({String? uid}) =>
       _userCollection.doc(uid).collection("following").snapshots();
 
-  Future<void> addFriend(String? currUserId, String? followingUserId) async {
-    Contact follower = Contact(uid: followingUserId, addedOn: Timestamp.now());
+  Future<void> addFriend(
+      final String? currUserId, final String? followingUserId) async {
+    final Contact follower =
+        Contact(uid: followingUserId, addedOn: Timestamp.now());
     var senderMap = follower.toMap(follower);
     await _userCollection
         .doc(currUserId)
@@ -156,7 +160,8 @@ class AuthMethods {
         .doc(followingUserId)
         .set(senderMap as Map<String, dynamic>);
 
-    Contact following = Contact(uid: currUserId, addedOn: Timestamp.now());
+    final Contact following =
+        Contact(uid: currUserId, addedOn: Timestamp.now());
     var receiverMap = following.toMap(following);
     return _userCollection
         .doc(followingUserId)
@@ -165,7 +170,8 @@ class AuthMethods {
         .set(receiverMap as Map<String, dynamic>);
   }
 
-  Future<void> removeFriend(String? currUserId, String? followingUserId) async {
+  Future<void> removeFriend(
+      final String? currUserId, final String? followingUserId) async {
     await _userCollection
         .doc(currUserId)
         .collection("following")

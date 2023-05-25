@@ -1,5 +1,5 @@
+import 'package:chatify/constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:chatify/encryption/encryptText.dart';
 
 class Message {
@@ -26,7 +26,7 @@ class Message {
     this.isRead,
     this.isLocation,
     this.position,
-    this.replyMessage
+    this.replyMessage,
   });
 
   Message.imageMessage({
@@ -36,8 +36,7 @@ class Message {
     this.type,
     this.timestamp,
     this.photoUrl,
-     this.isRead,
-
+    this.isRead,
   });
 
   Message.videoMessage({
@@ -47,8 +46,9 @@ class Message {
     this.type,
     this.timestamp,
     this.videoUrl,
-     this.isRead,
+    this.isRead,
   });
+
   Message.audioMessage({
     this.senderId,
     this.receiverId,
@@ -56,8 +56,9 @@ class Message {
     this.type,
     this.timestamp,
     this.audioUrl,
-     this.isRead,
+    this.isRead,
   });
+
   Message.fileMessage({
     this.senderId,
     this.receiverId,
@@ -65,99 +66,94 @@ class Message {
     this.type,
     this.timestamp,
     this.fileUrl,
-     this.isRead,
+    this.isRead,
   });
 
-  Map toMap() {
-    var encryptedText = encryptAESCryptoJS(this.message!, "password");
-    // print(encryptedText);
-    // var decrypted = decryptAESCryptoJS("U2FsdGVkX18kywp91Ikacgub10Cw94ZytfYUrsevhYQ=","password");
-    // print(decrypted);
-    var map = Map<String, dynamic>();
-    map['senderId'] = this.senderId;
-    map['receiverId'] = this.receiverId;
-    map['type'] = this.type;
-    map['message'] = encryptedText;
-    map['timestamp'] = this.timestamp;
-    map['isRead'] = this.isRead;
-    map["isLocation"] = this.isLocation;
-    map["position"] = this.position;
-    map["reply"] =
+  Map<String, dynamic> toMap() {
+    var encryptedText = encryptAESCryptoJS(this.message!, Constants.PASSWORD);
+    var map = <String, dynamic>{};
+    map[Constants.SENDER_ID] = this.senderId;
+    map[Constants.RECEIVER_ID] = this.receiverId;
+    map[Constants.TYPE] = this.type;
+    map[Constants.MESSAGE] = encryptedText;
+    map[Constants.TIMESTAMP] = this.timestamp;
+    map[Constants.IS_READ] = this.isRead;
+    map[Constants.IS_LOCATION] = this.isLocation;
+    map[Constants.POSITION] = this.position;
+    map[Constants.REPLY] =
         this.replyMessage == null ? null : this.replyMessage!.toMap();
     return map;
   }
 
-  Map toImageMap() {
-    var map = Map<String, dynamic>();
-    map['message'] = this.message;
-    map['senderId'] = this.senderId;
-    map['receiverId'] = this.receiverId;
-    map['type'] = this.type;
-    map['timestamp'] = this.timestamp;
-    map['photoUrl'] = this.photoUrl;
-    map['isRead'] = this.isRead;
+  Map<String, dynamic> toImageMap() {
+    var map = <String, dynamic>{};
+    map[Constants.MESSAGE] = this.message;
+    map[Constants.SENDER_ID] = this.senderId;
+    map[Constants.RECEIVER_ID] = this.receiverId;
+    map[Constants.TYPE] = this.type;
+    map[Constants.TIMESTAMP] = this.timestamp;
+    map[Constants.PHOTO_URL] = this.photoUrl;
+    map[Constants.IS_READ] = this.isRead;
     return map;
   }
 
-  Map toVideoMap() {
-    var map = Map<String, dynamic>();
-    map['message'] = this.message;
-    map['senderId'] = this.senderId;
-    map['receiverId'] = this.receiverId;
-    map['type'] = this.type;
-    map['timestamp'] = this.timestamp;
-    map['videoUrl'] = this.videoUrl;
-    map['isRead'] = this.isRead;
+  Map<String, dynamic> toVideoMap() {
+    var map = <String, dynamic>{};
+    map[Constants.MESSAGE] = this.message;
+    map[Constants.SENDER_ID] = this.senderId;
+    map[Constants.RECEIVER_ID] = this.receiverId;
+    map[Constants.TYPE] = this.type;
+    map[Constants.TIMESTAMP] = this.timestamp;
+    map[Constants.VIDEO_URL] = this.videoUrl;
+    map[Constants.IS_READ] = this.isRead;
     return map;
   }
 
-  Map toAudioMap() {
-    var map = Map<String, dynamic>();
-    map['message'] = this.message;
-    map['senderId'] = this.senderId;
-    map['receiverId'] = this.receiverId;
-    map['type'] = this.type;
-    map['timestamp'] = this.timestamp;
-    map['audioUrl'] = this.audioUrl;
-    map['isRead'] = this.isRead;
+  Map<String, dynamic> toAudioMap() {
+    var map = <String, dynamic>{};
+    map[Constants.MESSAGE] = this.message;
+    map[Constants.SENDER_ID] = this.senderId;
+    map[Constants.RECEIVER_ID] = this.receiverId;
+    map[Constants.TYPE] = this.type;
+    map[Constants.TIMESTAMP] = this.timestamp;
+    map[Constants.AUDIO_URL] = this.audioUrl;
+    map[Constants.IS_READ] = this.isRead;
     return map;
   }
 
-  Map tofileMap() {
-    var map = Map<String, dynamic>();
-    map['message'] = this.message;
-    map['senderId'] = this.senderId;
-    map['receiverId'] = this.receiverId;
-    map['type'] = this.type;
-    map['timestamp'] = this.timestamp;
-    map['fileUrl'] = this.fileUrl;
-    map['isRead'] = this.isRead;
+  Map<String, dynamic> tofileMap() {
+    var map = <String, dynamic>{};
+    map[Constants.MESSAGE] = this.message;
+    map[Constants.SENDER_ID] = this.senderId;
+    map[Constants.RECEIVER_ID] = this.receiverId;
+    map[Constants.TYPE] = this.type;
+    map[Constants.TIMESTAMP] = this.timestamp;
+    map[Constants.FILE_URL] = this.fileUrl;
+    map[Constants.IS_READ] = this.isRead;
     return map;
   }
 
-  // named constructor
   Message.fromMap(Map<String, dynamic> map) {
     var decryptedMessage;
-    // if message is of type text then only we need to enrpyt it other wise we can simply assign it to message
-    if (map['message'] != 'IMAGE' &&
-        map['message'] != 'VIDEO' &&
-        map["message"] != 'AUDIO' &&
-        map['message'] != 'FILE')
-      decryptedMessage = decryptAESCryptoJS(map['message'], "password");
+    if (map[Constants.MESSAGE] == Constants.TEXT)
+      decryptedMessage =
+          decryptAESCryptoJS(map[Constants.MESSAGE], Constants.PASSWORD);
     else
-      decryptedMessage = map['message'];
-    this.senderId = map['senderId'];
-    this.receiverId = map['receiverId'];
-    this.type = map['type'];
+      decryptedMessage = map[Constants.MESSAGE];
+    this.senderId = map[Constants.SENDER_ID];
+    this.receiverId = map[Constants.RECEIVER_ID];
+    this.type = map[Constants.TYPE];
     this.message = decryptedMessage;
-    this.timestamp = map['timestamp'];
-    this.photoUrl = map['photoUrl'];
-    this.videoUrl = map['videoUrl'];
-    this.audioUrl = map['audioUrl'];
-    this.fileUrl = map['fileUrl'];
-    this.isRead = map['isRead'];
-    this.isLocation=map["isLocation"];
-    this.position =map["position"];
-    this.replyMessage=map["reply"]==null ? null : Message.fromMap(map['reply']);
+    this.timestamp = map[Constants.TIMESTAMP];
+    this.photoUrl = map[Constants.PHOTO_URL];
+    this.videoUrl = map[Constants.VIDEO_URL];
+    this.audioUrl = map[Constants.AUDIO_URL];
+    this.fileUrl = map[Constants.FILE_URL];
+    this.isRead = map[Constants.IS_READ];
+    this.isLocation = map[Constants.IS_LOCATION];
+    this.position = map[Constants.POSITION];
+    this.replyMessage = map[Constants.REPLY] == null
+        ? null
+        : Message.fromMap(map[Constants.REPLY]);
   }
 }

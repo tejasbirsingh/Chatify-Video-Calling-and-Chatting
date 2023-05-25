@@ -129,7 +129,7 @@ class ViewLayout extends StatelessWidget {
           color: Colors.green,
         ),
         onPressed: () {
-          _chatMethods.addToBlockedList(
+          _chatMethods.addOrDeleteUserFromBlockedList(
               senderId: user.getUser.uid, receiverId: friendViewLayout.uid);
         },
       ),
