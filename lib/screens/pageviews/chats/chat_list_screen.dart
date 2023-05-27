@@ -14,6 +14,9 @@ import 'package:chatify/screens/pageviews/chats/widgets/contact_view.dart';
 import 'package:chatify/screens/pageviews/chats/widgets/quiet_box.dart';
 import 'package:chatify/screens/pageviews/chats/widgets/user_circle.dart';
 
+/*
+  It displays the list of contacts user recently interacted with.
+*/
 class ChatListScreen extends StatefulWidget {
   @override
   _ChatListScreenState createState() => _ChatListScreenState();

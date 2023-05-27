@@ -5,6 +5,9 @@ import 'package:chatify/models/userData.dart';
 import 'package:chatify/resources/auth_methods.dart';
 import 'package:chatify/utils/utilities.dart';
 
+/*
+  It displays the status of user.
+*/
 class OnlineDotIndicator extends StatelessWidget {
   final String uid;
   final AuthMethods _authMethods = AuthMethods();
@@ -36,25 +39,17 @@ class OnlineDotIndicator extends StatelessWidget {
           UserData? user;
 
           if (snapshot.hasData) {
-            user = UserData.fromMap(snapshot.data!.data() as Map<String, dynamic>);
-             return CircleAvatar(
+            user =
+                UserData.fromMap(snapshot.data!.data() as Map<String, dynamic>);
+            return CircleAvatar(
               radius: 300.0,
               backgroundColor: getColor(user.state!),
             );
           }
-            return CircleAvatar(
-              radius: 300.0,
-              backgroundColor: getColor(0),
-            );
-          // return Container(
-          //   height: 10,
-          //   width: 10,
-          //   margin: EdgeInsets.only(right: 5, top: 5),
-          //   decoration: BoxDecoration(
-          //     shape: BoxShape.circle,
-          //     color: getColor(user?.state),
-          //   ),
-          // );
+          return CircleAvatar(
+            radius: 300.0,
+            backgroundColor: getColor(0),
+          );
         },
       ),
     );

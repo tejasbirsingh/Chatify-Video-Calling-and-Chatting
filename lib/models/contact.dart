@@ -1,3 +1,4 @@
+import 'package:chatify/constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Contact  {
@@ -12,13 +13,13 @@ class Contact  {
 
   Map toMap(Contact contact) {
     var data = Map<String, dynamic>();
-    data['contact_id'] = contact.uid;
-    data['added_on'] = contact.addedOn;
+    data[Constants.CONTACT_ID] = contact.uid;
+    data[Constants.ADDED_ON] = contact.addedOn;
     return data;
   }
 
   Contact.fromMap(Map<String, dynamic> mapData) {
-    this.uid = mapData['contact_id'];
-    this.addedOn = mapData["added_on"];
+    this.uid = mapData[Constants.CONTACT_ID];
+    this.addedOn = mapData[Constants.ADDED_ON];
   }
 }

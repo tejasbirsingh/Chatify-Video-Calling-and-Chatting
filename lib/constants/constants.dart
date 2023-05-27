@@ -41,7 +41,23 @@ class Constants {
   static const String FIREBASE_TOKEN = "firebase_token";
   static const String STATE = "state";
   static const String USER_NAME = "userame";
-    static const String UID = "uid";
+  static const String UID = "uid";
   static const String HAS_STATUS = "hasstatus";
-
+  static const String CALLER_ID = "caller_id";
+  static const String CALLER_NAME = "caller_name";
+  static const String CALLER_PIC = "caller_pic";
+  static const String CALL_RECEIVER_ID = "receiver_id";
+  static const String RECEIVER_NAME = "receiver_name";
+  static const String RECEIVER_PIC = "receiver_pic";
+  static const String CHANNEL_ID = "channel_id";
+  static const String HAS_DIALLED = "has_dialled";
+  static const String ADDED_ON = "added_on";
+  static const String CONTACT_ID = "contact_id";
+  static const String CALL_STATUS = "call_status";
+  static const String LOG_ID = "log_id";
+  static const String CALL_LOGS_TABLE_NAME = "call_logs";
+  static const String VIDEO = "VIDEO";
+  static const String MESSAGE_TYPE_VIDEO = "video";
+  static const String MESSAGE_TYPE_FILE = "file";
+  static const String MESSAGE_TYPE_AUDIO = "audio";
 }

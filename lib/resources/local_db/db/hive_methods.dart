@@ -20,38 +20,27 @@ class HiveMethods implements LogInterface {
   @override
   addLogs(Log log) async {
     var box = await Hive.openBox(hiveBox);
-
     var logMap = log.toMap(log);
-
-    // box.put("custom_key", logMap);
     int idOfInput = await box.add(logMap);
-
     print("Log added with id ${idOfInput.toString()} in Hive db");
 
     close();
-
     return idOfInput;
   }
 
   updateLogs(int i, Log newLog) async {
     var box = await Hive.openBox(hiveBox);
-
     var newLogMap = newLog.toMap(newLog);
-
     box.putAt(i, newLogMap);
-
     close();
   }
 
   @override
   Future<List<Log>> getLogs() async {
     var box = await Hive.openBox(hiveBox);
-
     List<Log> logList = [];
-
-    for (int i = box.length-1;i>=0; i--) {
+    for (int i = box.length - 1; i >= 0; i--) {
       var logMap = box.getAt(i);
-
       logList.add(Log.fromMap(logMap));
     }
     return logList;
@@ -60,9 +49,7 @@ class HiveMethods implements LogInterface {
   @override
   deleteLogs(int logId) async {
     var box = await Hive.openBox(hiveBox);
-
     await box.deleteAt(logId);
-    // await box.delete(logId);
   }
 
   @override

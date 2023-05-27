@@ -1,3 +1,5 @@
+import 'package:chatify/constants/constants.dart';
+
 class Call {
   String? callerId;
   String? callerName;
@@ -22,25 +24,25 @@ class Call {
   // to map
   Map<String, dynamic> toMap(Call call) {
     Map<String, dynamic> callMap = Map();
-    callMap["caller_id"] = call.callerId;
-    callMap["caller_name"] = call.callerName;
-    callMap["caller_pic"] = call.callerPic;
-    callMap["receiver_id"] = call.receiverId;
-    callMap["receiver_name"] = call.receiverName;
-    callMap["receiver_pic"] = call.receiverPic;
-    callMap["channel_id"] = call.channelId;
-    callMap["has_dialled"] = call.hasDialled;
+    callMap[Constants.CALLER_ID] = call.callerId;
+    callMap[Constants.CALLER_NAME] = call.callerName;
+    callMap[Constants.CALLER_PIC] = call.callerPic;
+    callMap[Constants.CALL_RECEIVER_ID] = call.receiverId;
+    callMap[Constants.RECEIVER_NAME] = call.receiverName;
+    callMap[Constants.RECEIVER_PIC] = call.receiverPic;
+    callMap[Constants.CHANNEL_ID] = call.channelId;
+    callMap[Constants.HAS_DIALLED] = call.hasDialled;
     return callMap;
   }
 
   Call.fromMap(Map callMap) {
-    this.callerId = callMap["caller_id"];
-    this.callerName = callMap["caller_name"];
-    this.callerPic = callMap["caller_pic"];
-    this.receiverId = callMap["receiver_id"];
-    this.receiverName = callMap["receiver_name"];
-    this.receiverPic = callMap["receiver_pic"];
-    this.channelId = callMap["channel_id"];
-    this.hasDialled = callMap["has_dialled"];
+    this.callerId = callMap[Constants.CALLER_ID];
+    this.callerName = callMap[Constants.CALLER_NAME];
+    this.callerPic = callMap[Constants.CALLER_PIC];
+    this.receiverId = callMap[Constants.CALL_RECEIVER_ID];
+    this.receiverName = callMap[Constants.RECEIVER_NAME];
+    this.receiverPic = callMap[Constants.RECEIVER_PIC];
+    this.channelId = callMap[Constants.CHANNEL_ID];
+    this.hasDialled = callMap[Constants.HAS_DIALLED];
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:chatify/models/userData.dart';
 import 'package:chatify/provider/audio_upload_provider.dart';
@@ -11,29 +10,23 @@ import 'package:chatify/resources/chat_methods.dart';
 
 class StorageMethods {
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
   var _storageReference;
-
-  //user class
   UserData user = UserData();
 
-  Future<String> uploadImageToStorage(File imageFile) async {
+  Future<String> uploadImageToStorage(final File imageFile) async {
     try {
       _storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      var storageUploadTask =
-          _storageReference.putFile(imageFile);
+      var storageUploadTask = _storageReference.putFile(imageFile);
       var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
-
-      // print(url);
       return url;
     } catch (e) {
       return "error";
     }
   }
 
-  Future<String?> uploadVideoToStorage(File videoFile) async {
+  Future<String?> uploadVideoToStorage(final File videoFile) async {
     try {
       _storageReference = FirebaseStorage.instance
           .ref()
@@ -50,7 +43,7 @@ class StorageMethods {
     }
   }
 
-  Future<String?> uploadAudioMessage(File audioFile) async {
+  Future<String?> uploadAudioMessage(final File audioFile) async {
     try {
       _storageReference = FirebaseStorage.instance
           .ref()
@@ -67,7 +60,7 @@ class StorageMethods {
     }
   }
 
-  Future<String?> uploadFileMessage(File file) async {
+  Future<String?> uploadFileMessage(final File file) async {
     try {
       _storageReference = FirebaseStorage.instance
           .ref()
@@ -84,16 +77,16 @@ class StorageMethods {
   }
 
   void uploadImage({
-    required File image,
-    required String receiverId,
-    required String senderId,
-    required ImageUploadProvider imageUploadProvider,
+    required final File image,
+    required final String receiverId,
+    required final String senderId,
+    required final ImageUploadProvider imageUploadProvider,
   }) async {
     final ChatMethods chatMethods = ChatMethods();
 
     imageUploadProvider.setToLoading();
 
-    String url = await uploadImageToStorage(image);
+    final String url = await uploadImageToStorage(image);
 
     imageUploadProvider.setToIdle();
 
@@ -101,52 +94,52 @@ class StorageMethods {
   }
 
   void uploadAudio({
-    required File audio,
-    required String receiverId,
-    required String senderId,
-    required AudioUploadProvider audioUploadProvider,
+    required final File audio,
+    required final String receiverId,
+    required final String senderId,
+    required final AudioUploadProvider audioUploadProvider,
   }) async {
     final ChatMethods chatMethods = ChatMethods();
 
     audioUploadProvider.setToLoading();
-    String? url = await uploadAudioMessage(audio);
+    final String? url = await uploadAudioMessage(audio);
     audioUploadProvider.setToIdle();
     chatMethods.setAudioMsg(url, receiverId, senderId);
   }
 
   void uploadFile({
-    required File file,
-    required String receiverId,
-    required String senderId,
-    required FileUploadProvider fileUploadProvider,
+    required final File file,
+    required final String receiverId,
+    required final String senderId,
+    required final FileUploadProvider fileUploadProvider,
   }) async {
     final ChatMethods chatMethods = ChatMethods();
 
     fileUploadProvider.setToLoading();
-    String? url = await uploadFileMessage(file);
+    final String? url = await uploadFileMessage(file);
     fileUploadProvider.setToIdle();
     chatMethods.setFileMsg(url, receiverId, senderId);
   }
 
   void uploadVideo({
-    required File video,
-    required String receiverId,
-    required String senderId,
-    required VideoUploadProvider videoUploadProvider,
+    required final File video,
+    required final String receiverId,
+    required final String senderId,
+    required final VideoUploadProvider videoUploadProvider,
   }) async {
     final ChatMethods chatMethods = ChatMethods();
     videoUploadProvider.setToLoading();
-    String? url = await uploadVideoToStorage(video);
+    final String? url = await uploadVideoToStorage(video);
     videoUploadProvider.setToIdle();
     chatMethods.setVideoMsg(url, receiverId, senderId);
   }
 
   void uploadStatus({
-    required File image,
-    required String uploader,
+    required final File image,
+    required final String uploader,
   }) async {
     final ChatMethods chatMethods = ChatMethods();
-    String url = await uploadImageToStorage(image);
+    final String url = await uploadImageToStorage(image);
 
     chatMethods.addStatus(url, uploader);
   }

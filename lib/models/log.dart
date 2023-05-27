@@ -1,3 +1,5 @@
+import 'package:chatify/constants/constants.dart';
+
 class Log {
   int? logId;
   String? callerName;
@@ -20,23 +22,23 @@ class Log {
   // to map
   Map<String, dynamic> toMap(Log log) {
     Map<String, dynamic> logMap = Map();
-    logMap["log_id"] = log.logId;
-    logMap["caller_name"] = log.callerName;
-    logMap["caller_pic"] = log.callerPic;
-    logMap["receiver_name"] = log.receiverName;
-    logMap["receiver_pic"] = log.receiverPic;
-    logMap["call_status"] = log.callStatus;
-    logMap["timestamp"] = log.timestamp;
+    logMap[Constants.LOG_ID] = log.logId;
+    logMap[Constants.CALLER_NAME] = log.callerName;
+    logMap[Constants.CALLER_PIC] = log.callerPic;
+    logMap[Constants.RECEIVER_NAME] = log.receiverName;
+    logMap[Constants.RECEIVER_PIC] = log.receiverPic;
+    logMap[Constants.CALL_STATUS] = log.callStatus;
+    logMap[Constants.TIMESTAMP] = log.timestamp;
     return logMap;
   }
 
   Log.fromMap(Map logMap) {
-    this.logId = logMap["log_id"];
-    this.callerName = logMap["caller_name"];
-    this.callerPic = logMap["caller_pic"];
-    this.receiverName = logMap["receiver_name"];
-    this.receiverPic = logMap["receiver_pic"];
-    this.callStatus = logMap["call_status"];
-    this.timestamp = logMap["timestamp"];
+    this.logId = logMap[Constants.LOG_ID];
+    this.callerName = logMap[Constants.CALLER_NAME];
+    this.callerPic = logMap[Constants.CALLER_PIC];
+    this.receiverName = logMap[Constants.RECEIVER_NAME];
+    this.receiverPic = logMap[Constants.RECEIVER_PIC];
+    this.callStatus = logMap[Constants.CALL_STATUS];
+    this.timestamp = logMap[Constants.TIMESTAMP];
   }
 }

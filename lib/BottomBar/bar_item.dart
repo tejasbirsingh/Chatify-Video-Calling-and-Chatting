@@ -27,24 +27,19 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
   Widget build(BuildContext context) {
     UserProvider userProvider = Provider.of<UserProvider>(context);
     return Container(
-        decoration: BoxDecoration(
-          
-            gradient: LinearGradient(colors: [
-                  
-                userProvider.getUser.firstColor != null
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [
+          userProvider.getUser.firstColor != null
               ? Color(userProvider.getUser.firstColor ?? Colors.white.value)
               : Theme.of(context).colorScheme.background,
           userProvider.getUser.secondColor != null
               ? Color(userProvider.getUser.secondColor ?? Colors.white.value)
               : Theme.of(context).scaffoldBackgroundColor,
-              
-            ]),
-          ),
+        ]),
+      ),
       child: Material(
-  
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40.0), topRight: Radius.circular(40.0)),
-     
         child: Padding(
           padding: const EdgeInsets.only(
             bottom: 10.0,
@@ -97,16 +92,13 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar>
               AnimatedSize(
                 duration: widget.animationDuration,
                 curve: Curves.easeInOut,
-                child: Text(
-                  isSelected ? item.text : "",
-                  style:GoogleFonts.paytoneOne(
-                    textStyle: TextStyle(
-                      color: item.color,
-                      
-                      fontWeight: widget.barStyle!.fontWeight,
-                      fontSize: widget.barStyle!.fontSize),
-                  )
-                ),
+                child: Text(isSelected ? item.text : "",
+                    style: GoogleFonts.paytoneOne(
+                      textStyle: TextStyle(
+                          color: item.color,
+                          fontWeight: widget.barStyle!.fontWeight,
+                          fontSize: widget.barStyle!.fontSize),
+                    )),
               )
             ],
           ),

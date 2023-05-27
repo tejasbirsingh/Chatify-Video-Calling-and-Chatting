@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:tuple/tuple.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
-String encryptAESCryptoJS(String plainText, String passphrase) {
+String encryptAESCryptoJS(final String plainText, final String passphrase) {
   try {
     final salt = genRandomWithNonZero(8);
     var keyndIV = deriveKeyAndIV(passphrase, salt);
@@ -15,7 +15,7 @@ String encryptAESCryptoJS(String plainText, String passphrase) {
     final encrypter = encrypt.Encrypter(
         encrypt.AES(key, mode: encrypt.AESMode.cbc, padding: "PKCS7"));
     final encrypted = encrypter.encrypt(plainText, iv: iv);
-    Uint8List encryptedBytesWithSalt = Uint8List.fromList(
+    final Uint8List encryptedBytesWithSalt = Uint8List.fromList(
         createUint8ListFromString("Salted__") + salt + encrypted.bytes);
     return base64.encode(encryptedBytesWithSalt);
   } catch (error) {
@@ -23,11 +23,11 @@ String encryptAESCryptoJS(String plainText, String passphrase) {
   }
 }
 
-String decryptAESCryptoJS(String encrypted, String passphrase) {
+String decryptAESCryptoJS(final String encrypted, final String passphrase) {
   try {
-    Uint8List encryptedBytesWithSalt = base64.decode(encrypted);
+    final Uint8List encryptedBytesWithSalt = base64.decode(encrypted);
 
-    Uint8List encryptedBytes =
+    final Uint8List encryptedBytes =
         encryptedBytesWithSalt.sublist(16, encryptedBytesWithSalt.length);
     final salt = encryptedBytesWithSalt.sublist(8, 16);
     var keyndIV = deriveKeyAndIV(passphrase, salt);
@@ -44,7 +44,7 @@ String decryptAESCryptoJS(String encrypted, String passphrase) {
   }
 }
 
-Tuple2<Uint8List, Uint8List> deriveKeyAndIV(String passphrase, Uint8List salt) {
+Tuple2<Uint8List, Uint8List> deriveKeyAndIV(final String passphrase, final Uint8List salt) {
   var password = createUint8ListFromString(passphrase);
   Uint8List concatenatedHashes = Uint8List(0);
   List<int> currentHash = Uint8List(0);
@@ -70,7 +70,7 @@ Tuple2<Uint8List, Uint8List> deriveKeyAndIV(String passphrase, Uint8List salt) {
   return new Tuple2(keyBtyes, ivBtyes);
 }
 
-Uint8List createUint8ListFromString(String s) {
+Uint8List createUint8ListFromString(final String s) {
   var ret = new Uint8List(s.length);
   for (var i = 0; i < s.length; i++) {
     ret[i] = s.codeUnitAt(i);
@@ -78,7 +78,7 @@ Uint8List createUint8ListFromString(String s) {
   return ret;
 }
 
-Uint8List genRandomWithNonZero(int seedLength) {
+Uint8List genRandomWithNonZero(final int seedLength) {
   final random = Random.secure();
   const int randomMax = 245;
   final Uint8List uint8list = Uint8List(seedLength);

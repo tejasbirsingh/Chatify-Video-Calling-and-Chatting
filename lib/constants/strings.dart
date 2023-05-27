@@ -100,4 +100,5 @@ class Strings {
   static const String dialled = "DIALLED";
   static const String ok = "OK";
   static const String noRecents = "No Recents";
+  static const String noMessage = "No Message";
 }

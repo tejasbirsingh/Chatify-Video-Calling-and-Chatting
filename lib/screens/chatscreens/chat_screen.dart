@@ -326,7 +326,7 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Future<bool> getIsContactBlocked() async {
-    return await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
+    return await getIsContactBlocked();
   }
 
   Widget moreMenuOptions() {
@@ -1217,7 +1217,7 @@ class _ChatScreenState extends State<ChatScreen>
       textFieldController.text = "";
 
       final bool isBlocked =
-          await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
+          await getIsContactBlocked();
       final bool isMuted =
           await _chatMethods.isMuted(widget.receiver.uid!, _currentUserId!);
 
@@ -1474,7 +1474,7 @@ class _ChatScreenState extends State<ChatScreen>
         ],
       ) as File;
       final bool isBlocked =
-          await _chatMethods.isBlocked(widget.receiver.uid, _currentUserId);
+          await getIsContactBlocked();
       if (isBlocked) {
         _storageMethods.uploadImage(
           image: cropped,

@@ -1,26 +1,15 @@
 import 'dart:io';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:chatify/models/log.dart';
 import 'package:chatify/resources/local_db/interface/log_interface.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../../../constants/constants.dart';
+
 class SqliteMethods implements LogInterface {
   Database? _db;
-
   String databaseName = "";
-
-  String tableName = "Call_Logs";
-
-  // columns
-  String id = 'log_id';
-  String callerName = 'caller_name';
-  String callerPic = 'caller_pic';
-  String receiverName = 'receiver_name';
-  String receiverPic = 'receiver_pic';
-  String callStatus = 'call_status';
-  String timestamp = 'timestamp';
 
   Future<Database> get db async {
     print("db was null, now awaiting it");
@@ -39,9 +28,9 @@ class SqliteMethods implements LogInterface {
     return db;
   }
 
-  _onCreate(Database db, int version) async {
-    String createTableQuery =
-        "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, $receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT)";
+  _onCreate(final Database db, final int version) async {
+    final String createTableQuery =
+        "CREATE TABLE ${Constants.CALL_LOGS_TABLE_NAME} (${Constants.LOG_ID} INTEGER PRIMARY KEY, ${Constants.CALLER_NAME} TEXT, ${Constants.CALLER_PIC} TEXT, ${Constants.RECEIVER_NAME} TEXT, ${Constants.RECEIVER_PIC} TEXT, ${Constants.CALL_STATUS} TEXT, ${Constants.TIMESTAMP} TEXT)";
 
     await db.execute(createTableQuery);
     print("table created");
@@ -51,16 +40,15 @@ class SqliteMethods implements LogInterface {
   addLogs(Log log) async {
     var dbClient = await db;
     print("the log has been added in sqlite db");
-    await dbClient.insert(tableName, log.toMap(log));
+    await dbClient.insert(Constants.CALL_LOGS_TABLE_NAME, log.toMap(log));
   }
 
   updateLogs(Log log) async {
     var dbClient = await db;
-
     await dbClient.update(
-      tableName,
+      Constants.CALL_LOGS_TABLE_NAME,
       log.toMap(log),
-      where: '$id = ?',
+      where: '${Constants.LOG_ID} = ?',
       whereArgs: [log.logId],
     );
   }
@@ -69,18 +57,16 @@ class SqliteMethods implements LogInterface {
   Future<List<Log>> getLogs() async {
     try {
       var dbClient = await db;
-
-      // List<Map> maps = await dbClient.rawQuery("SELECT * FROM $tableName");
       List<Map> maps = await dbClient.query(
-        tableName,
+        Constants.CALL_LOGS_TABLE_NAME,
         columns: [
-          id,
-          callerName,
-          callerPic,
-          receiverName,
-          receiverPic,
-          callStatus,
-          timestamp,
+          Constants.LOG_ID,
+          Constants.CALLER_NAME,
+          Constants.CALLER_PIC,
+          Constants.RECEIVER_NAME,
+          Constants.RECEIVER_PIC,
+          Constants.CALL_STATUS,
+          Constants.TIMESTAMP,
         ],
       );
 
@@ -102,8 +88,8 @@ class SqliteMethods implements LogInterface {
   @override
   deleteLogs(int logId) async {
     var client = await db;
-    return await client
-        .delete(tableName, where: '$id = ?', whereArgs: [logId + 1]);
+    return await client.delete(Constants.CALL_LOGS_TABLE_NAME,
+        where: '${Constants.LOG_ID} = ?', whereArgs: [logId + 1]);
   }
 
   @override
