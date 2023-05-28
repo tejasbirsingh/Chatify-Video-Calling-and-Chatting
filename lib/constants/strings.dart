@@ -101,4 +101,7 @@ class Strings {
   static const String ok = "OK";
   static const String noRecents = "No Recents";
   static const String noMessage = "No Message";
+  static const String friendAdded = "Friend added!";
+  static const String alreadyAFriend = "Already a friend!";
+  static const String search = "Search";
 }

@@ -1,7 +1,7 @@
+import 'package:chatify/constants/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:provider/provider.dart';
 import 'package:chatify/models/userData.dart';
 import 'package:chatify/provider/user_provider.dart';
@@ -19,17 +19,19 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final AuthMethods _authMethods = AuthMethods();
-
-  late List<UserData> userList;
-  late List<String> friendsList;
+  List<UserData> userList = [];
+  List<String>? friendsList;
   String query = "";
-  TextEditingController searchController = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
   bool _folded = true;
-  animationVariables() {
+
+  void animationVariables() {
     Future.delayed(const Duration(milliseconds: 100), () {
-      setState(() {
-        _folded = false;
-      });
+      if (mounted) {
+        setState(() {
+          _folded = false;
+        });
+      }
     });
   }
 
@@ -37,68 +39,75 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     animationVariables();
-    _authMethods.getCurrentUser().then((User user) {
-      _authMethods.fetchAllUsers(user).then((List<UserData> list) {
-        setState(() {
-          userList = list;
+    _authMethods.getCurrentUser().then((final User? user) {
+      if (user != null) {
+        _authMethods.fetchAllUsers(user).then((List<UserData> list) {
+          if (mounted) {
+            setState(() {
+              userList = list;
+            });
+          }
         });
-      });
+      }
     });
     fetchFriends();
   }
 
-  fetchFriends() {
-    _authMethods.getCurrentUser().then((User user) {
-      _authMethods.fetchAllFriends(user).then((List<String> list) {
-        setState(() {
-          friendsList = list;
+  void fetchFriends() {
+    _authMethods.getCurrentUser().then((final User? user) {
+      if (user != null) {
+        _authMethods.fetchAllFriends(user).then((final List<String> list) {
+          if (mounted) {
+            setState(() {
+              friendsList = list;
+            });
+          }
         });
-      });
+      }
     });
   }
 
-  buildSuggestions(String query, UserData user) {
-    final List<UserData> suggestionList = query.isEmpty
-        ? []
-        : userList != null
-            ? userList.where((UserData user) {
-                String _getUsername = user.username!.toLowerCase();
-                String _query = query.toLowerCase();
-                String _getName = user.name!.toLowerCase();
-                bool matchesUsername = _getUsername.contains(_query);
-                bool matchesName = _getName.contains(_query);
-
-                return (matchesUsername || matchesName);
-              }).toList()
-            : [];
+  Widget buildSuggestions(final String? query, final UserData? user) {
+    List<UserData> suggestionList = [];
+    if (query != null && userList.isNotEmpty) {
+      suggestionList = userList.where((UserData user) {
+        final String _getUsername = user.username?.toLowerCase() ?? '';
+        final String _query = query.toLowerCase();
+        final String _getName = user.name?.toLowerCase() ?? '';
+        final bool matchesUsername = _getUsername.contains(_query);
+        final bool matchesName = _getName.contains(_query);
+        return (matchesUsername || matchesName);
+      }).toList();
+    }
 
     return ListView.builder(
       itemCount: suggestionList.length,
       itemBuilder: ((context, index) {
-        UserData searchedUser = UserData(
-            uid: suggestionList[index].uid,
-            profilePhoto: suggestionList[index].profilePhoto,
-            name: suggestionList[index].name,
-            username: suggestionList[index].email,
-            firebaseToken: suggestionList[index].firebaseToken);
+        final UserData searchedUser = UserData(
+          uid: suggestionList[index].uid,
+          profilePhoto: suggestionList[index].profilePhoto,
+          name: suggestionList[index].name,
+          username: suggestionList[index].email,
+          firebaseToken: suggestionList[index].firebaseToken,
+        );
 
-        bool isFriend;
-        if (friendsList.contains(searchedUser.uid.toString())) {
+        bool isFriend = false;
+        if (friendsList != null &&
+            friendsList!.contains(searchedUser.uid.toString())) {
           isFriend = true;
-        } else {
-          isFriend = false;
         }
         return CustomTile(
           icon: Icon(Icons.abc),
-          onLongPress: () => {},
           mini: false,
           onTap: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                          receiver: searchedUser,
-                        )));
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(
+                  receiver: searchedUser,
+                ),
+              ),
+            );
           },
           leading: CachedImage(
             searchedUser.profilePhoto!,
@@ -109,13 +118,20 @@ class _SearchScreenState extends State<SearchScreen> {
           subtitle: Text(
             searchedUser.username!,
             style: GoogleFonts.patuaOne(
-                textStyle: Theme.of(context).textTheme.bodyLarge),
+              textStyle: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(fontSize: 16.0),
+            ),
           ),
           title: Text(
             searchedUser.name!,
             style: GoogleFonts.patuaOne(
-                textStyle: Theme.of(context).textTheme.displayLarge,
-                letterSpacing: 1.0),
+              textStyle: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontSize: 20.0, letterSpacing: 1.0),
+            ),
           ),
           trailing: IconButton(
             icon: isFriend
@@ -126,17 +142,19 @@ class _SearchScreenState extends State<SearchScreen> {
                 : Icon(Icons.person_add, size: 40.0),
             color: isFriend ? Colors.green : Theme.of(context).iconTheme.color,
             onPressed: () {
-              _authMethods.addFriend(user.uid, searchedUser.uid);
+              if (user != null) {
+                _authMethods.addFriend(user.uid, searchedUser.uid);
 
-              final snackbar = SnackBar(
-                content: Text("Friend added!"),
-              );
-              final snackbarFriend = SnackBar(
-                content: Text("Already a friend!"),
-              );
-              isFriend
-                  ? ScaffoldMessenger.of(context).showSnackBar(snackbarFriend)
-                  : ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                final snackbar = SnackBar(
+                  content: Text(Strings.friendAdded),
+                );
+                final snackbarFriend = SnackBar(
+                  content: Text(Strings.alreadyAFriend),
+                );
+                isFriend
+                    ? ScaffoldMessenger.of(context).showSnackBar(snackbarFriend)
+                    : ScaffoldMessenger.of(context).showSnackBar(snackbar);
+              }
             },
           ),
         );
@@ -158,12 +176,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
                     userProvider.getUser.firstColor != null
-                        ? Color(userProvider.getUser.firstColor ??
-                            Colors.white.value)
+                        ? Color(userProvider.getUser.firstColor!)
                         : Theme.of(context).colorScheme.background,
                     userProvider.getUser.secondColor != null
-                        ? Color(userProvider.getUser.secondColor ??
-                            Colors.white.value)
+                        ? Color(userProvider.getUser.secondColor!)
                         : Theme.of(context).scaffoldBackgroundColor,
                   ]),
                 ),
@@ -191,22 +207,27 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               Positioned(
-                top: 10.0,
-                left: 20.0,
+                  top: 10.0,
+                  left: 20.0,
                   child: IconButton(
-                      
-                icon: Icon(Icons.arrow_back,size: 30.0,),
-                onPressed: () => Navigator.of(context).pop(),
-              )),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: 30.0,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  )),
               Positioned(
                 child: Container(
                     child: Center(
-                        child: Text(
-                  'Search',
-                  style: GoogleFonts.oswald(
-                      textStyle: Theme.of(context).textTheme.displayLarge,
-                      fontSize: 34.0),
-                ))),
+                  child: Text(
+                    Strings.search,
+                    style: GoogleFonts.oswald(
+                        textStyle: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(fontSize: 34.0)),
+                  ),
+                )),
                 top: 10.0,
                 left: MediaQuery.of(context).size.width * 0.3,
                 right: MediaQuery.of(context).size.width * 0.3,
@@ -243,12 +264,12 @@ class _SearchScreenState extends State<SearchScreen> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.close, color: Colors.black),
                           onPressed: () {
-                            WidgetsBinding.instance.addPostFrameCallback(
+                            WidgetsBinding.instance!.addPostFrameCallback(
                                 (_) => searchController.clear());
                           },
                         ),
                         border: InputBorder.none,
-                        hintText: "Search",
+                        hintText: Strings.search,
                         hintStyle: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 30,
@@ -274,12 +295,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(colors: [
                       userProvider.getUser.firstColor != null
-                          ? Color(userProvider.getUser.firstColor ??
-                              Colors.white.value)
+                          ? Color(userProvider.getUser.firstColor!)
                           : Theme.of(context).colorScheme.background,
                       userProvider.getUser.secondColor != null
-                          ? Color(userProvider.getUser.secondColor ??
-                              Colors.white.value)
+                          ? Color(userProvider.getUser.secondColor!)
                           : Theme.of(context).scaffoldBackgroundColor,
                     ]),
                   ),

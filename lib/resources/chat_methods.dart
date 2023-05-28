@@ -246,7 +246,6 @@ class ChatMethods {
     } else {
       return true;
     }
-    // return false;
   }
 
   Future<bool> isMuted(final String userId, final String receiverId) async {

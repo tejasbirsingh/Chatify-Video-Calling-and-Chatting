@@ -60,4 +60,5 @@ class Constants {
   static const String MESSAGE_TYPE_VIDEO = "video";
   static const String MESSAGE_TYPE_FILE = "file";
   static const String MESSAGE_TYPE_AUDIO = "audio";
+  static const String FOLLOWING = "following";
 }

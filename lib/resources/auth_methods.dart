@@ -1,3 +1,4 @@
+import 'package:chatify/constants/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:chatify/constants/strings.dart';
@@ -56,7 +57,7 @@ class AuthMethods {
       final UserCredential user = await _auth.signInWithCredential(credential);
       return user;
     } catch (e) {
-      print("Auth methods error");
+      print("Auth methods error- ");
       print(e);
       return null;
     }
@@ -67,16 +68,13 @@ class AuthMethods {
         .collection(USERS_COLLECTION)
         .where(EMAIL_FIELD, isEqualTo: user.user!.email)
         .get();
-
     final List<DocumentSnapshot> docs = result.docs;
-
     //if user is registered then length of list > 0 or else less than 0
     return docs.length == 0 ? true : false;
   }
 
-  Future<void> addDataToDb(final User currentUser, final String token) async {
-    final String? username = Utils.getUsername(currentUser.email);
-
+  Future<void> addDataToDb(final User? currentUser, final String? token) async {
+    final String? username = Utils.getUsername(currentUser!.email);
     final UserData user = UserData(
       uid: currentUser.uid,
       email: currentUser.email,
@@ -87,16 +85,14 @@ class AuthMethods {
       firstColor: null,
       secondColor: null,
     );
-
     firestore
         .collection(USERS_COLLECTION)
         .doc(currentUser.uid)
-        .set(user.toMap(user) as Map<String, String>);
+        .set(user.toMap(user) as Map<String, dynamic>);
   }
 
   Future<List<UserData>> fetchAllUsers(final User currentUser) async {
     final List<UserData> userList = [];
-
     final QuerySnapshot querySnapshot =
         await firestore.collection(USERS_COLLECTION).get();
     for (var i = 0; i < querySnapshot.docs.length; i++) {
@@ -111,10 +107,10 @@ class AuthMethods {
   Future<List<String>> fetchAllFriends(final User curruser) async {
     final List<String> userList = [];
     final QuerySnapshot querySnapshot =
-        await _userCollection.doc(curruser.uid).collection("following").get();
+        await _userCollection.doc(curruser.uid).collection(Constants.FOLLOWING).get();
 
     for (var i = 0; i < querySnapshot.docs.length; i++) {
-      userList.add(querySnapshot.docs[i]["contact_id"]);
+      userList.add(querySnapshot.docs[i][Constants.CONTACT_ID]);
     }
 
     return userList;

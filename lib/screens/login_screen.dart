@@ -64,7 +64,7 @@ class LoginScreenState extends State<LoginScreen> {
 
     UserCredential? user = await _authMethods.signIn();
 
-    authenticateUser(user!, widget.token!);
+    authenticateUser(user, widget.token);
     setState(() {
       isLoginPressed = false;
     });
@@ -75,15 +75,15 @@ class LoginScreenState extends State<LoginScreen> {
     await prefs.setBool(Constants.IS_LOCKED, false);
   }
 
-  void authenticateUser(UserCredential user, String token) {
-    _authMethods.authenticateUser(user).then((isNewUser) {
+  void authenticateUser(UserCredential? user, String? token) {
+    _authMethods.authenticateUser(user!).then((isNewUser) {
       setState(() {
         isLoginPressed = false;
       });
 
       if (isNewUser) {
         setAppLocker();
-        _authMethods.addDataToDb(user.user!, token).then((value) {
+        _authMethods.addDataToDb(user.user, token).then((value) {
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) {
             return HomeScreen();
