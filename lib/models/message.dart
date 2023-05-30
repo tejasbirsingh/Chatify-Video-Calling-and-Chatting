@@ -135,7 +135,7 @@ class Message {
 
   Message.fromMap(Map<String, dynamic> map) {
     var decryptedMessage;
-    if (map[Constants.MESSAGE] == Constants.TEXT)
+    if (map[Constants.TYPE] == Constants.TEXT)
       decryptedMessage =
           decryptAESCryptoJS(map[Constants.MESSAGE], Constants.PASSWORD);
     else

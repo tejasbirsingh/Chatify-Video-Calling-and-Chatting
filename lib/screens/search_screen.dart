@@ -96,66 +96,69 @@ class _SearchScreenState extends State<SearchScreen> {
             friendsList!.contains(searchedUser.uid.toString())) {
           isFriend = true;
         }
-        return CustomTile(
-          icon: Icon(Icons.abc),
-          mini: false,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(
-                  receiver: searchedUser,
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 2.0),
+          child: CustomTile(
+            icon: Icon(Icons.abc),
+            mini: false,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                    receiver: searchedUser,
+                  ),
                 ),
-              ),
-            );
-          },
-          leading: CachedImage(
-            searchedUser.profilePhoto!,
-            radius: 60.0,
-            isRound: true,
-            isTap: () => {},
-          ),
-          subtitle: Text(
-            searchedUser.username!,
-            style: GoogleFonts.patuaOne(
-              textStyle: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontSize: 16.0),
-            ),
-          ),
-          title: Text(
-            searchedUser.name!,
-            style: GoogleFonts.patuaOne(
-              textStyle: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontSize: 20.0, letterSpacing: 1.0),
-            ),
-          ),
-          trailing: IconButton(
-            icon: isFriend
-                ? Icon(
-                    Icons.check,
-                    size: 40.0,
-                  )
-                : Icon(Icons.person_add, size: 40.0),
-            color: isFriend ? Colors.green : Theme.of(context).iconTheme.color,
-            onPressed: () {
-              if (user != null) {
-                _authMethods.addFriend(user.uid, searchedUser.uid);
-
-                final snackbar = SnackBar(
-                  content: Text(Strings.friendAdded),
-                );
-                final snackbarFriend = SnackBar(
-                  content: Text(Strings.alreadyAFriend),
-                );
-                isFriend
-                    ? ScaffoldMessenger.of(context).showSnackBar(snackbarFriend)
-                    : ScaffoldMessenger.of(context).showSnackBar(snackbar);
-              }
+              );
             },
+            leading: CachedImage(
+              searchedUser.profilePhoto!,
+              radius: 60.0,
+              isRound: true,
+              isTap: () => {},
+            ),
+            subtitle: Text(
+              searchedUser.username!,
+              style: GoogleFonts.patuaOne(
+                textStyle: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontSize: 16.0),
+              ),
+            ),
+            title: Text(
+              searchedUser.name!,
+              style: GoogleFonts.patuaOne(
+                textStyle: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontSize: 20.0, letterSpacing: 1.0),
+              ),
+            ),
+            trailing: IconButton(
+              icon: isFriend
+                  ? Icon(
+                      Icons.check,
+                      size: 40.0,
+                    )
+                  : Icon(Icons.person_add, size: 40.0),
+              color: isFriend ? Colors.green : Theme.of(context).iconTheme.color,
+              onPressed: () {
+                if (user != null) {
+                  _authMethods.addFriend(user.uid, searchedUser.uid);
+        
+                  final snackbar = SnackBar(
+                    content: Text(Strings.friendAdded),
+                  );
+                  final snackbarFriend = SnackBar(
+                    content: Text(Strings.alreadyAFriend),
+                  );
+                  isFriend
+                      ? ScaffoldMessenger.of(context).showSnackBar(snackbarFriend)
+                      : ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                }
+              },
+            ),
           ),
         );
       }),

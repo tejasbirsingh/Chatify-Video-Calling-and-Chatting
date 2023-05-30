@@ -105,6 +105,7 @@ class _ChatScreenState extends State<ChatScreen>
   String ocrText = "";
   String backgroundImage = "";
   ShakeDetector? detector;
+  bool isContactBlocked = false;
 
   @override
   void initState() {
@@ -128,6 +129,7 @@ class _ChatScreenState extends State<ChatScreen>
         );
       });
     });
+    getIsContactBlocked();
     animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 250),
@@ -144,6 +146,12 @@ class _ChatScreenState extends State<ChatScreen>
     setState(() {
       backgroundImage = prefs.getString(Constants.BACKGROUND) ?? "";
     });
+  }
+
+  getIsContactBlocked() async {
+    _chatMethods
+        .isBlocked(widget.receiver.uid, _currentUserId)
+        .then((value) => {isContactBlocked = value});
   }
 
   void toggleMenu() {
@@ -325,19 +333,7 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  Future<bool> getIsContactBlocked() async {
-    return await getIsContactBlocked();
-  }
-
   Widget moreMenuOptions() {
-    bool isContactBlocked = false;
-    getIsContactBlocked().then((value) => {
-          if (value) {blockedDialog(context)},
-          isContactBlocked = value
-        });
-    if (isContactBlocked) {
-      return Container();
-    }
     return Visibility(
       visible: moreMenu,
       child: Container(
@@ -1215,13 +1211,10 @@ class _ChatScreenState extends State<ChatScreen>
       });
 
       textFieldController.text = "";
-
-      final bool isBlocked =
-          await getIsContactBlocked();
       final bool isMuted =
           await _chatMethods.isMuted(widget.receiver.uid!, _currentUserId!);
 
-      if (isBlocked) {
+      if (!isContactBlocked) {
         _chatMethods.addMessageToDb(_message);
 
         if (!isMuted) {
@@ -1240,10 +1233,7 @@ class _ChatScreenState extends State<ChatScreen>
         children: <Widget>[
           GestureDetector(
             onTap: () async {
-              toggleMenu();
-              final bool isBlocked = await _chatMethods.isBlocked(
-                  widget.receiver.uid, _currentUserId);
-              if (isBlocked) {
+              if (!isContactBlocked) {
                 toggleMenu();
               } else {
                 blockedDialog(context);
@@ -1302,9 +1292,7 @@ class _ChatScreenState extends State<ChatScreen>
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onPressed: () async {
-                        bool isBlocked = await _chatMethods.isBlocked(
-                            widget.receiver.uid, _currentUserId);
-                        if (isBlocked) {
+                        if (!isContactBlocked) {
                           if (!showEmojiPicker) {
                             // keyboard is visible
                             hideKeyboard();
@@ -1354,10 +1342,7 @@ class _ChatScreenState extends State<ChatScreen>
                       : IconButton(
                           icon: Icon(Icons.mic_none_outlined),
                           onPressed: () async {
-                            bool isBlocked = await _chatMethods.isBlocked(
-                                widget.receiver.uid, _currentUserId);
-
-                            if (isBlocked) {
+                            if (!isContactBlocked) {
                               var ran = Random().nextInt(50);
                               String path = Utils.generateRandomString(ran);
                               Io.Directory appDocDirectory =
@@ -1380,9 +1365,7 @@ class _ChatScreenState extends State<ChatScreen>
               : GestureDetector(
                   child: Icon(Icons.camera_alt),
                   onTap: () async {
-                    bool isBlocked = await _chatMethods.isBlocked(
-                        widget.receiver.uid, _currentUserId);
-                    if (isBlocked) {
+                    if (!isContactBlocked) {
                       pickImage(source: ImageSource.camera);
                     } else {
                       blockedDialog(context);
@@ -1473,9 +1456,7 @@ class _ChatScreenState extends State<ChatScreen>
           )
         ],
       ) as File;
-      final bool isBlocked =
-          await getIsContactBlocked();
-      if (isBlocked) {
+      if (!isContactBlocked) {
         _storageMethods.uploadImage(
           image: cropped,
           receiverId: widget.receiver.uid!,
@@ -1646,9 +1627,7 @@ class _ChatScreenState extends State<ChatScreen>
                 timestamp: Timestamp.now(),
                 type: Constants.MESSAGE_TYPE_CALL,
               );
-              final bool isBlocked = await _chatMethods.isBlocked(
-                  widget.receiver.uid, _currentUserId);
-              if (isBlocked &&
+              if (!isContactBlocked &&
                   await Permissions.cameraAndMicrophonePermissionsGranted()) {
                 CallUtils.dial(
                   from: sender,
@@ -1679,13 +1658,14 @@ class _ChatScreenState extends State<ChatScreen>
                           _currentUserId, widget.receiver.uid),
                       builder: (context, AsyncSnapshot<bool> snapshot) =>
                           GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           _chatMethods.addOrDeleteUserFromBlockedList(
                               senderId: _currentUserId,
                               receiverId: widget.receiver.uid);
+                          getIsContactBlocked();
                         },
                         child: Text(
-                          snapshot.data == true
+                          snapshot.data == false
                               ? Strings.block
                               : Strings.unblock,
                           style: Theme.of(context).textTheme.bodyLarge,

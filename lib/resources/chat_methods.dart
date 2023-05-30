@@ -14,16 +14,16 @@ class ChatMethods {
 
   // Stores text message in firebase.
   Future<void> addMessageToDb(final Message message) async {
-    var map = message.toMap();
+    var messageMap = message.toMap();
     await _messageCollection
         .doc(message.senderId)
         .collection(message.receiverId!)
-        .add(map);
+        .add(messageMap);
     addToContacts(senderId: message.senderId, receiverId: message.receiverId);
     await _messageCollection
         .doc(message.receiverId!)
         .collection(message.senderId!)
-        .add(map);
+        .add(messageMap);
   }
 
   DocumentReference getContactsDocument(

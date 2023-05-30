@@ -44,7 +44,8 @@ String decryptAESCryptoJS(final String encrypted, final String passphrase) {
   }
 }
 
-Tuple2<Uint8List, Uint8List> deriveKeyAndIV(final String passphrase, final Uint8List salt) {
+Tuple2<Uint8List, Uint8List> deriveKeyAndIV(
+    final String passphrase, final Uint8List salt) {
   var password = createUint8ListFromString(passphrase);
   Uint8List concatenatedHashes = Uint8List(0);
   List<int> currentHash = Uint8List(0);
@@ -54,11 +55,9 @@ Tuple2<Uint8List, Uint8List> deriveKeyAndIV(final String passphrase, final Uint8
   while (!enoughBytesForKey) {
     // int preHashLength = currentHash.length + password.length + salt.length;
     if (currentHash.length > 0)
-      preHash = Uint8List.fromList(
-          currentHash + password + salt);
+      preHash = Uint8List.fromList(currentHash + password + salt);
     else
-      preHash = Uint8List.fromList(
-          password + salt);
+      preHash = Uint8List.fromList(password + salt);
 
     currentHash = md5.convert(preHash).bytes;
     concatenatedHashes = Uint8List.fromList(concatenatedHashes + currentHash);
@@ -82,8 +81,8 @@ Uint8List genRandomWithNonZero(final int seedLength) {
   final random = Random.secure();
   const int randomMax = 245;
   final Uint8List uint8list = Uint8List(seedLength);
-  for (int i=0; i < seedLength; i++) {
-    uint8list[i] = random.nextInt(randomMax)+1;
+  for (int i = 0; i < seedLength; i++) {
+    uint8list[i] = random.nextInt(randomMax) + 1;
   }
   return uint8list;
 }

@@ -3,7 +3,7 @@ import 'package:chatify/configs/firebase_config.dart';
 import 'package:http/http.dart' as http;
 
 Future<http.Response> sendNotification(
-    String message, String sender, String receiver) async {
+    final String message, final String sender, final String receiver) async {
   final Uri uri = Uri(path: 'https://fcm.googleapis.com/fcm/send');
   return await http.post(
     uri,
