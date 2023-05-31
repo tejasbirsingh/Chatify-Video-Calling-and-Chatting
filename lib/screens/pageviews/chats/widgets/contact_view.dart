@@ -36,7 +36,6 @@ class _ContactViewState extends State<ContactView> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final UserData user = snapshot.data!;
-
           return ViewLayout(
             contact: user,
             senderId: widget.senderId,

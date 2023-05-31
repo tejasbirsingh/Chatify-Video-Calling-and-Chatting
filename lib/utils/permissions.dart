@@ -2,9 +2,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 
 class Permissions {
+
   static Future<bool> cameraAndMicrophonePermissionsGranted() async {
-    PermissionStatus? cameraPermissionStatus = await _getCameraPermission();
-    PermissionStatus? microphonePermissionStatus =
+    final PermissionStatus? cameraPermissionStatus = await _getCameraPermission();
+    final PermissionStatus? microphonePermissionStatus =
         await _getMicrophonePermission();
 
     if (cameraPermissionStatus == PermissionStatus.granted &&
@@ -18,7 +19,7 @@ class Permissions {
   }
 
   static Future<bool> recordingPermission() async {
-    PermissionStatus? microphonePermissionStatus =
+    final PermissionStatus? microphonePermissionStatus =
         await _getMicrophonePermission();
 
     if (microphonePermissionStatus == PermissionStatus.granted) {
@@ -83,8 +84,8 @@ class Permissions {
   }
 
   static void _handleInvalidPermissions(
-    PermissionStatus? cameraPermissionStatus,
-    PermissionStatus? microphonePermissionStatus,
+    final PermissionStatus? cameraPermissionStatus,
+    final PermissionStatus? microphonePermissionStatus,
   ) {
     if (cameraPermissionStatus == PermissionStatus.denied &&
         microphonePermissionStatus == PermissionStatus.denied) {

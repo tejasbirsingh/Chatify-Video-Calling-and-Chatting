@@ -1331,7 +1331,8 @@ class _ChatScreenState extends State<ChatScreen>
                                 await getApplicationDocumentsDirectory();
                             path =
                                 appDocDirectory.path + Constants.SLASH + path;
-                            _isRecording = await recorder.toggleRecording(path);
+                            _isRecording =
+                                await recorder.toggleRecording(path) ?? false;
 
                             _stop();
                             setState(() {
@@ -1627,8 +1628,9 @@ class _ChatScreenState extends State<ChatScreen>
                 timestamp: Timestamp.now(),
                 type: Constants.MESSAGE_TYPE_CALL,
               );
-              if (!isContactBlocked &&
-                  await Permissions.cameraAndMicrophonePermissionsGranted()) {
+              
+              await Permissions.cameraAndMicrophonePermissionsGranted();
+              if (!isContactBlocked) {
                 CallUtils.dial(
                   from: sender,
                   to: widget.receiver,

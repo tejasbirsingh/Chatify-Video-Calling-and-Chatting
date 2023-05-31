@@ -24,7 +24,7 @@ class LastMessageContainer extends StatelessWidget {
           var docList = snapshot.data!.docs;
 
           if (docList.isNotEmpty) {
-            Message message =
+            final Message message =
                 Message.fromMap(docList.last.data() as Map<String, dynamic>);
             return SizedBox(
               width: MediaQuery.of(context).size.width * 0.6,
