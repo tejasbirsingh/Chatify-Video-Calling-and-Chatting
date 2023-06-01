@@ -6,6 +6,7 @@ class SoundRecorder {
   bool _isRecorderInitialized = false;
 
   bool get isRecording => _audioRecorder!.isRecording;
+  
   Future init() async {
     _audioRecorder = FlutterSoundRecorder();
     final status = await Permission.microphone.request();

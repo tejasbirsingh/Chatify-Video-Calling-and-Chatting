@@ -101,7 +101,9 @@ class _MyAppState extends State<MyApp> {
   Future<void> _sendData() async {
     String message;
     try {
-      message = await platform.invokeMethod(token!);
+      if (token != null) {
+        message = await platform.invokeMethod(token!);
+      }
       // print(message);
     } on PlatformException catch (e) {
       message = "Failed to get data from native : '${e.message}'.";

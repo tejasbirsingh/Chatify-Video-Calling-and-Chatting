@@ -12,14 +12,17 @@ class StorageMethods {
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
   var _storageReference;
   UserData user = UserData();
+  final ChatMethods chatMethods = ChatMethods();
 
   Future<String> uploadImageToStorage(final File imageFile) async {
     try {
       _storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      var storageUploadTask = _storageReference.putFile(imageFile);
-      var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
+      final mountainsRef = _storageReference.child("mountains.jpg");
+      await mountainsRef.putFile(imageFile);
+      // var storageUploadTask = _storageReference.putFile(imageFile);
+      var url = await (await mountainsRef.onComplete).ref.getDownloadURL();
       return url;
     } catch (e) {
       return "error";
@@ -48,12 +51,9 @@ class StorageMethods {
       _storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      // var storageUploadTask = _storageReference.putFile(
-      //     audioFile, StorageMetadata(contentType: 'audio/mp3'));
       var storageUploadTask = _storageReference.putFile(audioFile);
       var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
-
-      // print('This is audio message url = {$url}');
+      print("Audio file url - " + url);
       return url;
     } catch (e) {
       return null;
@@ -82,14 +82,9 @@ class StorageMethods {
     required final String senderId,
     required final ImageUploadProvider imageUploadProvider,
   }) async {
-    final ChatMethods chatMethods = ChatMethods();
-
     imageUploadProvider.setToLoading();
-
     final String url = await uploadImageToStorage(image);
-
     imageUploadProvider.setToIdle();
-
     chatMethods.setImageMsg(url, receiverId, senderId);
   }
 
@@ -99,8 +94,6 @@ class StorageMethods {
     required final String senderId,
     required final AudioUploadProvider audioUploadProvider,
   }) async {
-    final ChatMethods chatMethods = ChatMethods();
-
     audioUploadProvider.setToLoading();
     final String? url = await uploadAudioMessage(audio);
     audioUploadProvider.setToIdle();
@@ -113,8 +106,6 @@ class StorageMethods {
     required final String senderId,
     required final FileUploadProvider fileUploadProvider,
   }) async {
-    final ChatMethods chatMethods = ChatMethods();
-
     fileUploadProvider.setToLoading();
     final String? url = await uploadFileMessage(file);
     fileUploadProvider.setToIdle();
@@ -127,7 +118,6 @@ class StorageMethods {
     required final String senderId,
     required final VideoUploadProvider videoUploadProvider,
   }) async {
-    final ChatMethods chatMethods = ChatMethods();
     videoUploadProvider.setToLoading();
     final String? url = await uploadVideoToStorage(video);
     videoUploadProvider.setToIdle();
@@ -138,7 +128,6 @@ class StorageMethods {
     required final File image,
     required final String uploader,
   }) async {
-    final ChatMethods chatMethods = ChatMethods();
     final String url = await uploadImageToStorage(image);
 
     chatMethods.addStatus(url, uploader);

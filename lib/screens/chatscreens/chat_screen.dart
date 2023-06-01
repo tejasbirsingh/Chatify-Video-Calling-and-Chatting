@@ -533,52 +533,51 @@ class _ChatScreenState extends State<ChatScreen>
 
   _start() async {
     try {
-      final bool result = await record.hasPermission();
-      // if (await Permissions.recordingPermission()) {
-      var ran = Random().nextInt(50);
-      String path = Utils.generateRandomString(ran);
-      Io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
-      path = appDocDirectory.path + Constants.SLASH + path;
+      // final bool result = await record.hasPermission();
+      if (await record.hasPermission()) {
+        var ran = Random().nextInt(50);
+        String path = Utils.generateRandomString(ran);
+        final Io.Directory appDocDirectory =
+            await getApplicationDocumentsDirectory();
+        path = appDocDirectory.path + Constants.SLASH + path;
 
-      // await record.start(
-      //   path: path,
-      //   encoder: AudioEncoder.AAC,
-      //   bitRate: 128000,
-      // );
-      await recorder.record(path);
-      bool isRecording = await record.isRecording();
-      // bool isRecording = await recorder.toggleRecording(path);
+        await record.start(
+          path: path,
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+        );
+        await recorder.record(path);
+        final bool isRecording = await record.isRecording();
+        // bool isRecording = await recorder.toggleRecording(path);
 
-      setState(() {
-        // _recording = new Recording(duration: new Duration(), path: "");
-        _isRecording = isRecording;
-      });
-      // } else {
-      //   print("No permissions");
-      // }
+        setState(() {
+          // _recording = new Recording(duration: new Duration(), path: "");
+          _isRecording = isRecording;
+        });
+      } else {
+        print("No permissions");
+      }
     } catch (e) {
       print(e);
     }
   }
 
   _stop() async {
-    // var recording = await record.stop();
-    String recording = await recorder.stop();
-
-    bool isRecording = await record.isRecording();
-    File file = File(recording);
-    _storageMethods.uploadAudio(
-        audio: file,
-        receiverId: widget.receiver.uid!,
-        senderId: _currentUserId!,
-        audioUploadProvider: _audioUploadProvider!);
-    sendNotification(Constants.AUDIO, sender!.name.toString(),
-        widget.receiver.firebaseToken.toString());
-
-    setState(() {
-      // _recording = recording;
-      _isRecording = isRecording;
-    });
+    final String? recording = await recorder.stop();
+    if (recording != null) {
+      final bool isRecording = await record.isRecording();
+      final File file = File(recording);
+      _storageMethods.uploadAudio(
+          audio: file,
+          receiverId: widget.receiver.uid!,
+          senderId: _currentUserId!,
+          audioUploadProvider: _audioUploadProvider!);
+      sendNotification(Constants.AUDIO, sender!.name.toString(),
+          widget.receiver.firebaseToken.toString());
+      setState(() {
+        _isRecording = isRecording;
+      });
+    }
   }
 
   Widget chatMessageItem(final DocumentSnapshot snapshot) {
@@ -1327,13 +1326,12 @@ class _ChatScreenState extends State<ChatScreen>
                           onPressed: () async {
                             var ran = Random().nextInt(50);
                             String path = Utils.generateRandomString(ran);
-                            Io.Directory appDocDirectory =
+                            final Io.Directory appDocDirectory =
                                 await getApplicationDocumentsDirectory();
                             path =
                                 appDocDirectory.path + Constants.SLASH + path;
                             _isRecording =
                                 await recorder.toggleRecording(path) ?? false;
-
                             _stop();
                             setState(() {
                               isRecordStart = false;
@@ -1346,7 +1344,7 @@ class _ChatScreenState extends State<ChatScreen>
                             if (!isContactBlocked) {
                               var ran = Random().nextInt(50);
                               String path = Utils.generateRandomString(ran);
-                              Io.Directory appDocDirectory =
+                              final Io.Directory appDocDirectory =
                                   await getApplicationDocumentsDirectory();
                               path =
                                   appDocDirectory.path + Constants.SLASH + path;
@@ -1439,7 +1437,7 @@ class _ChatScreenState extends State<ChatScreen>
     });
     final File? selectedImage = await Utils.pickImage(source: source);
     if (selectedImage != null) {
-      final cropped = await ImageCropper().cropImage(
+      final croppedFile = await ImageCropper().cropImage(
         sourcePath: selectedImage.path,
         aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
         compressFormat: ImageCompressFormat.jpg,
@@ -1450,29 +1448,32 @@ class _ChatScreenState extends State<ChatScreen>
           AndroidUiSettings(
             toolbarColor: Theme.of(context).colorScheme.background,
             toolbarTitle: Strings.editImage,
-            // statusBarColor: Theme.of(context).backgroundColor,
+            statusBarColor: Theme.of(context).colorScheme.background,
             backgroundColor: Colors.black,
             activeControlsWidgetColor: Colors.teal,
             toolbarWidgetColor: Theme.of(context).iconTheme.color,
           )
         ],
-      ) as File;
-      if (!isContactBlocked) {
-        _storageMethods.uploadImage(
-          image: cropped,
-          receiverId: widget.receiver.uid!,
-          senderId: _currentUserId!,
-          imageUploadProvider: _imageUploadProvider!,
-        );
-        sendNotification(Constants.IMAGE, sender!.name.toString(),
-            widget.receiver.firebaseToken.toString());
-      } else {
-        blockedDialog(context);
-      }
+      );
+      if (croppedFile != null) {
+        final File? cropped = File(croppedFile!.path);
+        if (!isContactBlocked) {
+          _storageMethods.uploadImage(
+            image: cropped!,
+            receiverId: widget.receiver.uid!,
+            senderId: _currentUserId!,
+            imageUploadProvider: _imageUploadProvider!,
+          );
+          sendNotification(Constants.IMAGE, sender!.name.toString(),
+              widget.receiver.firebaseToken.toString());
+        } else {
+          blockedDialog(context);
+        }
 
-      this.setState(() {
-        _isEditing = false;
-      });
+        this.setState(() {
+          _isEditing = false;
+        });
+      }
     } else {
       this.setState(() {
         _isEditing = false;
@@ -1628,7 +1629,7 @@ class _ChatScreenState extends State<ChatScreen>
                 timestamp: Timestamp.now(),
                 type: Constants.MESSAGE_TYPE_CALL,
               );
-              
+
               await Permissions.cameraAndMicrophonePermissionsGranted();
               if (!isContactBlocked) {
                 CallUtils.dial(

@@ -70,7 +70,10 @@ class Message {
   });
 
   Map<String, dynamic> toMap() {
-    var encryptedText = encryptAESCryptoJS(this.message!, Constants.PASSWORD);
+    var encryptedText =this.message!;
+    if(this.type == Constants.TEXT) {
+        encryptedText = encryptAESCryptoJS(this.message!, Constants.PASSWORD);
+    }
     var map = <String, dynamic>{};
     map[Constants.SENDER_ID] = this.senderId;
     map[Constants.RECEIVER_ID] = this.receiverId;
@@ -134,9 +137,12 @@ class Message {
   }
 
   Message.fromMap(Map<String, dynamic> map) {
-    var decryptedMessage =
-        decryptAESCryptoJS(map[Constants.MESSAGE], Constants.PASSWORD);
+    var decryptedMessage = map[Constants.MESSAGE];
 
+    if(map[Constants.TYPE] == Constants.TEXT) {
+      decryptedMessage =
+        decryptAESCryptoJS(map[Constants.MESSAGE], Constants.PASSWORD);
+    }
     this.senderId = map[Constants.SENDER_ID];
     this.receiverId = map[Constants.RECEIVER_ID];
     this.type = map[Constants.TYPE];
