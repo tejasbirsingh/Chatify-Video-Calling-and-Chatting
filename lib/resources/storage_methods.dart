@@ -16,15 +16,18 @@ class StorageMethods {
 
   Future<String> uploadImageToStorage(final File imageFile) async {
     try {
-      _storageReference = FirebaseStorage.instance
+      final storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      final mountainsRef = _storageReference.child("mountains.jpg");
-      await mountainsRef.putFile(imageFile);
-      // var storageUploadTask = _storageReference.putFile(imageFile);
-      var url = await (await mountainsRef.onComplete).ref.getDownloadURL();
-      return url;
+
+      final uploadTask = storageReference.putFile(imageFile);
+      // Wait for the upload task to complete
+      final snapshot = await uploadTask;
+      // Get the download URL
+      final downloadURL = await snapshot.ref.getDownloadURL();
+      return downloadURL;
     } catch (e) {
+      print('Error uploading image: $e');
       return "error";
     }
   }
@@ -48,14 +51,17 @@ class StorageMethods {
 
   Future<String?> uploadAudioMessage(final File audioFile) async {
     try {
-      _storageReference = FirebaseStorage.instance
+      final storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      var storageUploadTask = _storageReference.putFile(audioFile);
-      var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
-      print("Audio file url - " + url);
-      return url;
+
+      final uploadTask = storageReference.putFile(audioFile);
+      await uploadTask;
+      final downloadURL = await storageReference.getDownloadURL();
+      print("Audio file URL: $downloadURL");
+      return downloadURL;
     } catch (e) {
+      print('Error uploading audio message: $e');
       return null;
     }
   }
