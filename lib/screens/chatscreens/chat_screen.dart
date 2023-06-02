@@ -531,54 +531,61 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
-  _start() async {
-    try {
-      // final bool result = await record.hasPermission();
-      if (await record.hasPermission()) {
-        var ran = Random().nextInt(50);
-        String path = Utils.generateRandomString(ran);
-        final Io.Directory appDocDirectory =
-            await getApplicationDocumentsDirectory();
-        path = appDocDirectory.path + Constants.SLASH + path;
+ // Start recording
+_start() async {
+  try {
+    if (await record.hasPermission()) {
+      var ran = Random().nextInt(50);
+      String path = Utils.generateRandomString(ran);
+      final appDocDirectory = await getApplicationDocumentsDirectory();
+      path = appDocDirectory.path + Constants.SLASH + path;
 
-        await record.start(
-          path: path,
-          encoder: AudioEncoder.aacLc,
-          bitRate: 128000,
-        );
-        await recorder.record(path);
-        final bool isRecording = await record.isRecording();
-        // bool isRecording = await recorder.toggleRecording(path);
+      await record.start(
+        path: path,
+        encoder: AudioEncoder.aacLc,
+        bitRate: 128000,
+      );
 
-        setState(() {
-          // _recording = new Recording(duration: new Duration(), path: "");
-          _isRecording = isRecording;
-        });
-      } else {
-        print("No permissions");
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+      final isRecording = await record.isRecording();
 
-  _stop() async {
-    final String? recording = await recorder.stop();
-    if (recording != null) {
-      final bool isRecording = await record.isRecording();
-      final File file = File(recording);
-      _storageMethods.uploadAudio(
-          audio: file,
-          receiverId: widget.receiver.uid!,
-          senderId: _currentUserId!,
-          audioUploadProvider: _audioUploadProvider!);
-      sendNotification(Constants.AUDIO, sender!.name.toString(),
-          widget.receiver.firebaseToken.toString());
       setState(() {
         _isRecording = isRecording;
       });
+    } else {
+      print("No permissions");
     }
+  } catch (e) {
+    print(e);
   }
+}
+
+// Stop recording and upload audio
+_stop() async {
+  final recording = await record.stop();
+  if (recording != null) {
+    final isRecording = await record.isRecording();
+    final file = File(recording);
+    
+    // Upload the audio file
+    _storageMethods.uploadAudio(
+      audio: file,
+      receiverId: widget.receiver.uid!,
+      senderId: _currentUserId!,
+      audioUploadProvider: _audioUploadProvider!,
+    );
+    
+    // Send notification
+    sendNotification(
+      Constants.AUDIO,
+      sender!.name.toString(),
+      widget.receiver.firebaseToken.toString(),
+    );
+    
+    setState(() {
+      _isRecording = isRecording;
+    });
+  }
+}
 
   Widget chatMessageItem(final DocumentSnapshot snapshot) {
     final Message _message =
