@@ -11,10 +11,7 @@ class ChatifyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
 
   const ChatifyAppBar(
-      {Key? key,
-      required this.title,
-      required this.actions,
-      this.leading})
+      {Key? key, required this.title, required this.actions, this.leading})
       : super(key: key);
 
   @override
@@ -34,5 +31,6 @@ class ChatifyAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
+
   final Size preferredSize = const Size.fromHeight(kToolbarHeight + 10);
 }

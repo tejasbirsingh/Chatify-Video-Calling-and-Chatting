@@ -107,6 +107,7 @@ class _MyAppState extends State<MyApp> {
       // print(message);
     } on PlatformException catch (e) {
       message = "Failed to get data from native : '${e.message}'.";
+      print(message);
     }
   }
 

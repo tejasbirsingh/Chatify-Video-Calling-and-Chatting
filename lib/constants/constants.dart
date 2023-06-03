@@ -61,4 +61,6 @@ class Constants {
   static const String MESSAGE_TYPE_FILE = "file";
   static const String MESSAGE_TYPE_AUDIO = "audio";
   static const String FOLLOWING = "following";
+  static const String NO_IMAGE_AVAILABLE_URL =
+      "https://www.esm.rochester.edu/uploads/NoPhotoAvailable.jpg";
 }

@@ -490,7 +490,6 @@ class _ChatScreenState extends State<ChatScreen>
           skinToneDialogBgColor: Colors.white,
           skinToneIndicatorColor: Colors.grey,
           enableSkinTones: true,
-          showRecentsTab: true,
           recentsLimit: 28,
           noRecents: const Text(
             Strings.noRecents,

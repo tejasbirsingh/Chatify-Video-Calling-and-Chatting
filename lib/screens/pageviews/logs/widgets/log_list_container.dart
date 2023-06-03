@@ -15,8 +15,6 @@ class LogListContainer extends StatefulWidget {
 class _LogListContainerState extends State<LogListContainer> {
   getIcon(String callStatus, double _iconSize) {
     Icon _icon;
-    
-
     switch (callStatus) {
       case CALL_STATUS_DIALLED:
         _icon = Icon(
@@ -42,7 +40,6 @@ class _LogListContainerState extends State<LogListContainer> {
         );
         break;
     }
-
     return Container(
       margin: EdgeInsets.only(right: 5),
       child: _icon,
@@ -59,25 +56,22 @@ class _LogListContainerState extends State<LogListContainer> {
         }
 
         if (snapshot.hasData) {
-          List<dynamic> logList = snapshot.data;
-
+          final List<dynamic> logList = snapshot.data;
           if (logList.isNotEmpty) {
             return ListView.builder(
               itemCount: logList.length,
               itemBuilder: (context, i) {
-                Log _log = logList[i];
-                bool hasDialled = _log.callStatus == CALL_STATUS_DIALLED;
-
+                final Log _log = logList[i];
+                final bool hasDialled = _log.callStatus == CALL_STATUS_DIALLED;
                 return Padding(
-                  padding:  EdgeInsets.symmetric(vertical:4.0,horizontal: 4.0),
+                  padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                   child: CustomTile(
                     onTap: () => {},
                     leading: CachedImage(
-                    
                       hasDialled ? _log.receiverPic! : _log.callerPic!,
                       isRound: true,
-                      radius: 45, isTap: () {  },
-                      
+                      radius: 45,
+                      isTap: () {},
                     ),
                     mini: false,
                     onLongPress: () => showDialog(
@@ -86,20 +80,23 @@ class _LogListContainerState extends State<LogListContainer> {
                         backgroundColor: Theme.of(context).cardColor,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0)),
-                        title: Text("Delete this Log?",
-                        style:TextStyle(color: Colors.black,
-                        fontSize: 20.0),),
-                        content:
-                            Text("Are you sure you wish to delete this log?",
-                             style: Theme.of(context).textTheme.bodyLarge,
-                            ),
+                        title: Text(
+                          Strings.deleteThisLog,
+                          style: TextStyle(color: Colors.black, fontSize: 20.0),
+                        ),
+                        content: Text(
+                          Strings.confirmLogDeletion,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
                         actions: [
                           TextButton(
-                            child: Text("YES",style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold
-                            ),),
+                            child: Text(
+                              Strings.yes,
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
                             onPressed: () async {
                               Navigator.maybePop(context);
                               await LogRepository.deleteLogs(i);
@@ -109,44 +106,46 @@ class _LogListContainerState extends State<LogListContainer> {
                             },
                           ),
                           TextButton(
-                            child: Text("NO",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                              color: Colors.black
-                            ),),
+                            child: Text(
+                              Strings.no,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20.0,
+                                  color: Colors.black),
+                            ),
                             onPressed: () => Navigator.maybePop(context),
                           ),
                         ],
                       ),
                     ),
                     title: Text(
-                      hasDialled ? _log.receiverName! : _log.callerName!,
-                      style: Theme.of(context).textTheme.bodyLarge
-                    ),
-                    icon: getIcon(_log.callStatus!,15.0),
+                        hasDialled ? _log.receiverName! : _log.callerName!,
+                        style: Theme.of(context).textTheme.bodyLarge),
+                    icon: getIcon(_log.callStatus!, 15.0),
                     subtitle: Text(
                       Utils.formatDateString(_log.timestamp!),
                       style: TextStyle(
-                        color:Theme.of(context).textTheme.bodyLarge!.backgroundColor,
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .backgroundColor,
                         fontSize: 13,
                       ),
                     ),
-                    trailing: getIcon(_log.callStatus!,30.0),
+                    trailing: getIcon(_log.callStatus!, 30.0),
                   ),
                 );
               },
             );
           }
           return QuietBox(
-            heading: "This is where all your call logs are listed",
-            subtitle: "Calling people all over the world with just one click",
+            heading: Strings.callLogsListHeading,
+            subtitle: Strings.callsLogsListSubHeading,
           );
         }
-
         return QuietBox(
-          heading: "This is where all your call logs are listed",
-          subtitle: "Calling people all over the world with just one click",
+          heading: Strings.callLogsListHeading,
+          subtitle: Strings.callsLogsListSubHeading,
         );
       },
     );

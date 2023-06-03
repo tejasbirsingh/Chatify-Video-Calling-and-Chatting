@@ -104,4 +104,11 @@ class Strings {
   static const String friendAdded = "Friend added!";
   static const String alreadyAFriend = "Already a friend!";
   static const String search = "Search";
+  static const String deleteThisLog = "Delete this Log ?";
+  static const String confirmLogDeletion =
+      "Are you sure you wish to delete this log ?";
+  static const String callLogsListHeading =
+      "This is where all your call logs are listed";
+  static const String callsLogsListSubHeading =
+      "Calling people all over the world with just one click";
 }

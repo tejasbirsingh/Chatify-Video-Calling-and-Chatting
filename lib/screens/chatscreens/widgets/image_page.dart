@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:chatify/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chatify/provider/user_provider.dart';
-
 import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 import 'package:chatify/utils/utilities.dart';
 import 'package:dio/dio.dart';
@@ -17,15 +17,12 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
-  final String NO_IMAGE_AVAILABLE_URL =
-      "https://www.esm.rochester.edu/uploads/NoPhotoAvailable.jpg";
   String downloadedMessage = 'Initializing...';
   bool _isDownloading = false;
   double _percentage = 0;
-  late String fileName;
+  String? fileName;
   int initialPage = 0;
-
-  late String imageDownloadUrl;
+  String? imageDownloadUrl;
   @override
   void initState() {
     super.initState();
@@ -46,21 +43,32 @@ class _ImagePageState extends State<ImagePage> {
     var dir = await getExternalStorageDirectory();
     Dio dio = Dio();
 
-    dio.download(
-        imageDownloadUrl ?? NO_IMAGE_AVAILABLE_URL,
+    try {
+      await dio.download(
+        imageDownloadUrl ?? Constants.NO_IMAGE_AVAILABLE_URL,
         '${dir!.path}/$fileName.jpg',
         onReceiveProgress: (actualBytes, totalBytes) {
-      var percentage = actualBytes / totalBytes * 100;
-      _percentage = percentage / 100;
-      if (percentage == 100) {
-        setState(() {
-          _isDownloading = false;
-        });
-      }
+          var percentage = actualBytes / totalBytes * 100;
+
+          setState(() {
+            _isDownloading = true;
+            downloadedMessage = 'Downloading... ${percentage.floor()}%';
+          });
+
+          if (percentage == 100) {
+            setState(() {
+              _isDownloading = false;
+              downloadedMessage = 'Download completed. Image saved to gallery.';
+            });
+          }
+        },
+      );
+    } catch (e) {
       setState(() {
-        downloadedMessage = 'Downloading...${percentage.floor()} % ';
+        downloadedMessage = 'Failed to download the file.';
       });
-    });
+      print(e.toString());
+    }
   }
 
   @override
@@ -112,7 +120,7 @@ class _ImagePageState extends State<ImagePage> {
                         });
                       },
                       enlargeCenterPage: true,
-                      height: MediaQuery.of(context).size.height,
+                      height: MediaQuery.of(context).size.height * 0.6,
                       enableInfiniteScroll: false,
                       viewportFraction: 0.95,
                       enlargeStrategy: CenterPageEnlargeStrategy.scale,
@@ -122,7 +130,7 @@ class _ImagePageState extends State<ImagePage> {
                             child: CachedImage(
                               item,
                               fit: BoxFit.cover,
-                              isTap: () => {},
+                              width: MediaQuery.of(context).size.width * 0.8,
                             ),
                           ))
                       .toList(),
