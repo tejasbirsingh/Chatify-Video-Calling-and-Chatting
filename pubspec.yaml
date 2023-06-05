@@ -23,11 +23,11 @@ dependencies:
   advance_pdf_viewer: ^2.0.0
   audioplayers: ^4.0.1
   permission_handler: ^10.2.0
-  video_trimmer: ^2.0.1
+  video_trimmer: ^2.1.0
   cached_network_image: ^3.0.0
-  cached_video_player: ^2.0.0-dev.1
+  cached_video_player: ^2.0.4
   video_player: ^2.1.10
-  flutter_pdfview: ^1.1.0
+  flutter_pdfview: ^1.2.9
   carousel_slider: ^4.0.0-nullsafety.0
   chewie: ^1.5.0
   circular_reveal_animation: ^2.0.0
@@ -45,7 +45,6 @@ dependencies:
   firebase_core: ^2.10.0
   firebase_messaging: ^14.6.2
   # firebase_ml_vision: ^0.12.0+2
- 
   flare_flutter: ^3.0.0
   flutter_colorpicker: ^1.0.3
   flutter_ringtone_player: ^3.0.0

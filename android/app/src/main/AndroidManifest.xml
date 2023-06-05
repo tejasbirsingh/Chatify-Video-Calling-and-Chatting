@@ -31,6 +31,7 @@
                android:value="AIzaSyA07n5T8K3IGYY1WXzRVoIQpQZep43Ugac"/>
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -52,6 +53,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            
      
             
         </activity>
@@ -65,7 +67,6 @@
             <!-- <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"
                 android:value="ocr" /> -->
-       
 
     </application>
 </manifest>

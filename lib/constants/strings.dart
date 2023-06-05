@@ -111,4 +111,8 @@ class Strings {
       "This is where all your call logs are listed";
   static const String callsLogsListSubHeading =
       "Calling people all over the world with just one click";
+  static const String videoSavedSnackBarContent = "Video Saved successfully";
+  static const String send = "Send";
+  static const String notificationVideo = "Video";
+  static const String videoTrimmer = "Video Trimmer";
 }

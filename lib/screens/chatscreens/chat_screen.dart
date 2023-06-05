@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:chatify/constants/constants.dart';
+import 'package:chatify/screens/chatscreens/widgets/video_trimmer.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:circular_reveal_animation/circular_reveal_animation.dart';
@@ -55,6 +56,7 @@ import 'package:chatify/widgets/custom_app_bar.dart';
 import 'package:chatify/widgets/gradient_icon.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_trimmer/video_trimmer.dart';
 
 class ChatScreen extends StatefulWidget {
   final UserData receiver;
@@ -364,7 +366,7 @@ class _ChatScreenState extends State<ChatScreen>
               }, Colors.green),
               moreMenuItem(Icons.video_label, Strings.video, () async {
                 toggleMenu();
-                // pickVideo();
+                pickVideo();
               }, Colors.pink),
               moreMenuItem(Icons.file_copy, Strings.file, () async {
                 toggleMenu();
@@ -530,61 +532,61 @@ class _ChatScreenState extends State<ChatScreen>
     );
   }
 
- // Start recording
-_start() async {
-  try {
-    if (await record.hasPermission()) {
-      var ran = Random().nextInt(50);
-      String path = Utils.generateRandomString(ran);
-      final appDocDirectory = await getApplicationDocumentsDirectory();
-      path = appDocDirectory.path + Constants.SLASH + path;
+  // Start recording
+  _start() async {
+    try {
+      if (await record.hasPermission()) {
+        var ran = Random().nextInt(50);
+        String path = Utils.generateRandomString(ran);
+        final appDocDirectory = await getApplicationDocumentsDirectory();
+        path = appDocDirectory.path + Constants.SLASH + path;
 
-      await record.start(
-        path: path,
-        encoder: AudioEncoder.aacLc,
-        bitRate: 128000,
+        await record.start(
+          path: path,
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+        );
+
+        final isRecording = await record.isRecording();
+
+        setState(() {
+          _isRecording = isRecording;
+        });
+      } else {
+        print("No permissions");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+// Stop recording and upload audio
+  _stop() async {
+    final recording = await record.stop();
+    if (recording != null) {
+      final isRecording = await record.isRecording();
+      final file = File(recording);
+
+      // Upload the audio file
+      _storageMethods.uploadAudio(
+        audio: file,
+        receiverId: widget.receiver.uid!,
+        senderId: _currentUserId!,
+        audioUploadProvider: _audioUploadProvider!,
       );
 
-      final isRecording = await record.isRecording();
+      // Send notification
+      sendNotification(
+        Constants.AUDIO,
+        sender!.name.toString(),
+        widget.receiver.firebaseToken.toString(),
+      );
 
       setState(() {
         _isRecording = isRecording;
       });
-    } else {
-      print("No permissions");
     }
-  } catch (e) {
-    print(e);
   }
-}
-
-// Stop recording and upload audio
-_stop() async {
-  final recording = await record.stop();
-  if (recording != null) {
-    final isRecording = await record.isRecording();
-    final file = File(recording);
-    
-    // Upload the audio file
-    _storageMethods.uploadAudio(
-      audio: file,
-      receiverId: widget.receiver.uid!,
-      senderId: _currentUserId!,
-      audioUploadProvider: _audioUploadProvider!,
-    );
-    
-    // Send notification
-    sendNotification(
-      Constants.AUDIO,
-      sender!.name.toString(),
-      widget.receiver.firebaseToken.toString(),
-    );
-    
-    setState(() {
-      _isRecording = isRecording;
-    });
-  }
-}
 
   Widget chatMessageItem(final DocumentSnapshot snapshot) {
     final Message _message =
@@ -1487,29 +1489,36 @@ _stop() async {
     }
   }
 
-  // Future pickVideo() async {
-  //   final Trimmer _trimmer = Trimmer();
-  //   PickedFile video = await ImagePicker().getVideo(
-  //       source: ImageSource.gallery, maxDuration: Duration(minutes: 5));
-  //   await _trimmer.loadVideo(videoFile: File(video.path));
-  //   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-  //     return TrimmerView(
-  //       trimmerFile: _trimmer,
-  //       receiver: widget.receiver.uid,
-  //       sender: _currentUserId,
-  //     );
-  //   }));
-  //   if (video != null) {
-  //     videoPlayerController = VideoPlayerController.file(File(video.path))
-  //       ..initialize().then((_) {
-  //         setState(() {
-  //           videoPlayerController.play();
-  //         });
-  //       });
-  //   }
-  //   sendNotification("Video", sender.name.toString(),
-  //       widget.receiver.firebaseToken.toString());
-  // }
+  Future<void> pickVideo() async {
+    final Trimmer _trimmer = Trimmer();
+    final XFile? video = await ImagePicker().pickVideo(
+      source: ImageSource.gallery,
+      maxDuration: const Duration(minutes: 5),
+    );
+    if (video != null) {
+      await _trimmer.loadVideo(videoFile: File(video.path));
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return TrimmerView(
+          trimmer: _trimmer,
+          receiver: widget.receiver.uid!,
+          sender: _currentUserId!,
+        );
+      })).then((_) {
+        videoPlayerController = VideoPlayerController.file(File(video.path))
+          ..initialize().then((_) {
+            setState(() {
+              videoPlayerController!.play();
+            });
+          });
+      });
+
+      sendNotification(
+        Strings.notificationVideo,
+        sender!.name.toString(),
+        widget.receiver.firebaseToken.toString(),
+      );
+    }
+  }
 
   Future<void> downloadFile(final String imagePath) async {
     final Dio dio = Dio();
