@@ -403,7 +403,7 @@ class _ChatScreenState extends State<ChatScreen>
                   message: Strings.location,
                   position: x,
                   timestamp: Timestamp.now(),
-                  type: Strings.location,
+                  type: MESSAGE_TYPE_LOCATION,
                   isRead: false,
                   isLocation: true,
                 );
@@ -771,7 +771,7 @@ class _ChatScreenState extends State<ChatScreen>
     if (message.isLocation = true && message.type == MESSAGE_TYPE_LOCATION) {
       return GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => showMap(
+            builder: (context) => ViewMapPage(
                   receiver: widget.receiver,
                   isSender: true,
                   pos: message.position!,
@@ -1017,7 +1017,7 @@ class _ChatScreenState extends State<ChatScreen>
     if (message.isLocation = true && message.type == Constants.LOCATION) {
       return GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => showMap(
+            builder: (context) => ViewMapPage(
                   receiver: widget.receiver,
                   isSender: false,
                   pos: message.position!,
@@ -1464,7 +1464,7 @@ class _ChatScreenState extends State<ChatScreen>
         ],
       );
       if (croppedFile != null) {
-        final File? cropped = File(croppedFile!.path);
+        final File? cropped = File(croppedFile.path);
         if (!isContactBlocked) {
           _storageMethods.uploadImage(
             image: cropped!,

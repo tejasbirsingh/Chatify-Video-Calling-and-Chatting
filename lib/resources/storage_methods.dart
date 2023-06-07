@@ -10,7 +10,6 @@ import 'package:chatify/resources/chat_methods.dart';
 
 class StorageMethods {
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var _storageReference;
   UserData user = UserData();
   final ChatMethods chatMethods = ChatMethods();
 
@@ -39,13 +38,12 @@ class StorageMethods {
           .child('${DateTime.now().millisecondsSinceEpoch}');
 
       final uploadTask = storageReference.putFile(videoFile);
-      await uploadTask;
-      final downloadURL = await storageReference.getDownloadURL();
-      print("Audio file URL: $downloadURL");
+      final snapshot = await uploadTask;
+      final downloadURL = await snapshot.ref.getDownloadURL();
       return downloadURL;
     } catch (e) {
-      print('Error uploading audio message: $e');
-      return null;
+      print('Error uploading image: $e');
+      return "error";
     }
   }
 
@@ -54,14 +52,11 @@ class StorageMethods {
       final storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-
       final uploadTask = storageReference.putFile(audioFile);
       await uploadTask;
       final downloadURL = await storageReference.getDownloadURL();
-      print("Audio file URL: $downloadURL");
       return downloadURL;
     } catch (e) {
-      print('Error uploading audio message: $e');
       return null;
     }
   }
@@ -71,14 +66,11 @@ class StorageMethods {
       final storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-
       final uploadTask = storageReference.putFile(file);
       await uploadTask;
       final downloadURL = await storageReference.getDownloadURL();
-      print("Audio file URL: $downloadURL");
       return downloadURL;
     } catch (e) {
-      print('Error uploading audio message: $e');
       return null;
     }
   }
@@ -136,7 +128,6 @@ class StorageMethods {
     required final String uploader,
   }) async {
     final String url = await uploadImageToStorage(image);
-
     chatMethods.addStatus(url, uploader);
   }
 }

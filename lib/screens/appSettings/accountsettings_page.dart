@@ -390,7 +390,8 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
         });
   }
 
-  Future<AlertDialog?> _showImageDialog(final BuildContext context, final UserData user) {
+  Future<AlertDialog?> _showImageDialog(
+      final BuildContext context, final UserData user) {
     return showDialog<AlertDialog>(
         context: context,
         barrierDismissible: false,
@@ -410,12 +411,15 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
                     setState(() {
                       imageFile = selectedImage;
                     });
-                    compressImage();
-                    _updateMethods.uploadImageToStorage(imageFile!).then((url) {
-                      _updateMethods.updatePhoto(url, user.uid!).then((v) {
-                        Navigator.pop(context);
+                    if (imageFile != null) {
+                      compressImage();
+                      _updateMethods
+                          .uploadImageToStorage(imageFile!)
+                          .then((url) {
+                        _updateMethods.updatePhoto(url, user.uid!).then((v) {});
                       });
-                    });
+                    }
+                    Navigator.pop(context);
                   });
                 },
               ),
@@ -431,8 +435,7 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
                     });
                     compressImage();
                     _updateMethods.uploadImageToStorage(imageFile!).then((url) {
-                      _updateMethods.updatePhoto(url, user.uid!).then((v) {
-                      });
+                      _updateMethods.updatePhoto(url, user.uid!).then((v) {});
                     });
                   });
                 },
@@ -461,7 +464,7 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
         ? selectedImage = await Utils.pickImage(source: ImageSource.gallery)
         : selectedImage = await Utils.pickImage(source: ImageSource.camera);
     if (selectedImage != null) {
-      final cropped = await ImageCropper().cropImage(
+      final croppedImage = await ImageCropper().cropImage(
         sourcePath: selectedImage.path,
         aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
         compressFormat: ImageCompressFormat.jpg,
@@ -477,11 +480,14 @@ class _AccountsSettingsPageState extends State<AccountsSettingsPage> {
             toolbarWidgetColor: Colors.white,
           )
         ],
-      ) as File;
-      this.setState(() {
-        _isEditing = false;
-      });
-      return cropped;
+      );
+      if (croppedImage != null) {
+        final File? cropped = File(croppedImage.path);
+        this.setState(() {
+          _isEditing = false;
+        });
+        return cropped;
+      }
     } else {
       this.setState(() {
         _isEditing = false;

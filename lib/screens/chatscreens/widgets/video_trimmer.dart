@@ -1,12 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chatify/provider/video_upload_provider.dart';
-import 'package:chatify/resources/chat_methods.dart';
 import 'package:chatify/resources/storage_methods.dart';
-
 import 'package:video_trimmer/video_trimmer.dart';
-
 import '../../../constants/strings.dart';
 
 class TrimmerView extends StatefulWidget {
@@ -27,7 +25,13 @@ class _TrimmerViewState extends State<TrimmerView> {
   double _endValue = 0.0;
   bool _isPlaying = false;
   bool _progressVisibility = false;
+  var _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  Random _rnd = Random();
 
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+
+    
   Future<String> _saveVideo() async {
     setState(() {
       _progressVisibility = true;
@@ -38,8 +42,12 @@ class _TrimmerViewState extends State<TrimmerView> {
         .saveTrimmedVideo(
       startValue: _startValue,
       endValue: _endValue,
+      videoFileName: getRandomString(15),
       onSave: (String? outputFilePath) {
-        _value = outputFilePath!;
+        if (outputFilePath != null) {
+          _value = outputFilePath;
+          print("Output File path" + outputFilePath);
+        }
       },
     )
         .then((_) {
@@ -85,10 +93,11 @@ class _TrimmerViewState extends State<TrimmerView> {
                       onPressed: _progressVisibility
                           ? null
                           : () async {
-                              final String outputPath = await _saveVideo();
-                              if (outputPath.isNotEmpty) {
-                                File videoFile = File(outputPath);
-
+                              await _saveVideo().then((outputPath) {
+                                print("Output File path in saveMethod" +
+                                    outputPath);
+                                final File videoFile = File(outputPath);
+                                print("Video File" + videoFile.path);
                                 if (videoFile.existsSync()) {
                                   _storageMethods.uploadVideo(
                                     video: videoFile,
@@ -103,10 +112,8 @@ class _TrimmerViewState extends State<TrimmerView> {
                                 );
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(snackBar);
-
                                 Navigator.pop(context);
-                              }
-                              Navigator.pop(context);
+                              });
                             },
                       child: Row(
                         children: [

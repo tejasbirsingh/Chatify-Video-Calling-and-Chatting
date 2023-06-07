@@ -7,7 +7,6 @@ import 'package:chatify/constants/strings.dart';
 class UpdateMethods {
   final String? uid;
   UpdateMethods({this.uid});
-  var _storageReference;
 
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -20,13 +19,15 @@ class UpdateMethods {
 
   Future<String> uploadImageToStorage(File imageFile) async {
     try {
-      _storageReference = FirebaseStorage.instance
+      var storageReference = FirebaseStorage.instance
           .ref()
           .child('${DateTime.now().millisecondsSinceEpoch}');
-      var storageUploadTask = _storageReference.putFile(imageFile);
-      var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
+      var uploadTask = storageReference.putFile(imageFile);
+      var snapshot = await uploadTask;
+      var url = await snapshot.ref.getDownloadURL();
       return url;
     } catch (e) {
+      print(e.toString());
       return "error";
     }
   }

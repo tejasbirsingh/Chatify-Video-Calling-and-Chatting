@@ -115,4 +115,5 @@ class Strings {
   static const String send = "Send";
   static const String notificationVideo = "Video";
   static const String videoTrimmer = "Video Trimmer";
+  static const String yourLocation = "Your Location";
 }
