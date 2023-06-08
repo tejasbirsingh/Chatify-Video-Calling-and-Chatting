@@ -13,10 +13,8 @@ class CallMethods {
     try {
       call!.hasDialled = true;
       final Map<String, dynamic> hasDialledMap = call.toMap(call);
-
       call.hasDialled = false;
       final Map<String, dynamic> hasNotDialledMap = call.toMap(call);
-
       await callCollection.doc(call.callerId).set(hasDialledMap);
       await callCollection.doc(call.receiverId).set(hasNotDialledMap);
       return true;

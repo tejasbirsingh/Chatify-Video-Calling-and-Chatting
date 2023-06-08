@@ -18,12 +18,12 @@ class PickupLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
 
-    return (userProvider.getUser != null)
-        ? StreamBuilder<DocumentSnapshot>(
+    return StreamBuilder<DocumentSnapshot>(
       stream: callMethods.callStream(uid: userProvider.getUser.uid),
       builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data!.data()!=null) {
-          Call call = Call.fromMap(snapshot.data!.data() as Map<String, dynamic> );
+        if (snapshot.hasData && snapshot.data!.data() != null) {
+          final Call call =
+              Call.fromMap(snapshot.data!.data() as Map<String, dynamic>);
 
           if (!call.hasDialled!) {
             return PickupScreen(call: call);
@@ -31,11 +31,6 @@ class PickupLayout extends StatelessWidget {
         }
         return scaffold;
       },
-    )
-        : Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
     );
   }
 }

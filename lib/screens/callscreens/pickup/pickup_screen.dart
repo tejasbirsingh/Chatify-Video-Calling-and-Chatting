@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
 import 'package:chatify/constants/strings.dart';
 import 'package:chatify/models/call.dart';
 import 'package:chatify/models/log.dart';
@@ -9,33 +8,26 @@ import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/call_methods.dart';
 import 'package:chatify/resources/local_db/repository/log_repository.dart';
 import 'package:chatify/screens/callscreens/call_screen.dart';
-
 import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
-
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:chatify/utils/permissions.dart';
 
 class PickupScreen extends StatefulWidget {
   final Call call;
-
   PickupScreen({
     required this.call,
   });
-
   @override
   _PickupScreenState createState() => _PickupScreenState();
 }
 
 class _PickupScreenState extends State<PickupScreen> {
   final CallMethods callMethods = CallMethods();
-  // final LogRepository logRepository = LogRepository(isHive: true);
-  // final LogRepository logRepository = LogRepository(isHive: false);
-
   bool isCallMissed = true;
 
   addToLocalStorage({required String callStatus}) {
-    Log log = Log(
+    final Log log = Log(
       callerName: widget.call.callerName,
       callerPic: widget.call.callerPic,
       receiverName: widget.call.receiverName,
@@ -43,7 +35,6 @@ class _PickupScreenState extends State<PickupScreen> {
       timestamp: DateTime.now().toString(),
       callStatus: callStatus,
     );
-
     LogRepository.addLogs(log);
   }
 
@@ -66,7 +57,6 @@ class _PickupScreenState extends State<PickupScreen> {
   Widget build(BuildContext context) {
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: true);
-
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -85,7 +75,7 @@ class _PickupScreenState extends State<PickupScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "Incoming Call",
+              Strings.incomingCall,
               style: GoogleFonts.patuaOne(
                   textStyle: TextStyle(
                       fontSize: 30,
@@ -111,22 +101,20 @@ class _PickupScreenState extends State<PickupScreen> {
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(60.0),
                   ),
-                 
                   child: GestureDetector(
                     onTap: () async {
                       FlutterRingtonePlayer.stop();
                       isCallMissed = false;
                       addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                      await Permissions.cameraAndMicrophonePermissionsGranted()
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    CallScreen(call: widget.call),
-                              ),
-                            )
-                       
-                          : [];
+                      // await Permissions.cameraAndMicrophonePermissionsGranted()
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CallScreen(call: widget.call),
+                        ),
+                      );
+
+                      // : [];
                     },
                     child: Container(
                       width: 70.0,
@@ -144,7 +132,6 @@ class _PickupScreenState extends State<PickupScreen> {
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(60.0),
                     ),
-                
                     child: GestureDetector(
                       onTap: () async {
                         FlutterRingtonePlayer.stop();

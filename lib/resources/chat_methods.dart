@@ -5,7 +5,6 @@ import 'package:chatify/models/contact.dart';
 import 'package:chatify/models/message.dart';
 
 class ChatMethods {
-
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _messageCollection =
       _firestore.collection(MESSAGES_COLLECTION);
@@ -268,23 +267,21 @@ class ChatMethods {
           .orderBy(Constants.TIMESTAMP)
           .snapshots();
 
-
-  // Returns the count of unread messages.
+// Returns the count of unread messages.
   Future<int> unreadMessagesCount({
     required String senderId,
     required String receiverId,
   }) async {
     var c = 0;
-    await _messageCollection
+    var documentSnapshot = await _messageCollection
         .doc(receiverId)
         .collection(senderId)
-        .where(Constants.IS_READ, isNotEqualTo: true)
-        .get()
-        .then((documentSnapshot) {
-      c = documentSnapshot.docs.length;
-    });
+        .where(Constants.IS_READ, isEqualTo: false)
+        .get();
+    c = documentSnapshot.docs.length;
     return c;
   }
+
 
   void addStatus(final String url, final String senderId) async {
     await _userCollection

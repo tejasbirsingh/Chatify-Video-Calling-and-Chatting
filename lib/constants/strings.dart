@@ -116,4 +116,6 @@ class Strings {
   static const String notificationVideo = "Video";
   static const String videoTrimmer = "Video Trimmer";
   static const String yourLocation = "Your Location";
+  static const String incomingCall = "Incoming Call";
+  static const String callScreenWaitMessage = "Please wait for remote user to join";
 }
