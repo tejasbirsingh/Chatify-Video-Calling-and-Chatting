@@ -18,7 +18,7 @@
 // import 'package:chatify/utils/utilities.dart';
 
 // class TextRecognitionWidget extends StatefulWidget {
-//   final String receiverId;
+//   final String? receiverId;
 //   const TextRecognitionWidget({Key? key, this.receiverId}) : super(key: key);
 
 //   @override
@@ -27,9 +27,9 @@
 
 // class _TextRecognitionWidgetState extends State<TextRecognitionWidget> {
 //   String ocrText = 'No text scanned';
-//   File image;
+//   File? image;
 //   final pdf = pw.Document();
-//   String fileName;
+//   String? fileName;
 
 //   @override
 //   void initState() {
@@ -49,7 +49,7 @@
 //           title: Text("Image to Pdf",
 //               style: GoogleFonts.oswald(
 //                   textStyle: TextStyle(
-//                       color: Theme.of(context).textTheme.headline1.color,
+//                       color: Theme.of(context).textTheme.displayLarge!.color,
 //                       fontWeight: FontWeight.bold,
 //                       fontSize: 26.0))),
 //           iconTheme: Theme.of(context).iconTheme,
@@ -75,7 +75,7 @@
 //                   width: MediaQuery.of(context).size.width * 0.9,
 //                   decoration: BoxDecoration(
 //                       border: Border.all(
-//                           color: Theme.of(context).textTheme.headline1.color)),
+//                           color: Theme.of(context).textTheme.displayLarge!.color!)),
 //                   child: buildImage()),
 //               SizedBox(height: 5.0),
 //               Container(
@@ -171,7 +171,7 @@
 //           ),
 //           Text(
 //             name,
-//             style: TextStyle(color: Theme.of(context).textTheme.bodyText1.color, fontSize: 16.0),
+//             style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: 16.0),
 //           )
 //         ],
 //       ),
@@ -208,7 +208,7 @@
 //   Widget buildImage() => Container(
 //         child: image != null
 //             ? Image.file(
-//                 image,
+//                 image!,
 //                 // color: Theme.of(context).iconTheme.color,
 //                fit:BoxFit.cover
 //               )
@@ -217,12 +217,12 @@
 
 //   Future pickImageGallery() async {
 //     final file = await ImagePicker().getImage(source: ImageSource.gallery);
-//     setImage(File(file.path));
+//     setImage(File(file!.path));
 //   }
 
 //   Future pickImageCamera() async {
 //     final file = await ImagePicker().getImage(source: ImageSource.camera);
-//     setImage(File(file.path));
+//     setImage(File(file!.path));
 //   }
 
 //   Future scanText() async {
@@ -251,7 +251,7 @@
 //     }
 //   }
 
-//   void setImage(File newImage) {
+//   void setImage(File? newImage) {
 //     setState(() {
 //       image = newImage;
 //     });

@@ -58,8 +58,8 @@ class _AllStatusPageState extends State<AllStatusPage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
                   userProvider!.getUser.firstColor != null
-                      ? Color(
-                          userProvider!.getUser.firstColor ?? Colors.white.value)
+                      ? Color(userProvider!.getUser.firstColor ??
+                          Colors.white.value)
                       : Theme.of(context).colorScheme.background,
                   userProvider!.getUser.secondColor != null
                       ? Color(userProvider!.getUser.secondColor ??
@@ -164,7 +164,8 @@ class _AllStatusPageState extends State<AllStatusPage> {
                                             .displayLarge),
                                     trailing: IconButton(
                                       onPressed: () async {
-                                        UserData newUser = userProvider!.getUser;
+                                        UserData newUser =
+                                            userProvider!.getUser;
                                         newUser.hasStatus = false;
                                         if (docList.length == 1)
                                           _userCollection
@@ -176,8 +177,9 @@ class _AllStatusPageState extends State<AllStatusPage> {
                                             FirebaseStorage.instance.ref(url);
                                         // print(url);
 
-                                        await storageReference.delete().then(
-                                            (value) => print('deleted'));
+                                        await storageReference
+                                            .delete()
+                                            .then((value) => print('deleted'));
                                       },
                                       icon: Icon(Icons.delete),
                                     ),
@@ -219,8 +221,8 @@ class _AllStatusPageState extends State<AllStatusPage> {
                               padding: EdgeInsets.all(4.0),
                               itemCount: docList.length,
                               itemBuilder: (context, i) {
-                                Contact user =
-                                    Contact.fromMap(docList[i].data() as Map<String, dynamic>);
+                                Contact user = Contact.fromMap(
+                                    docList[i].data() as Map<String, dynamic>);
 
                                 return StatusView(user);
                               },
@@ -256,29 +258,34 @@ class _AllStatusPageState extends State<AllStatusPage> {
 
   Future pickImage({required ImageSource source, String? userId}) async {
     File? selectedImage = await Utils.pickImage(source: source);
-    final cropped = (await ImageCropper().cropImage(
+    final croppedImage = (await ImageCropper().cropImage(
       sourcePath: selectedImage!.path,
-        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-        compressFormat: ImageCompressFormat.jpg,
-        compressQuality: 80,
-        maxHeight: 700,
-        maxWidth: 700,
-        uiSettings: [
-           AndroidUiSettings(
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 80,
+      maxHeight: 700,
+      maxWidth: 700,
+      uiSettings: [
+        AndroidUiSettings(
             toolbarTitle: 'Edit Image',
-            toolbarColor:  Theme.of(context).colorScheme.background,
+            toolbarColor: Theme.of(context).colorScheme.background,
             toolbarWidgetColor: Theme.of(context).iconTheme.color,
             initAspectRatio: CropAspectRatioPreset.original,
             activeControlsWidgetColor: Colors.teal,
             lockAspectRatio: false),
-        ],
-      )) as File;
-    _storageMethods.uploadStatus(
-      image: cropped,
-      uploader: userId!,
-    );
-    UserData newUser = userProvider!.getUser;
-    newUser.hasStatus = true;
-    _userCollection.doc(userProvider!.getUser.uid).set(newUser.toMap(newUser));
+      ],
+    ));
+    if (croppedImage != null) {
+      final File cropped = File(croppedImage.path);
+      _storageMethods.uploadStatus(
+        image: cropped,
+        uploader: userId!,
+      );
+      final UserData newUser = userProvider!.getUser;
+      newUser.hasStatus = true;
+      _userCollection
+          .doc(userProvider!.getUser.uid)
+          .set(newUser.toMap(newUser));
+    }
   }
 }

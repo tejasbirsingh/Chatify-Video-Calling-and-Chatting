@@ -134,75 +134,75 @@ class _CallScreenState extends State<CallScreen> {
     }));
   }
 
-  Widget _remoteVideo() {
+  List<Widget> _remoteVideo() {
     if (_remoteUid != null) {
-      return AgoraVideoView(
+      return [AgoraVideoView(
         controller: VideoViewController.remote(
           rtcEngine: _engine,
           canvas: VideoCanvas(uid: _remoteUid),
           connection: RtcConnection(channelId: widget.call.channelId),
         ),
-      );
+      )];
     } else {
-      return const Text(
+      return [const Text(
         'Please wait for remote user to join',
         textAlign: TextAlign.center,
-      );
+      )];
     }
   }
 
   /// Video view wrapper
-  // Widget _videoView(view) {
-  //   return Expanded(child: Container(child: view));
-  // }
+  Widget _videoView(view) {
+    return Expanded(child: Container(child: view));
+  }
 
-  /// Video view row wrapper
-  // Widget _expandedVideoRow(final List<Widget> views) {
-  //   final wrappedViews = views.map<Widget>(_videoView).toList();
-  //   return Expanded(
-  //     child: Row(
-  //       children: wrappedViews,
-  //     ),
-  //   );
-  // }
+  //  Video view row wrapper
+  Widget _expandedVideoRow(final List<Widget> views) {
+    final wrappedViews = views.map<Widget>(_videoView).toList();
+    return Expanded(
+      child: Row(
+        children: wrappedViews,
+      ),
+    );
+  }
 
   /// Video layout wrapper
-  // Widget _viewRows() {
-  //   final views = _remoteVideo();
-  //   switch (views.length) {
-  //     case 1:
-  //       return Container(
-  //           child: Column(
-  //         children: <Widget>[_videoView(views[0])],
-  //       ));
-  //     case 2:
-  //       return Container(
-  //           child: Column(
-  //         children: <Widget>[
-  //           _expandedVideoRow([views[0]]),
-  //           _expandedVideoRow([views[1]])
-  //         ],
-  //       ));
-  //     case 3:
-  //       return Container(
-  //           child: Column(
-  //         children: <Widget>[
-  //           _expandedVideoRow(views.sublist(0, 2)),
-  //           _expandedVideoRow(views.sublist(2, 3))
-  //         ],
-  //       ));
-  //     case 4:
-  //       return Container(
-  //           child: Column(
-  //         children: <Widget>[
-  //           _expandedVideoRow(views.sublist(0, 2)),
-  //           _expandedVideoRow(views.sublist(2, 4))
-  //         ],
-  //       ));
-  //     default:
-  //   }
-  //   return Container();
-  // }
+  Widget _viewRows() {
+    final views = _remoteVideo();
+    switch (views.length) {
+      case 1:
+        return Container(
+            child: Column(
+          children: <Widget>[_videoView(views[0])],
+        ));
+      case 2:
+        return Container(
+            child: Column(
+          children: <Widget>[
+            _expandedVideoRow([views[0]]),
+            _expandedVideoRow([views[1]])
+          ],
+        ));
+      case 3:
+        return Container(
+            child: Column(
+          children: <Widget>[
+            _expandedVideoRow(views.sublist(0, 2)),
+            _expandedVideoRow(views.sublist(2, 3))
+          ],
+        ));
+      case 4:
+        return Container(
+            child: Column(
+          children: <Widget>[
+            _expandedVideoRow(views.sublist(0, 2)),
+            _expandedVideoRow(views.sublist(2, 4))
+          ],
+        ));
+      default:
+    }
+    return Container();
+  }
 
   void _onToggleMute() {
     setState(() {
@@ -284,10 +284,10 @@ class _CallScreenState extends State<CallScreen> {
       body: Center(
         child: Stack(
           children: <Widget>[
-            Center(
-              child: _remoteVideo(),
-            ),
-            // _viewRows(),
+            // Center(
+            //   child: _remoteVideo(),
+            // ),
+            _viewRows(),
             _toolbar(),
             Align(
               alignment: Alignment.topLeft,

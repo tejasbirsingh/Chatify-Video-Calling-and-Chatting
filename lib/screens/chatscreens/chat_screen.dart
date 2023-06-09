@@ -372,21 +372,21 @@ class _ChatScreenState extends State<ChatScreen>
                 toggleMenu();
                 pickFile();
               }, Colors.orange),
-              moreMenuItem(Icons.scanner, Strings.scanText, () async {
-                setState(() {
-                  isWriting = true;
-                });
-                toggleMenu();
-                parseText();
-              }, Colors.purple),
-              moreMenuItem(Icons.picture_as_pdf, Strings.textToPdf, () async {
-                toggleMenu();
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => TextRecognitionWidget(
-                //             receiverId: widget.receiver.uid)));
-              }, Colors.red),
+              // moreMenuItem(Icons.scanner, Strings.scanText, () async {
+              //   setState(() {
+              //     isWriting = true;
+              //   });
+              //   toggleMenu();
+              //   parseText();
+              // }, Colors.purple),
+              // moreMenuItem(Icons.picture_as_pdf, Strings.textToPdf, () async {
+              //   toggleMenu();
+              //   Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //           builder: (context) => TextRecognitionWidget(
+              //               receiverId: widget.receiver.uid)));
+              // }, Colors.red),
               moreMenuItem(Icons.location_on, Strings.location, () async {
                 setState(() {
                   isWriting = true;
