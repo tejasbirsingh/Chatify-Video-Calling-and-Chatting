@@ -1,37 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:chatify/screens/chatscreens/video_viewer.dart';
-
 import 'package:video_player/video_player.dart';
 
-class videoPlayer extends StatefulWidget {
+class VideoPlayerView extends StatefulWidget {
   final String url;
-
-  const videoPlayer({Key? key, required this.url}) : super(key: key);
+  const VideoPlayerView({Key? key, required this.url}) : super(key: key);
   @override
-  _videoPlayerState createState() => _videoPlayerState();
+  _VideoPlayerViewState createState() => _VideoPlayerViewState();
 }
 
-class _videoPlayerState extends State<videoPlayer> {
-  late VideoPlayerController _videoPlayerController;
+class _VideoPlayerViewState extends State<VideoPlayerView> {
+  VideoPlayerController? _videoPlayerController;
   bool _isplaying = false;
 
   @override
   void initState() {
     super.initState();
     _videoPlayerController = VideoPlayerController.network(widget.url);
-    _videoPlayerController
+    _videoPlayerController!
       ..initialize().then((_) {
-        _videoPlayerController.setLooping(false);
-
+        _videoPlayerController!.setLooping(false);
         setState(() {});
-        _videoPlayerController..addListener(() {});
+        _videoPlayerController!..addListener(() {});
       });
   }
 
   @override
   void dispose() {
-    _videoPlayerController.removeListener(() {});
-    _videoPlayerController.dispose();
+    _videoPlayerController!.removeListener(() {});
+    _videoPlayerController!.dispose();
     super.dispose();
   }
 
@@ -39,7 +36,7 @@ class _videoPlayerState extends State<videoPlayer> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _videoPlayerController.value.isInitialized
+        _videoPlayerController!.value.isInitialized
             ? GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -51,7 +48,7 @@ class _videoPlayerState extends State<videoPlayer> {
                 },
                 child: AspectRatio(
                   aspectRatio: 1 / 1,
-                  child: VideoPlayer(_videoPlayerController),
+                  child: VideoPlayer(_videoPlayerController!),
                 ),
               )
             : Container(),
@@ -70,7 +67,7 @@ class _videoPlayerState extends State<videoPlayer> {
                         size: 30.0,
                       ),
                       onPressed: () {
-                        _videoPlayerController.pause();
+                        _videoPlayerController!.pause();
                         setState(() {
                           _isplaying = false;
                         });
@@ -82,7 +79,7 @@ class _videoPlayerState extends State<videoPlayer> {
                         size: 30.0,
                       ),
                       onPressed: () {
-                        _videoPlayerController.play();
+                        _videoPlayerController!.play();
                         setState(() {
                           _isplaying = true;
                         });

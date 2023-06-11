@@ -31,41 +31,39 @@ class _TrimmerViewState extends State<TrimmerView> {
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
-    
-  Future<String> _saveVideo() async {
+  Future<void> _saveVideo(VideoUploadProvider _videoUploadProvider) async {
     setState(() {
       _progressVisibility = true;
     });
 
-    String _value = "";
-    await widget.trimmer
-        .saveTrimmedVideo(
+    await widget.trimmer.saveTrimmedVideo(
       startValue: _startValue,
       endValue: _endValue,
       videoFileName: getRandomString(15),
       onSave: (String? outputFilePath) {
         if (outputFilePath != null) {
-          _value = outputFilePath;
-          print("Output File path" + outputFilePath);
+          final File videoFile = File(outputFilePath);
+          _storageMethods.uploadVideo(
+            video: videoFile,
+            receiverId: widget.receiver,
+            senderId: widget.sender,
+            videoUploadProvider: _videoUploadProvider,
+          );
         }
+        setState(() {
+          _progressVisibility = false;
+        });
       },
-    )
-        .then((_) {
-      setState(() {
-        _progressVisibility = false;
-      });
-    });
-
-    return _value;
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     VideoUploadProvider _videoUploadProvider =
         Provider.of<VideoUploadProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
+        iconTheme: Theme.of(context).iconTheme,
         title: Text(
           Strings.videoTrimmer,
           style: Theme.of(context).textTheme.titleLarge,
@@ -83,7 +81,8 @@ class _TrimmerViewState extends State<TrimmerView> {
                 Visibility(
                   visible: _progressVisibility,
                   child: LinearProgressIndicator(
-                    backgroundColor: Colors.red,
+                    color: Colors.white,
+                    // backgroundColor: Colors.black,
                   ),
                 ),
                 Row(
@@ -93,49 +92,16 @@ class _TrimmerViewState extends State<TrimmerView> {
                       onPressed: _progressVisibility
                           ? null
                           : () async {
-                              await _saveVideo().then((outputPath) {
-                                print("Output File path in saveMethod" +
-                                    outputPath);
-                                final File videoFile = File(outputPath);
-                                print("Video File" + videoFile.path);
-                                if (videoFile.existsSync()) {
-                                  _storageMethods.uploadVideo(
-                                    video: videoFile,
-                                    receiverId: widget.receiver,
-                                    senderId: widget.sender,
-                                    videoUploadProvider: _videoUploadProvider,
-                                  );
-                                }
-                                final snackBar = SnackBar(
-                                  content:
-                                      Text(Strings.videoSavedSnackBarContent),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                                Navigator.pop(context);
-                              });
+                              await _saveVideo(_videoUploadProvider);
+                              final snackBar = SnackBar(
+                                content:
+                                    Text(Strings.videoSavedSnackBarContent),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                              Navigator.pop(context);
                             },
-                      child: Row(
-                        children: [
-                          Text(Strings.send),
-                          Icon(
-                            Icons.send,
-                            color: Colors.green,
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed: () {
-                        _storageMethods.uploadVideo(
-                          video: File(widget.trimmer.toString()),
-                          receiverId: widget.receiver,
-                          senderId: widget.sender,
-                          videoUploadProvider: _videoUploadProvider,
-                        );
-                        Navigator.pop(context);
-                      },
+                      child: Text(Strings.send),
                     ),
                   ],
                 ),
@@ -146,8 +112,11 @@ class _TrimmerViewState extends State<TrimmerView> {
                 ),
                 Center(
                   child: TrimViewer(
-                    viewerHeight: 50.0,
+                    editorProperties:
+                        TrimEditorProperties(circlePaintColor: Colors.white),
+                    viewerHeight: 80.0,
                     viewerWidth: MediaQuery.of(context).size.width,
+                    durationTextStyle: TextStyle(color: Colors.white),
                     onChangeStart: (value) {
                       setState(() {
                         _startValue = value;
@@ -170,12 +139,12 @@ class _TrimmerViewState extends State<TrimmerView> {
                   child: _isPlaying
                       ? Icon(
                           Icons.pause,
-                          size: 80.0,
+                          size: 40.0,
                           color: Colors.white,
                         )
                       : Icon(
                           Icons.play_arrow,
-                          size: 80.0,
+                          size: 40.0,
                           color: Colors.white,
                         ),
                   onPressed: () async {

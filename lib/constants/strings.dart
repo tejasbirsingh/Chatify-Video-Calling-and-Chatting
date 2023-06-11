@@ -83,7 +83,7 @@ class Strings {
   static const String settings = "Settings";
   static const String accountOptions = "Name, Profile Photo, Email, Status";
   static const String customizationSettings = "Dark Mode, App Color";
-  static const String privacy = "privacy";
+  static const String privacy = "Privacy";
   static const String privacySettings = "App Locker, Blocked Contacts";
   static const String aboutAppDetails = "Developer, version";
   static const String image = "Image";

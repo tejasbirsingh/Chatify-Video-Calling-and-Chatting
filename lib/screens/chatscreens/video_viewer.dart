@@ -8,9 +8,7 @@ import 'package:video_player/video_player.dart';
 
 class VideoPage extends StatefulWidget {
   final String url;
-
   const VideoPage({Key? key, required this.url}) : super(key: key);
-
   @override
   _VideoPageState createState() => _VideoPageState();
 }
@@ -37,7 +35,6 @@ class _VideoPageState extends State<VideoPage> {
   Future<void> downloadFile() async {
     var dir = await getExternalStorageDirectory();
     Dio dio = Dio();
-
     dio.download(widget.url, '${dir!.path}/$fileName.mp4',
         onReceiveProgress: (actualBytes, totalBytes) {
       var percentage = actualBytes / totalBytes * 100;
@@ -77,33 +74,39 @@ class _VideoPageState extends State<VideoPage> {
           children: [
             _isDownloading
                 ? Center(
+                    child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.2,
                     child: Column(
-                    children: [
-                      Text(
-                        downloadedMessage,
-                        style: TextStyle(color: Colors.white, fontSize: 20.0),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal:
-                                MediaQuery.of(context).size.width * 0.2),
-                        child: LinearProgressIndicator(
-                          value: _percentage,
-                          backgroundColor: Colors.green,
+                      children: [
+                        Text(
+                          downloadedMessage,
+                          style: TextStyle(color: Colors.white, fontSize: 20.0),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.2),
+                          child: LinearProgressIndicator(
+                            value: _percentage,
+                            backgroundColor: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
                   ))
                 : Text(""),
             SizedBox(
               height: 20,
             ),
-            ChewieListItem(
-                videoPlayerController:
-                    VideoPlayerController.network(widget.url)),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: ChewieListItem(
+                  videoPlayerController:
+                      VideoPlayerController.network(widget.url)),
+            ),
           ],
         ));
   }

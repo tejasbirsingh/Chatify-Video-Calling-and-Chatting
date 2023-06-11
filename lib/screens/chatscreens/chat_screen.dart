@@ -844,7 +844,7 @@ class _ChatScreenState extends State<ChatScreen>
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.50),
                     child: message.videoUrl != null
-                        ? videoPlayer(
+                        ? VideoPlayerView(
                             url: message.videoUrl!,
                           )
                         : Icon(Icons.sync_problem)),
@@ -1059,7 +1059,7 @@ class _ChatScreenState extends State<ChatScreen>
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: audioPlayerClass(
                       url: message.audioUrl!,
-                      isSender: false,
+                      isSender: false,  
                     )),
                 SizedBox(height: 2.0),
                 Utils.formatTime(message.timestamp!.toDate(), context),
@@ -1080,7 +1080,7 @@ class _ChatScreenState extends State<ChatScreen>
                 constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.50),
                 child: message.videoUrl != null
-                    ? videoPlayer(
+                    ? VideoPlayerView(
                         url: message.videoUrl!,
                       )
                     : Icon(Icons.sync_problem)),
