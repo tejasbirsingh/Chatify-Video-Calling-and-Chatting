@@ -1490,16 +1490,14 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Future<void> pickVideo() async {
-    final Trimmer _trimmer = Trimmer();
     final XFile? video = await ImagePicker().pickVideo(
       source: ImageSource.gallery,
       maxDuration: const Duration(minutes: 5),
     );
     if (video != null) {
-      await _trimmer.loadVideo(videoFile: File(video.path));
       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
         return TrimmerView(
-          trimmer: _trimmer,
+          file: File(video.path),
           receiver: widget.receiver.uid!,
           sender: _currentUserId!,
         );
