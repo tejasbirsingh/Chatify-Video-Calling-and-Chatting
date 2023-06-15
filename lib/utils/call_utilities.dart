@@ -33,6 +33,7 @@ class CallUtils {
       message: Strings.dialled,
       timestamp: Timestamp.now(),
       type: Constants.MESSAGE_TYPE_CALL,
+      isRead: true
     );
 
     final Log log = Log(

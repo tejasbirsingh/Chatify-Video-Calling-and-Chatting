@@ -99,7 +99,6 @@ class _SearchScreenState extends State<SearchScreen> {
         return Padding(
           padding: const EdgeInsets.only(bottom: 2.0),
           child: CustomTile(
-            icon: Icon(Icons.abc),
             mini: false,
             onTap: () {
               Navigator.push(
@@ -142,11 +141,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       size: 40.0,
                     )
                   : Icon(Icons.person_add, size: 40.0),
-              color: isFriend ? Colors.green : Theme.of(context).iconTheme.color,
+              color:
+                  isFriend ? Colors.green : Theme.of(context).iconTheme.color,
               onPressed: () {
                 if (user != null) {
                   _authMethods.addFriend(user.uid, searchedUser.uid);
-        
+
                   final snackbar = SnackBar(
                     content: Text(Strings.friendAdded),
                   );
@@ -154,7 +154,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     content: Text(Strings.alreadyAFriend),
                   );
                   isFriend
-                      ? ScaffoldMessenger.of(context).showSnackBar(snackbarFriend)
+                      ? ScaffoldMessenger.of(context)
+                          .showSnackBar(snackbarFriend)
                       : ScaffoldMessenger.of(context).showSnackBar(snackbar);
                 }
               },

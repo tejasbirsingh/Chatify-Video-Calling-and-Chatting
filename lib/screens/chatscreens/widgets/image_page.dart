@@ -7,6 +7,7 @@ import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 import 'package:chatify/utils/utilities.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:ui' as ui;
 
 class ImagePage extends StatefulWidget {
   final String imageUrl;
@@ -140,7 +141,7 @@ class _ImagePageState extends State<ImagePage> {
                     child: Column(
                     children: [
                       Text(
-                        downloadedMessage ?? '',
+                        downloadedMessage,
                         style: TextStyle(color: Colors.white, fontSize: 20.0),
                       ),
                       SizedBox(

@@ -20,7 +20,7 @@ class ChatMethods {
         .add(messageMap);
     addToContacts(senderId: message.senderId, receiverId: message.receiverId);
     await _messageCollection
-        .doc(message.receiverId!)
+        .doc(message.receiverId)
         .collection(message.senderId!)
         .add(messageMap);
   }

@@ -811,7 +811,7 @@ class _ChatScreenState extends State<ChatScreen>
                             gradient: LinearGradient(
                                 colors: [Colors.green, Colors.teal])),
                         width: MediaQuery.of(context).size.width * 0.4,
-                        child: audioPlayerClass(
+                        child: AudioPlayerView(
                           url: message.audioUrl!,
                           isSender: true,
                         )),
@@ -1057,7 +1057,7 @@ class _ChatScreenState extends State<ChatScreen>
                           Colors.blue.shade900
                         ])),
                     width: MediaQuery.of(context).size.width * 0.4,
-                    child: audioPlayerClass(
+                    child: AudioPlayerView(
                       url: message.audioUrl!,
                       isSender: false,  
                     )),

@@ -1,16 +1,17 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
-class audioPlayerClass extends StatefulWidget {
+class AudioPlayerView extends StatefulWidget {
   final String url;
   final bool isSender;
 
-  const audioPlayerClass({Key? key, required this.url, required this.isSender}) : super(key: key);
+  const AudioPlayerView({Key? key, required this.url, required this.isSender})
+      : super(key: key);
   @override
-  _audioPlayerClassState createState() => _audioPlayerClassState();
+  _AudioPlayerViewState createState() => _AudioPlayerViewState();
 }
 
-class _audioPlayerClassState extends State<audioPlayerClass> {
+class _AudioPlayerViewState extends State<AudioPlayerView> {
   AudioPlayer audioPlayer = AudioPlayer();
   Duration? totalDuration;
   Duration? position;

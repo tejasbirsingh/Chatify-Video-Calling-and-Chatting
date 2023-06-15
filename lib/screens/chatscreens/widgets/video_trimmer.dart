@@ -77,7 +77,6 @@ class _TrimmerViewState extends State<TrimmerView> {
         Provider.of<VideoUploadProvider>(context);
     return Scaffold(
       appBar: CustomAppBar(
-        // backgroundColor: Theme.of(context).bac,
         title: Text(
           Strings.videoTrimmer,
           style: Theme.of(context).textTheme.titleLarge,
