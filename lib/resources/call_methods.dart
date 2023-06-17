@@ -12,9 +12,11 @@ class CallMethods {
   Future<bool> makeCall({final Call? call}) async {
     try {
       call!.hasDialled = true;
-      final Map<String, dynamic> hasDialledMap = call.toMap(call);
+      Map<String, dynamic> hasDialledMap = call.toMap(call);
+
       call.hasDialled = false;
-      final Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+      Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+
       await callCollection.doc(call.callerId).set(hasDialledMap);
       await callCollection.doc(call.receiverId).set(hasNotDialledMap);
       return true;
@@ -30,7 +32,7 @@ class CallMethods {
       await callCollection.doc(call.receiverId).delete();
       return true;
     } catch (e) {
-      print(e);
+      print("Error occured while ending the call - " + e.toString());
       return false;
     }
   }

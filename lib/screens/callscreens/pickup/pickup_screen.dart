@@ -11,7 +11,6 @@ import 'package:chatify/screens/callscreens/call_screen.dart';
 import 'package:chatify/screens/chatscreens/widgets/cached_image.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:chatify/utils/permissions.dart';
 
 class PickupScreen extends StatefulWidget {
   final Call call;

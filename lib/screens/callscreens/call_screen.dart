@@ -20,42 +20,70 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
-  final CallMethods callMethods = CallMethods();
   int? _remoteUid;
-  UserProvider? userProvider;
-  StreamSubscription? callStreamSubscription;
-  late RtcEngine _engine;
-  static final _users = <int>[];
-  final _infoStrings = <String>[];
-  bool muted = false;
   bool _localUserJoined = false;
+  late RtcEngine _engine;
+  final CallMethods callMethods = CallMethods();
+  StreamSubscription? callStreamSubscription;
+  bool muted = false;
+  UserProvider? userProvider;
 
   @override
   void initState() {
     super.initState();
     addPostFrameCallback();
-    initializeAgora();
+    initAgora();
   }
 
-  Future<void> initializeAgora() async {
-    if (APP_ID.isEmpty) {
-      setState(() {
-        _infoStrings.add(
-          'APP_ID missing, please provide your APP_ID in settings.dart',
-        );
-        _infoStrings.add('Agora Engine is not starting');
-      });
-      return;
-    }
+  @override
+  void dispose() {
+    _engine.leaveChannel();
+    callStreamSubscription!.cancel();
+    super.dispose();
+  }
 
-    await _initAgoraRtcEngine();
+  Future<void> initAgora() async {
+    // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
-    _addAgoraEventHandlers();
-    await _engine.enableWebSdkInteroperability(true);
-    final VideoEncoderConfiguration configuration = VideoEncoderConfiguration(
-        dimensions: VideoDimensions(width: 1920, height: 1080));
-    await _engine.setVideoEncoderConfiguration(configuration);
 
+    //create the engine
+    _engine = createAgoraRtcEngine();
+    await _engine.initialize(const RtcEngineContext(
+      appId: APP_ID,
+      channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+    ));
+
+    _engine.registerEventHandler(
+      RtcEngineEventHandler(
+        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+          debugPrint("local user ${connection.localUid} joined");
+          setState(() {
+            _localUserJoined = true;
+          });
+        },
+        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+          debugPrint("remote user $remoteUid joined");
+          setState(() {
+            _remoteUid = remoteUid;
+          });
+        },
+        onUserOffline: (RtcConnection connection, int remoteUid,
+            UserOfflineReasonType reason) {
+          debugPrint("remote user $remoteUid left channel");
+          setState(() {
+            _remoteUid = null;
+          });
+        },
+        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
+          debugPrint(
+              '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
+        },
+      ),
+    );
+
+    await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+    await _engine.enableVideo();
+    await _engine.startPreview();
     await _engine.joinChannel(
         token: widget.call.callerId!,
         channelId: widget.call.channelId!,
@@ -69,7 +97,6 @@ class _CallScreenState extends State<CallScreen> {
       callStreamSubscription = callMethods
           .callStream(uid: userProvider!.getUser.uid)
           .listen((DocumentSnapshot ds) {
-        // defining the logic
         switch (ds.data()) {
           case null:
             Navigator.pop(context);
@@ -79,129 +106,6 @@ class _CallScreenState extends State<CallScreen> {
         }
       });
     });
-  }
-
-  /// Create agora sdk instance and initialize
-  Future<void> _initAgoraRtcEngine() async {
-    _engine = createAgoraRtcEngine();
-    await _engine.initialize(const RtcEngineContext(
-      appId: APP_ID,
-      channelProfile: ChannelProfileType.channelProfileCommunication,
-    ));
-    await _engine.enableVideo();
-    await _engine.startPreview();
-    await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-  }
-
-  /// Add agora event handlers
-  void _addAgoraEventHandlers() {
-    _engine.registerEventHandler(RtcEngineEventHandler(
-        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-      debugPrint("local user ${connection.localUid} joined");
-      setState(() {
-        final info =
-            'onJoinChannel: ${connection.channelId}, uid: ${connection.localUid}';
-        _infoStrings.add(info);
-        _localUserJoined = true;
-      });
-    }, onLeaveChannel: (RtcConnection connection, RtcStats rtcStats) {
-      setState(() {
-        _infoStrings.add('onLeaveChannel');
-        _users.clear();
-      });
-    }, onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-      debugPrint("remote user $remoteUid joined");
-      setState(() {
-        final info = 'userJoined: ${connection.localUid}';
-        _remoteUid = remoteUid;
-        _infoStrings.add(info);
-        _users.add(connection.localUid!);
-      });
-    }, onUserOffline: (RtcConnection connection, int remoteUid,
-            UserOfflineReasonType reason) {
-      setState(() {
-        final info = 'userOffline: ${connection.localUid}';
-        _remoteUid = null;
-        _infoStrings.add(info);
-        _users.remove(connection.localUid);
-      });
-    }, onFirstRemoteVideoFrame:
-            (RtcConnection connection, uid, width, height, elapsed) {
-      setState(() {
-        final info = 'firstRemoteVideo: $uid ${width}x $height';
-        _infoStrings.add(info);
-      });
-    }));
-  }
-
-  List<Widget> _remoteVideo() {
-    if (_remoteUid != null) {
-      return [AgoraVideoView(
-        controller: VideoViewController.remote(
-          rtcEngine: _engine,
-          canvas: VideoCanvas(uid: _remoteUid),
-          connection: RtcConnection(channelId: widget.call.channelId),
-        ),
-      )];
-    } else {
-      return [const Text(
-        'Please wait for remote user to join',
-        textAlign: TextAlign.center,
-      )];
-    }
-  }
-
-  /// Video view wrapper
-  Widget _videoView(view) {
-    return Expanded(child: Container(child: view));
-  }
-
-  //  Video view row wrapper
-  Widget _expandedVideoRow(final List<Widget> views) {
-    final wrappedViews = views.map<Widget>(_videoView).toList();
-    return Expanded(
-      child: Row(
-        children: wrappedViews,
-      ),
-    );
-  }
-
-  /// Video layout wrapper
-  Widget _viewRows() {
-    final views = _remoteVideo();
-    switch (views.length) {
-      case 1:
-        return Container(
-            child: Column(
-          children: <Widget>[_videoView(views[0])],
-        ));
-      case 2:
-        return Container(
-            child: Column(
-          children: <Widget>[
-            _expandedVideoRow([views[0]]),
-            _expandedVideoRow([views[1]])
-          ],
-        ));
-      case 3:
-        return Container(
-            child: Column(
-          children: <Widget>[
-            _expandedVideoRow(views.sublist(0, 2)),
-            _expandedVideoRow(views.sublist(2, 3))
-          ],
-        ));
-      case 4:
-        return Container(
-            child: Column(
-          children: <Widget>[
-            _expandedVideoRow(views.sublist(0, 2)),
-            _expandedVideoRow(views.sublist(2, 4))
-          ],
-        ));
-      default:
-    }
-    return Container();
   }
 
   void _onToggleMute() {
@@ -215,7 +119,7 @@ class _CallScreenState extends State<CallScreen> {
     _engine.switchCamera();
   }
 
-  /// Toolbar layout
+  // Toolbar layout
   Widget _toolbar() {
     return Container(
       alignment: Alignment.bottomCenter,
@@ -269,46 +173,60 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _users.clear();
-    _engine.leaveChannel();
-    callStreamSubscription!.cancel();
-    super.dispose();
-  }
-
+  // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            // Center(
-            //   child: _remoteVideo(),
-            // ),
-            _viewRows(),
-            _toolbar(),
-            Align(
-              alignment: Alignment.topLeft,
-              child: SizedBox(
-                width: 100,
-                height: 150,
-                child: Center(
-                  child: _localUserJoined
-                      ? AgoraVideoView(
-                          controller: VideoViewController(
-                            rtcEngine: _engine,
-                            canvas: const VideoCanvas(uid: 0),
-                          ),
-                        )
-                      : const CircularProgressIndicator(),
-                ),
+      appBar: AppBar(
+        title: const Text('Agora Video Call'),
+      ),
+      body: Stack(
+        children: [
+          _toolbar(),
+          Center(
+            child: _remoteVideo(),
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 100,
+              height: 150,
+              child: Center(
+                child: _localUserJoined
+                    ? AgoraVideoView(
+                        controller: VideoViewController(
+                          rtcEngine: _engine,
+                          canvas: const VideoCanvas(uid: 0),
+                        ),
+                      )
+                    : const CircularProgressIndicator(),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  // Display remote user's video
+  Widget _remoteVideo() {
+    if (_remoteUid != null) {
+      return AgoraVideoView(
+        controller: VideoViewController.remote(
+            rtcEngine: _engine,
+            canvas: VideoCanvas(uid: _remoteUid),
+            connection: RtcConnection(channelId: widget.call.channelId)),
+      );
+    } else {
+      return Text(
+        'Please wait for remote user to join. CallerId - ' +
+            widget.call.callerId! +
+            ", ReceiverId - " +
+            widget.call.receiverId! +
+            ", ChannelId - " +
+            widget.call.channelId!,
+        textAlign: TextAlign.center,
+      );
+    }
   }
 }
