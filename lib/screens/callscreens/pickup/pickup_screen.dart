@@ -96,6 +96,28 @@ class _PickupScreenState extends State<PickupScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(60.0),
+                    ),
+                    child: GestureDetector(
+                      onTap: () async {
+                        FlutterRingtonePlayer.stop();
+                        isCallMissed = false;
+                        addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                        await callMethods.endCall(call: widget.call);
+                      },
+                      child: Container(
+                        width: 70.0,
+                        height: 70.0,
+                        child: FlareActor(
+                          "assets/call_end.flr",
+                          animation: 'Record2',
+                        ),
+                      ),
+                    )),
+                SizedBox(width: 35),
+                Container(
                   decoration: BoxDecoration(
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(60.0),
@@ -125,28 +147,6 @@ class _PickupScreenState extends State<PickupScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 35),
-                Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(60.0),
-                    ),
-                    child: GestureDetector(
-                      onTap: () async {
-                        FlutterRingtonePlayer.stop();
-                        isCallMissed = false;
-                        addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
-                        await callMethods.endCall(call: widget.call);
-                      },
-                      child: Container(
-                        width: 70.0,
-                        height: 70.0,
-                        child: FlareActor(
-                          "assets/call_end.flr",
-                          animation: 'Record2',
-                        ),
-                      ),
-                    )),
               ],
             ),
           ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class CustomTile extends StatelessWidget {
   final Widget? leading;
   final Widget? title;
@@ -38,7 +37,7 @@ class CustomTile extends StatelessWidget {
               color: Colors.grey,
               blurRadius: 0.5,
               spreadRadius: 0.0,
-              offset: Offset(0.5, 0.5), 
+              offset: Offset(0.5, 0.5),
             )
           ],
         ),
@@ -53,10 +52,7 @@ class CustomTile extends StatelessWidget {
                 margin: EdgeInsets.only(left: mini ? 10 : 15),
                 padding: EdgeInsets.symmetric(vertical: mini ? 3 : 20),
                 decoration:
-                    BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0)
-                      
-                        ),
+                    BoxDecoration(borderRadius: BorderRadius.circular(20.0)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[

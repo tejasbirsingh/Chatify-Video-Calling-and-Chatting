@@ -10,6 +10,9 @@ import 'package:chatify/models/call.dart';
 import 'package:chatify/provider/user_provider.dart';
 import 'package:chatify/resources/call_methods.dart';
 
+/*
+ * Screen responsible for displaying ongoing video call. 
+ */
 class CallScreen extends StatefulWidget {
   final Call call;
   CallScreen({
@@ -59,6 +62,7 @@ class _CallScreenState extends State<CallScreen> {
           debugPrint("local user ${connection.localUid} joined");
           setState(() {
             _localUserJoined = true;
+            print("Local user joined");
           });
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
